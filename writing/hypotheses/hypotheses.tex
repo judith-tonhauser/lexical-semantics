@@ -1,0 +1,139 @@
+\documentclass[11pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[colorlinks = true,
+		linkcolor=black,
+		citecolor=black,
+	        urlcolor  = black]{hyperref}
+%\usepackage[dvips]{graphics}
+%\usepackage[table]{xcolor}
+%\usepackage{amssymb}
+\usepackage{float}
+%\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{multicol}
+\usepackage{txfonts}
+\usepackage{amsfonts}
+\usepackage{natbib}
+
+\usepackage{multirow}
+
+\usepackage{gb4e}
+\usepackage[all]{xy}
+\usepackage{rotating}
+\usepackage{tipa}
+\usepackage{multirow}
+\usepackage{authblk}
+\usepackage{url}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{adjustbox}
+\usepackage{array}
+
+\usepackage{dcolumn} % for printing model output tables directly from R
+
+
+%\usepackage{color}
+%\DeclareOuterCiteDelims{cite}{\textcolor{green}{\bibopenbracket}}{\textcolor{red}{\bibclosebracket}}
+
+\definecolor{Pink}{RGB}{255,50,170}
+\newcommand{\jd}[1]{\textcolor{Pink}{[jd: #1]}}  
+
+\newcommand{\jt}[1]{\textbf{\color{purple}JT: #1}}
+
+\newcommand{\tableref}[1]{Tab.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+
+\def\bad{{\leavevmode\llap{*}}}
+\def\marginal{{\leavevmode\llap{?}}}
+\def\verymarginal{{\leavevmode\llap{??}}}
+\def\swmarginal{{\leavevmode\llap{4}}}
+\def\infelic{{\leavevmode\llap{\#}}}
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+%\definecolor{gray}{rgb}{0.36, 0.54, 0.66}
+
+\newcommand{\dashrule}[1][black]{%
+  \color{#1}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}\xleaders\hbox{\rule{4pt}{0pt}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}}\hfill\kern0pt%
+}
+
+\setlength{\parindent}{.3in}
+\setlength{\parskip}{0ex}
+
+\newcommand{\yi}{\'{\symbol{16}}}
+\newcommand{\nasi}{\~{\symbol{16}}}
+\newcommand{\hina}{h\nasi na}
+\newcommand{\ina}{\nasi na}
+
+\newcommand{\foc}{$_{\mbox{\small F}}$}
+
+\hyphenation{par-ti-ci-pa-tion}
+
+%\setlength{\bibhang}{0.5in}
+%\setlength{\bibsep}{0mm}
+%\bibpunct[:]{(}{)}{,}{a}{}{,}
+
+\newcommand{\6}{\mbox{$[\hspace*{-.6mm}[$}} 
+\newcommand{\9}{\mbox{$]\hspace*{-.6mm}]$}}
+\newcommand{\sem}[2]{\6#1\9$^{#2}$}
+\renewcommand{\ni}{\~{\i}}
+
+\newcommand{\citepos}[1]{\citeauthor{#1}'s \citeyear{#1}}
+\newcommand{\citeposs}[1]{\citeauthor{#1}'s}
+\newcommand{\citetpos}[1]{\citeauthor{#1}'s \citeyear{#1}}
+
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{90}{0em}}}% no optional argument here, please!
+
+\title{Hypotheses}
+
+\author{YK and JT}
+
+%\author[$\bullet$]{Judith Degen}
+%\author[$\circ$]{Judith Tonhauser}
+%
+%\affil[$\bullet$]{Stanford University}
+%\affil[$\circ$]{University of Stuttgart}
+%
+%\renewcommand\Authands{ and }
+
+\begin{document}
+
+\maketitle
+
+\citealt{kiparsky-kiparsky70}
+
+\begin{exe}
+\ex here is a first example
+\ex here is another one
+\begin{xlist}
+\ex another
+\ex one
+\end{xlist}
+\end{exe}
+
+\section{H1: Emotive vs.\ doxastic vs.\ communicative vs.\ inferential}
+
+Here we test the hypothesis that...
+
+\subsection{test}
+
+\subsubsection{test}
+
+\bibliographystyle{../cslipubs-natbib}
+\bibliography{../bibliography}
+
+
+\end{document}
