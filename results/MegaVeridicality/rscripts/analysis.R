@@ -55,6 +55,9 @@ inferential = c("anticipate", "calculate", "compute", "conclude", "conjecture", 
                 "reason", "reason_out", "verify")
 length(inferential) #20
 
+d$communicative = d$verb
+d$communicative = case_when(...weak...strong...not)
+
 # chose here for plotting
 all_verbs <- c(emotive,cognitive,communicative,inferential,evidential)
 #all_verbs <- c(evidential)
