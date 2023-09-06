@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  14 AUG 2023 15:47
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  6 SEP 2023 16:08
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1240,42 +1240,46 @@ LaTeX Font Info:    Try loading font information for U+txsyc on input line 112.
 File: utxsyc.fd 2000/12/15 v3.1
 )
 Package xypdf Info: Line width: 0.61319pt on input line 112.
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 132.
 
-(./hypotheses.bbl) [1
 
-{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 149.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 149.
+(/usr/local/texlive/2016/texmf-dist/tex/latex/txfonts/omstxr.fd
+File: omstxr.fd 2000/12/15 v3.1
+)
+LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 132.
+ [1
+
+{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./hypo
+theses.bbl)
+[2]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 207.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 207.
  (./hypotheses.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 149.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 149.
-
-
-Package rerunfilecheck Warning: File `hypotheses.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `hypotheses.out':
-(rerunfilecheck)             Before: C0E81638BA546C2AF2CCCB4796272B17;644
-(rerunfilecheck)             After:  DA3702DFAAFD2FED5C8D6EE174E4857F;260.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 149.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 207.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 207.
+Package rerunfilecheck Info: File `hypotheses.out' has not changed.
+(rerunfilecheck)             Checksum: DA3702DFAAFD2FED5C8D6EE174E4857F;260.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 207.
  ) 
 Here is how much of TeX's memory you used:
- 24133 strings out of 493014
- 413767 string characters out of 6133351
- 528780 words of memory out of 5000000
- 27146 multiletter control sequences out of 15000+600000
+ 24161 strings out of 493014
+ 414203 string characters out of 6133351
+ 531810 words of memory out of 5000000
+ 27170 multiletter control sequences out of 15000+600000
  30114 words of font info for 80 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 55i,5n,54p,3242b,323s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 55i,5n,54p,3242b,611s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2016/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/201
-6/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-di
-st/fonts/type1/urw/times/utmri8a.pfb>
-Output written on hypotheses.pdf (1 page, 34598 bytes).
+exlive/2016/texmf-dist/fonts/type1/public/txfonts/rtxr.pfb></usr/local/texlive/
+2016/texmf-dist/fonts/type1/public/txfonts/txsy.pfb></usr/local/texlive/2016/te
+xmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2016/texmf-dist/f
+onts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1
+/urw/times/utmri8a.pfb>
+Output written on hypotheses.pdf (2 pages, 41858 bytes).
 PDF statistics:
- 58 PDF objects out of 1000 (max. 8388607)
- 51 compressed objects within 1 object stream
- 13 named destinations out of 1000 (max. 500000)
+ 70 PDF objects out of 1000 (max. 8388607)
+ 60 compressed objects within 1 object stream
+ 14 named destinations out of 1000 (max. 500000)
  45 words of extra memory for PDF output out of 10000 (max. 10000000)
 
