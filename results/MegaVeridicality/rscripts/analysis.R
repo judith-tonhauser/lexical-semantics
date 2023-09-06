@@ -22,6 +22,14 @@ names(d)
 
 # H1: emotive vs... ----
 
+# load codings by judith and yvonne
+j = read.csv("../data/judith-coding.csv")
+nrow(j)
+y = read.csv("../data/yvonne-coding.csv")
+nrow(y)
+
+# communicative vs privative (cognitive, evidential, emotive)
+
 table(d$verb)
 
 evidential = c("discover", "dream", "establish", "feel", "figure_out", "figure", "find_out",
