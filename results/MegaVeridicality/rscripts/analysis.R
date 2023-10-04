@@ -17,155 +17,134 @@ theme_set(theme_bw())
 # load data
 d = read.csv("../data/d.csv")
 nrow(d) #21692
-
 names(d)
 
-# H1: emotive vs... ----
+# load predicate coding
+y = read.csv("../data/predicate-coding.csv")
+nrow(y) #544
+names(y)
 
-# load codings by judith and yvonne
-j = read.csv("../data/judith-coding.csv")
-nrow(j)
-y = read.csv("../data/yvonne-coding.csv")
-nrow(y)
+d = left_join(d,y,by=c("verb","voice"))
+nrow(d) #21692
 
-# communicative vs privative (cognitive, evidential, emotive)
+# create datasets for projection and veridicality inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) #16291
+d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "conditional"))
+nrow(d.verid) #5401
 
-table(d$verb)
+# H1: communicative / emotive / cognitive / evidential ----
 
-evidential = c("discover", "dream", "establish", "feel", "figure_out", "figure", "find_out",
-               "generalize", "hallucinate", "hear", "imagine", "infer", "learn", "listen", 
-               "notice", "observe", "overhear", "perceive", "piece_together", "realize",
-               "reason_out", "recognize", "see")
+# create predicateType column
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                 emotive == "yes" ~ "emotive",
+                                 cognitive == "yes" ~ "cognitive",
+                                 evidential == "yes" ~ "evidential",
+                                 TRUE ~ "other"))
+table(d.proj$predicateType)
 
-emotive = c("trust", "desire", "fear", "worry", "mourn", "grieve", "frighten", "envy", "scare", "anger",
-            "freak_out", "frustrate", "petrify", "puzzle", "regret", "devastate", "disappoint", "embitter", "shame",
-            "dismay", "be annoyed", "content", "detest", "disturb", "hate", "traumatize", "enjoy", "embarrass",
-            "irritate", "amuse", "elate", "love", "pain", "upset", "bother", "resent")
-length(emotive) #37
+# how many predicates in which type and which voice?
+d.proj %>% 
+  select(predicateType, verb,voice) %>% 
+  unique() %>% 
+  group_by(predicateType,voice) %>% 
+  summarize(count=n())
 
-cognitive = c("feel", "presuppose", "think", "believe", "suppose", "find", "discover", "see", "remember", "know", "comprehend",
-              "conceive", "contemplate", "disbelieve", "dispute", "doubt", "estimate", "gather", "find_out", 
-              "learn", "maintain", "notice", "realize", "recognize", "rediscover", "reveal", "see", "hear",
-              "understand", "assume")
-length(cognitive) #29
+# color code the predicates
+cols = d.proj %>%
+  select(c(verb,predicateType)) %>%
+  distinct(verb,predicateType)
+nrow(cols) #538
 
-communicative = c("add", "advise", "alert", "argue", "announce", "assert", "assure", "babble", "bark", "cackle", "claim", 
-                  "communicate", "comment", "confess", "confirm", "convey", "declare", "discuss", "elaborate", "email",
-                  "express", "fax", "gab", "gloat", "gossip", "growl", "grunt", "gush", "hint", "inform", "insist", 
-                  "lecture", "lie", "maintain", "mention", "mutter", "narrate", "note", "phone", "publicize", "publish",
-                  "quip", "quote", "rant", "reassert", "recap", "reiterate", "repeat", "report", "say", "sing", "sob",
-                  "state", "stress", "tell", "underline", "utter", "vow", "warn", "weep", "whimper", "whine", "whisper",
-                  "wow", "yell")
-length(communicative) #64
+# color-code the predicates
+cols$Colors =  ifelse(cols$predicateType == "comPriv", "pink",
+                      ifelse(cols$predicateType == "emotive", "#D55E00", 
+                          ifelse(cols$predicateType == "cognitive", "#5b43c4", 
+                             ifelse(cols$predicateType == "communicative", "gray", 
+                                    ifelse(cols$predicateType == "inferential", "green", "black")))))
+cols
 
-inferential = c("anticipate", "calculate", "compute", "conclude", "conjecture", "deduce", "derive", "establish", "estimate",
-                "expect", "figure", "figure_out", "generalize", "infer", "piece_together", "pinpoint", "predict",
-                "reason", "reason_out", "verify")
-length(inferential) #20
 
-d$communicative = d$verb
-d$communicative = case_when(...weak...strong...not)
+# calculate by-predicateType means 
+mean.proj = d.proj %>%
+  #filter(voice == "active") %>%
+  group_by(predicateType,voice) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+mean.proj
+nrow(mean.proj) #375
+levels(mean.proj$predicateType)
 
-# chose here for plotting
-all_verbs <- c(emotive,cognitive,communicative,inferential,evidential)
-#all_verbs <- c(evidential)
-all_verbs
-length(unique(all_verbs)) #148
+ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = voice)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
+  geom_hline(yintercept=0) +
+  theme(axis.ticks.x=element_blank(),legend.position="top") +
+  theme(axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  ylab("Mean projection rating") +
+  xlab("Predicate")
+ggsave("../graphs/projection-by-predicateType.pdf",height=4,width=5)
 
-# restrict data to verbs in all_verbs and to embedding under entailment-canceling operator
-d.h1 <- droplevels(subset(d, d$verb %in% all_verbs))
-d.h1 <- droplevels(subset(d.h1, d.h1$polarity == "negative"))
-
-# by-predicate means
-mean.proj = d.h1 %>%
+# calculate by-predicate means 
+mean.proj = d.proj %>%
   group_by(verb) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb = fct_reorder(as.factor(verb),Mean.Proj))
 mean.proj
+nrow(mean.proj) #517
+levels(mean.proj$verb)
 
-# mean.verid = d.verid %>%
-#   group_by(verb) %>%
-#   summarize(Mean.Verid = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-#   mutate(YMin.Verid = Mean.Verid - CILow, YMax.Verid = Mean.Verid + CIHigh, verb = fct_reorder(as.factor(verb),mean.proj$Mean.Proj))
+# add predicateType to the means
+tmp = d.proj %>%
+  #filter(voice == "active") %>%
+  select(c(verb,predicateType)) %>%
+  distinct(verb,predicateType)
+nrow(tmp) #538 (some verbs have multiple predicate types)
 
-nrow(mean.proj)
-nrow(mean.verid)
-levels(mean.proj$verb) # ordered by mean, not alphabetically
+mean.proj = left_join(mean.proj, tmp, by = c("verb")) %>%
+  distinct() %>%
+  mutate(verb = fct_reorder(as.factor(verb),Mean.Proj))
+nrow(mean.proj) #538
 
-# # by-type mean
-# d$type = as.factor(
-#   ifelse(d$verb %in% cognitive, "cognitive", 
-#          ifelse(d$verb %in% emotive, "emotive", 
-#                 ifelse(d$verb %in% inferential, "inferential", "communicative"))))
-# 
-# table(d$type)
-# summary(d)
-# 
-# mean.type = d %>%
-#   group_by(type) %>%
-#   summarize(Mean = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-#   mutate(YMin = Mean - CILow, YMax = Mean + CIHigh, type = fct_reorder(as.factor(type),Mean))
-# 
-# nrow(mean.type) #4
-
-# color code the verbs
-cols = data.frame(verb=levels(mean.proj$verb))
-cols
-nrow(cols)
-
-cols$type = as.factor(
-  ifelse(cols$verb %in% cognitive, "cognitive", 
-         ifelse(cols$verb %in% emotive, "emotive", 
-                ifelse(cols$verb %in% inferential, "inferential", 
-                       ifelse(cols$verb %in% communicative, "communicative", "evidential")))))
-cols
-table(cols$type)
-
-cols$Colors =  ifelse(cols$type == "emotive", "#D55E00", 
-                      ifelse(cols$type == "cognitive", "#5b43c4", 
-                             ifelse(cols$type == "communicative", "gray", 
-                                    ifelse(cols$type == "inferential", "green", "black"))))
-cols
-
-# add type to the dataset
-mean.proj$type = as.factor(
-  ifelse(mean.proj$verb %in% cognitive, "cognitive", 
-         ifelse(mean.proj$verb %in% emotive, "emotive", 
-                ifelse(mean.proj$verb %in% inferential, "inferential", 
-                       ifelse(mean.proj$verb %in% "communicative", "communicative", "evidential")))))
-
-# mean.verid$type = as.factor(
-#   ifelse(mean.verid$verb %in% cognitive, "cognitive", 
-#          ifelse(mean.verid$verb %in% emotive, "emotive", 
-#                 ifelse(mean.verid$verb %in% inferential, "inferential", 
-#                        ifelse(mean.verid$verb %in% "communicative", "communicative", "evidential")))))
+cols$verb = factor(cols$verb, levels = mean.proj$verb[order(mean.proj$Mean.Proj)], ordered = TRUE)
 
 
-mean.proj$Colors =  ifelse(mean.proj$type == "emotive", "#D55E00", 
-                           ifelse(mean.proj$type == "cognitive", "#5b43c4", 
-                                  ifelse(mean.proj$type == "communicative", "gray", 
-                                         ifelse(mean.proj$type == "inferential", "green", "black"))))
+# remove "other" and "comPriv" predicates
+mean.proj = mean.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj) #519
 
-# mean.verid$Colors =  ifelse(mean.verid$type == "emotive", "#D55E00", 
-#                             ifelse(mean.verid$type == "cognitive", "#5b43c4", 
-#                                    ifelse(mean.verid$type == "communicative", "gray", 
-#                                           ifelse(mean.verid$type == "inferential", "green", "black"))))
-
-names(mean.proj)
-ggplot(mean.proj, aes(x=verb, y=Mean.Proj,fill = type,color = type)) +
+ggplot(mean.proj, aes(x=verb, y=Mean.Proj, fill = predicateType, color = predicateType)) +
   geom_point() +
-  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  #scale_color_manual(values = colors) +
-  #geom_line(aes(color=type), size=.5) + 
-  geom_hline(yintercept=.3) +
+  #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
+  geom_hline(yintercept=0) +
   theme(axis.ticks.x=element_blank(),legend.position="top") +
-  #theme(axis.text.x = element_text(face = ifelse(levels(means$verb) %in% our_preds,"bold","plain"))) +
-  theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
+  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major.x = element_blank()) +
   scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
-ggsave("../graphs/veridicality-by-predicate-and-type.pdf",height=4,width=13)
-ggsave("../graphs/projection-for-evidential.pdf",height=4,width=13)
+ggsave("../graphs/projection-by-predicatel.pdf",height=4,width=13)
+
+ggplot(mean.proj, aes(x=verb, y=Mean.Proj, fill = predicateType, color = predicateType)) +
+  geom_point() +
+  #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
+  geom_hline(yintercept=0) +
+  theme(axis.ticks.x=element_blank(),legend.position="top") +
+  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major.x = element_blank()) +
+  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  facet_grid(. ~ predicateType) +
+  ylab("Mean projection rating") +
+  xlab("Predicate")
+ggsave("../graphs/projection-faceted-by-predicatel.pdf",height=4,width=13)
 
 ##  end of script for now
 

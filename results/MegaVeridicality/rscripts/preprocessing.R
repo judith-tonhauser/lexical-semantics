@@ -16,8 +16,6 @@ library(ggrepel)
 # set the background of figures to white
 theme_set(theme_bw())
 
-## preprocessing ----
-
 # load raw data
 # d: judgments of "did that thing happen?" for positive and negated predicates with "that" complements
 d = read.csv("../data/mega-veridicality-v1/mega-veridicality-v1.csv")
@@ -53,12 +51,6 @@ table(d$veridicality)
 table(d$veridicality_num)
 
 table(d$verb)
-
-#factives <- c("discover", "know", "reveal", "see", "amuse", "annoy", "find_out", "forget", "learn",
-#              "love", "notice", "realize", "recognize", "regret", "remember", "reveal", "understand")
-
-# create items for d 
-
 table(d$verb) #verb
 table(d$frame) #only that_S
 table(d$voice) #active, passive
