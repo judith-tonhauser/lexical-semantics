@@ -34,6 +34,7 @@ d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "cond
 nrow(d.verid) #5401
 
 # H1: communicative / emotive / cognitive / evidential ----
+view(d.proj)
 
 # create predicateType column
 d.proj = d.proj %>%
@@ -46,7 +47,7 @@ d.proj = d.proj %>%
 table(d.proj$predicateType)
 
 # how many predicates in which type and which voice?
-d.proj %>% 
+d.proj %>%
   select(predicateType, verb,voice) %>% 
   unique() %>% 
   group_by(predicateType,voice) %>% 
@@ -56,6 +57,7 @@ d.proj %>%
 cols = d.proj %>%
   select(c(verb,predicateType)) %>%
   distinct(verb,predicateType)
+cols
 nrow(cols) #538
 
 # color-code the predicates
@@ -110,7 +112,6 @@ mean.proj = left_join(mean.proj, tmp, by = c("verb")) %>%
 nrow(mean.proj) #538
 
 cols$verb = factor(cols$verb, levels = mean.proj$verb[order(mean.proj$Mean.Proj)], ordered = TRUE)
-
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
