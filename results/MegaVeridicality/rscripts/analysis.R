@@ -55,10 +55,10 @@ d.proj %>%
 
 # color code the predicates
 cols = d.proj %>%
-  select(c(verb,predicateType)) %>%
-  distinct(verb,predicateType)
+  select(c(verb_renamed,predicateType)) %>%
+  distinct(verb_renamed,predicateType)
 cols
-nrow(cols) #538
+nrow(cols) #544
 
 # color-code the predicates
 cols$Colors =  ifelse(cols$predicateType == "comPriv", "pink",
@@ -69,22 +69,23 @@ cols$Colors =  ifelse(cols$predicateType == "comPriv", "pink",
 cols
 
 
-# calculate by-predicateType means 
+# calculate by-predicateType means
 mean.proj = d.proj %>%
   #filter(voice == "active") %>%
   group_by(predicateType,voice) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
 mean.proj
-nrow(mean.proj) #375
+nrow(mean.proj) #10
 levels(mean.proj$predicateType)
 
 ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = voice)) +
   geom_point() +
   geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
   geom_hline(yintercept=0) +
-  theme(axis.ticks.x=element_blank(),legend.position="top") +
-  theme(axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
+  theme(legend.position="top",
+        axis.ticks.x=element_blank(),
+        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
   scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
@@ -92,60 +93,134 @@ ggsave("../graphs/projection-by-predicateType.pdf",height=4,width=5)
 
 # calculate by-predicate means 
 mean.proj = d.proj %>%
-  group_by(verb) %>%
+  group_by(verb_renamed) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb = fct_reorder(as.factor(verb),Mean.Proj))
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
-nrow(mean.proj) #517
-levels(mean.proj$verb)
+nrow(mean.proj) #544
+levels(mean.proj$verb_renamed)
 
-# add predicateType to the means
+# add predicateType, verb and voice to the means
 tmp = d.proj %>%
   #filter(voice == "active") %>%
-  select(c(verb,predicateType)) %>%
-  distinct(verb,predicateType)
-nrow(tmp) #538 (some verbs have multiple predicate types)
+  select(c(verb,verb_renamed,voice,predicateType)) %>%
+  distinct(verb,verb_renamed,voice,predicateType)
+nrow(tmp) #544
 
-mean.proj = left_join(mean.proj, tmp, by = c("verb")) %>%
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
-  mutate(verb = fct_reorder(as.factor(verb),Mean.Proj))
-nrow(mean.proj) #538
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj) #544
 
-cols$verb = factor(cols$verb, levels = mean.proj$verb[order(mean.proj$Mean.Proj)], ordered = TRUE)
+cols$verb_renamed = factor(cols$verb_renamed, levels = mean.proj$verb_renamed[order(mean.proj$Mean.Proj)], ordered = TRUE)
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) #519
+nrow(mean.proj) #525
 
-ggplot(mean.proj, aes(x=verb, y=Mean.Proj, fill = predicateType, color = predicateType)) +
+ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color = predicateType)) +
   geom_point() +
   #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
   geom_hline(yintercept=0) +
-  theme(axis.ticks.x=element_blank(),legend.position="top") +
-  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
-  theme(axis.text.x=element_blank(),
+  theme(legend.position="top",
+        axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
         panel.grid.major.x = element_blank()) +
+  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
   scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
 ggsave("../graphs/projection-by-predicatel.pdf",height=4,width=13)
 
-ggplot(mean.proj, aes(x=verb, y=Mean.Proj, fill = predicateType, color = predicateType)) +
+ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color = predicateType)) +
   geom_point() +
   #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
   geom_hline(yintercept=0) +
-  theme(axis.ticks.x=element_blank(),legend.position="top") +
-  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
-  theme(axis.text.x=element_blank(),
+  theme(legend.position="top",
+        axis.text.x=element_blank(),
         axis.ticks.x=element_blank(),
         panel.grid.major.x = element_blank()) +
+  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
   scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
   facet_grid(. ~ predicateType) +
   ylab("Mean projection rating") +
   xlab("Predicate")
 ggsave("../graphs/projection-faceted-by-predicatel.pdf",height=4,width=13)
+
+# only "emotive" predicates
+mean.proj = mean.proj %>%
+  filter(predicateType == "emotive")
+nrow(mean.proj) #150
+
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = voice)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  scale_colour_discrete(name = element_blank(), 
+                        labels = c("verbal predicate", "adjectival predicate")) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
+  ylab("Mean projection rating") +
+  xlab("Emotive predicate")
+ggsave("../graphs/projection-emotive-predicates.pdf", height = 4, width = 8)
+
+# only emotives which occur in both "active" and "passive" sentence frames
+mean.proj = mean.proj %>%
+  group_by(verb) %>%
+  filter(n()>1) %>%
+  ungroup()
+nrow(mean.proj) #12
+
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = voice)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  scale_colour_discrete(name = element_blank(), 
+                        labels = c("verbal predicate", "adjectival predicate")) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+        panel.grid.major.x = element_blank()) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
+  ylab("Mean projection rating") +
+  xlab("Emotive predicate")
+ggsave("../graphs/projection-emotives-both-verb-and-adjective.pdf", height = 4, width = 8)
+
+ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj,ymax = YMax.Proj), width = 0) +
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.text.x = element_text(vjust = 1, hjust = 0.5),
+        panel.grid.major.x = element_blank()) +
+  scale_colour_discrete(name = element_blank(), 
+                        labels = c("verbal predicate", "adjectival predicate")) +
+  scale_x_discrete(labels = function(x) sub("_", " ", x)) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
+  ylab("Mean projection rating") +
+  xlab("Emotive predicate")
+ggsave("../graphs/projection-emotives-verb-adjective-comparison.pdf", height = 4,width = 8)
+
+# only verbal predicates
+## based on mean.proj as created by lines 95-120!!!
+mean.proj = mean.proj %>%
+  filter(!(mean.proj$predicateType == "emotive" & mean.proj$voice == "passive"))
+nrow(mean.proj) #402
+
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  scale_colour_discrete(name = "Predicate type") +  
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
+  ylab("Mean projection rating") +
+  xlab("Verbal predicate")
+ggsave("../graphs/projection-by-verbal-predicate.pdf", height = 4, width = 13)
+
 
 ##  end of script for now
 
