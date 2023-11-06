@@ -91,7 +91,7 @@ ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = voice)) +
   xlab("Predicate")
 ggsave("../graphs/projection-by-predicateType.pdf",height=4,width=5)
 
-# calculate by-predicate means 
+# calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
@@ -174,19 +174,6 @@ mean.proj = mean.proj %>%
   ungroup()
 nrow(mean.proj) #12
 
-ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = voice)) +
-  geom_point() +
-  geom_hline(yintercept = 0) +
-  scale_colour_discrete(name = element_blank(), 
-                        labels = c("verbal predicate", "adjectival predicate")) +
-  theme(legend.position = "top",
-        axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
-        panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
-  ylab("Mean projection rating") +
-  xlab("Emotive predicate")
-ggsave("../graphs/projection-emotives-both-verb-and-adjective.pdf", height = 4, width = 8)
-
 ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Proj,ymax = YMax.Proj), width = 0) +
@@ -203,7 +190,7 @@ ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
 ggsave("../graphs/projection-emotives-verb-adjective-comparison.pdf", height = 4,width = 8)
 
 # only verbal predicates
-## based on mean.proj as created by lines 95-120!!!
+## !!!!! based on mean.proj as defined in lines 95-120 !!!!!
 mean.proj = mean.proj %>%
   filter(!(mean.proj$predicateType == "emotive" & mean.proj$voice == "passive"))
 nrow(mean.proj) #402
@@ -220,6 +207,68 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) 
   ylab("Mean projection rating") +
   xlab("Verbal predicate")
 ggsave("../graphs/projection-by-verbal-predicate.pdf", height = 4, width = 13)
+
+
+
+
+# calculate by-predicate veridicality means 
+mean.verid = d.verid %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Verid = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Verid = Mean.Verid - CILow, YMax.Verid = Mean.Verid + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Verid))
+mean.verid
+nrow(mean.verid) #544
+levels(mean.verid$verb_renamed)
+
+## !!!!! based on mean.proj as defined in line 95-112 !!!!!
+mean.proj.verid = mean.proj %>%
+  inner_join(mean.verid,by=("verb_renamed"))
+
+# remove "other" and "comPriv" predicates
+mean.proj.verid = mean.proj.verid %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj.verid) #525
+
+
+# Mean projection by mean veridicality
+
+ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj)) +
+  geom_point(shape=21) +
+  geom_errorbarh(aes(xmin=YMin.Verid,xmax=YMax.Verid),alpha=.8,color="gray") +
+  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),alpha=.8,color="gray") +
+  geom_abline(intercept=0,slope=1, color="gray", linetype="dashed") +
+  xlab("Mean veridicality rating") +
+  ylab("Mean projection rating") +
+  scale_y_continuous(limits = c(0,1),breaks = c(0,0.2,0.4,0.6,0.8,1.0), labels= c("0",".2",".4",".6",".8","1")) +
+  scale_x_continuous(limits = c(0,1),breaks = c(0,0.2,0.4,0.6,0.8,1.0), labels= c("0",".2",".4",".6",".8","1")) +
+  coord_fixed(ratio = 1) +
+  theme(legend.position = "none", axis.title.x = element_text(color="black", size=14), axis.title.y = element_text(color="black", size=14))
+# Warning messages:
+# 1: Removed 37 rows containing missing values (`geom_point()`). 
+# 2: Removed 78 rows containing missing values (`geom_errorbarh()`). 
+
+
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    x = "Mean veridicality rating", y = "Mean projection rating",
+    color = "Predicate type") +
+  theme(legend.position = "top") +
+  coord_fixed(ratio = 1)
+ggsave("../graphs/projection-by-veridicality.pdf", height = 4,width = 8)
+
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
+  geom_point() +
+  geom_smooth(method = "lm", color = "black", linewidth = 0.5) +
+  labs(
+    x = "Mean veridicality rating", y = "Mean projection rating",
+    color = "Predicate type") +
+  theme(panel.grid = element_blank(),
+        legend.position = "none") +
+  coord_fixed(ratio = 1) + 
+  facet_wrap(~predicateType)
+ggsave("../graphs/projection-by-veridicality2.pdf", height = 4,width = 8)
 
 
 ##  end of script for now
