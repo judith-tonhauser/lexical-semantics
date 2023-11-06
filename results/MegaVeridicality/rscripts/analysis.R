@@ -33,8 +33,10 @@ nrow(d.proj) #16291
 d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "conditional"))
 nrow(d.verid) #5401
 
-# H1: communicative / emotive / cognitive / evidential ----
-view(d.proj)
+# H1: The lexical meaning of the predicate matters ----
+# We find that emotive predicates project more (by and large) than cognitive, evidential and communicative ones.
+# Potential confound: stative vs eventive
+#view(d.proj)
 
 # create predicateType column
 d.proj = d.proj %>%
@@ -72,14 +74,14 @@ cols
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   #filter(voice == "active") %>%
-  group_by(predicateType,voice) %>%
+  group_by(predicateType) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
 mean.proj
 nrow(mean.proj) #10
 levels(mean.proj$predicateType)
 
-ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = voice)) +
+ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, group = dynamicity)) +
   geom_point() +
   geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
   geom_hline(yintercept=0) +
@@ -209,8 +211,6 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) 
 ggsave("../graphs/projection-by-verbal-predicate.pdf", height = 4, width = 13)
 
 
-
-
 # calculate by-predicate veridicality means 
 mean.verid = d.verid %>%
   group_by(verb_renamed) %>%
@@ -223,6 +223,7 @@ levels(mean.verid$verb_renamed)
 ## !!!!! based on mean.proj as defined in line 95-112 !!!!!
 mean.proj.verid = mean.proj %>%
   inner_join(mean.verid,by=("verb_renamed"))
+mean.proj.verid
 
 # remove "other" and "comPriv" predicates
 mean.proj.verid = mean.proj.verid %>%
@@ -232,20 +233,18 @@ nrow(mean.proj.verid) #525
 
 # Mean projection by mean veridicality
 
-ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj)) +
+ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj, group = predicateType)) +
   geom_point(shape=21) +
+  geom_smooth(method = "lm", se = FALSE) +
   geom_errorbarh(aes(xmin=YMin.Verid,xmax=YMax.Verid),alpha=.8,color="gray") +
   geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),alpha=.8,color="gray") +
-  geom_abline(intercept=0,slope=1, color="gray", linetype="dashed") +
+  #geom_abline(intercept=0,slope=1, color="gray", linetype="dashed") +
   xlab("Mean veridicality rating") +
   ylab("Mean projection rating") +
-  scale_y_continuous(limits = c(0,1),breaks = c(0,0.2,0.4,0.6,0.8,1.0), labels= c("0",".2",".4",".6",".8","1")) +
-  scale_x_continuous(limits = c(0,1),breaks = c(0,0.2,0.4,0.6,0.8,1.0), labels= c("0",".2",".4",".6",".8","1")) +
+  scale_y_continuous(limits = c(-1,1)) +
+  scale_x_continuous(limits = c(-1,1)) +
   coord_fixed(ratio = 1) +
   theme(legend.position = "none", axis.title.x = element_text(color="black", size=14), axis.title.y = element_text(color="black", size=14))
-# Warning messages:
-# 1: Removed 37 rows containing missing values (`geom_point()`). 
-# 2: Removed 78 rows containing missing values (`geom_errorbarh()`). 
 
 
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
@@ -258,14 +257,23 @@ ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType
   coord_fixed(ratio = 1)
 ggsave("../graphs/projection-by-veridicality.pdf", height = 4,width = 8)
 
+
+
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
-  geom_point() +
+  geom_point(alpha = .3) +
+  geom_label_repel(data=subset(mean.proj.verid, Mean.Verid > 0 & Mean.Proj < 0),
+            aes(x = Mean.Verid, y = Mean.Proj, label=verb_renamed)) +
   geom_smooth(method = "lm", color = "black", linewidth = 0.5) +
   labs(
     x = "Mean veridicality rating", y = "Mean projection rating",
     color = "Predicate type") +
   theme(panel.grid = element_blank(),
         legend.position = "none") +
+  geom_abline(intercept=0,slope=0, color="gray", linetype="dashed") +
+  #geom_abline(intercept=0,slope=0, color="gray", linetype="dashed") +
+  geom_vline(xintercept=0, color="gray", linetype="dashed") +
+  scale_y_continuous(limits = c(-1,1)) +
+  scale_x_continuous(limits = c(-1,1)) +
   coord_fixed(ratio = 1) + 
   facet_wrap(~predicateType)
 ggsave("../graphs/projection-by-veridicality2.pdf", height = 4,width = 8)
@@ -291,7 +299,11 @@ ggplot(tmp, aes(x=Mean.Verid, y=Mean.Proj)) +
   xlab("Predicate")
 ggsave("../graphs/H1.pdf",height=4,width=13)
 
+# H2: Eventive vs stative ----
 
+# plot projection by dynamicity to see if dynamicity modulates projection
+
+# H3: There is a positive correlation between veridicality and projection ratings ----
 
 # create data relevant to investigate projection (embedding is negation, conditional or both)
 d_tmp <- droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
