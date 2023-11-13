@@ -1,6 +1,6 @@
 ﻿verb,voice,verb_renamed,communicative,pure,discourse_participation,state_changing,private,emotive,cognitive,stative,telic,activity,evidential ,unclear_classification,unclear_usage,unclear_sub_classification,stative_predicate,dynamic_predicate
 accept,active,accept,yes,,yes,,yes,,yes,yes,,,,,,,yes,yes
-acknowledge,active,acknowledge,yes,,yes,,,,,,,,,,,,yes,yes
+acknowledge,active,acknowledge,yes,,yes,,yes,,yes,yes,,,,,,,yes,yes
 add,active,add,yes,,yes,,,,,,,,,,,,,yes
 address,active,address,yes,,yes,,,,,,,,,,,,,yes
 admit,active,admit,yes,,yes,,,,,,,,,,,,,yes
@@ -10,7 +10,7 @@ advise,passive,be advised,,,,,yes,,,,,,yes,,,,,yes
 affirm,active,affirm,yes,,yes,,,,,,,,,,,,,yes
 aggravate,passive,be aggravated,,,,,yes,yes,,,,,,,,,yes,
 agitate,passive,be agitated,,,,,yes,yes,,,,,,,,,yes,
-agonize,active,agonize,,,,,yes,yes,,,,,,,,,,yes
+agonize,active,agonize,,,,,yes,,yes,,,yes,,,,,,yes
 agonize,passive,be agonized,,,,,yes,yes,,,,,,,,,yes,
 agree,active,agree,yes,,yes,,yes,,yes,yes,,,,,,,yes,yes
 alarm,passive,be alarmed,,,,,yes,yes,,,,,,,,,yes,
@@ -108,7 +108,7 @@ contest,active,contest,yes,,yes,,,,,,,,,,,,,yes
 convey,active,convey,yes,,yes,,,,,,,,,,,,,yes
 convince,passive,be convinced,,,,,yes,,yes,yes,,,yes,,,,yes,yes
 corroborate,active,corroborate,yes,,yes,,,,,,,,,,,,,yes
-cringe,active,cringe,,,,,yes,yes,,,,,,,,,,yes
+cringe,active,cringe,yes,,,,,,,,,,,,,,,yes
 crush,passive,be crushed,,,,,yes,yes,,,,,,,,,yes,
 cry,active,cry,yes,yes,,,,,,,,,,,,,,yes
 curse,active,curse,yes,yes,,,,,,,,,,,,,,yes
@@ -229,7 +229,7 @@ foretell,passive,be foretold,,,,,yes,,,,,,yes,,,,,yes
 forget,active,forget,,,,,yes,,yes,yes,,,,,,,yes,
 forgive,active,forgive,,,,,yes,,yes,,yes,,,,,,,yes
 forgive,passive,be forgiven,,,,,,,,,,,,yes,,,,yes
-freak_out,active,freak out,,,,,yes,yes,,,,,,,,,,yes
+freak_out,active,freak out,,,,,yes,yes,,,,,,,,,yes,
 freak_out,passive,be freaked out,,,,,yes,yes,,,,,,,,,yes,
 fret,active,fret,,,,,yes,yes,,,,,,,,,yes,
 frighten,passive,be frightened,,,,,yes,yes,,,,,,,,,yes,
@@ -538,7 +538,7 @@ whisper,active,whisper,yes,yes,,,,,,,,,,,,,,yes
 will,active,will,yes,yes,,,,,,,,,,,,,,yes
 wish,active,wish,,,,,yes,,yes,yes,,,,,,,yes,
 witness,active,witness,,,,,yes,,,,,,yes,,,,,yes
-worry,active,worry,,,,,yes,yes,yes,yes,,,,,,,,yes
+worry,active,worry,,,,,yes,yes,yes,yes,,,,,,,yes,
 worry,passive,be worried,,,,,yes,yes,yes,yes,,,,,,,yes,
 wow,passive,be wowed,,,,,yes,yes,,,,,,,,,yes,
 write,active,write,yes,yes,,,,,,,,,,,,,,yes

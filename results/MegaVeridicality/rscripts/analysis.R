@@ -27,16 +27,14 @@ names(y)
 d = left_join(d,y,by=c("verb","voice"))
 nrow(d) #21692
 
-# create datasets for projection and veridicality inferences
-d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
-nrow(d.proj) #16291
-d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "conditional"))
-nrow(d.verid) #5401
 
 # H1: The lexical meaning of the predicate matters ----
 # We find that emotive predicates project more (by and large) than cognitive, evidential and communicative ones.
 # Potential confound: stative vs eventive
-#view(d.proj)
+
+# create dataset for projection inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) #16291
 
 # create predicateType column
 d.proj = d.proj %>%
@@ -46,11 +44,12 @@ d.proj = d.proj %>%
                                  cognitive == "yes" ~ "cognitive",
                                  evidential == "yes" ~ "evidential",
                                  TRUE ~ "other"))
+
 table(d.proj$predicateType)
 
 # how many predicates in which type and which voice?
 d.proj %>%
-  select(predicateType, verb,voice) %>% 
+  select(predicateType, verb, voice) %>% 
   unique() %>% 
   group_by(predicateType,voice) %>% 
   summarize(count=n())
@@ -70,18 +69,18 @@ cols$Colors =  ifelse(cols$predicateType == "comPriv", "pink",
                                     ifelse(cols$predicateType == "inferential", "green", "black")))))
 cols
 
-
+## by-predicateType ----
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   #filter(voice == "active") %>%
-  group_by(predicateType) %>%
+  group_by(predicateType, voice) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
 mean.proj
 nrow(mean.proj) #10
 levels(mean.proj$predicateType)
 
-ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, group = dynamicity)) +
+ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = voice)) +
   geom_point() +
   geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
   geom_hline(yintercept=0) +
@@ -93,6 +92,7 @@ ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, group = dynamicity)) +
   xlab("Predicate")
 ggsave("../graphs/projection-by-predicateType.pdf",height=4,width=5)
 
+## by-predicate ----
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
@@ -119,7 +119,7 @@ cols$verb_renamed = factor(cols$verb_renamed, levels = mean.proj$verb_renamed[or
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) #525
+nrow(mean.proj) #524
 
 ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color = predicateType)) +
   geom_point() +
@@ -150,10 +150,10 @@ ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color =
   xlab("Predicate")
 ggsave("../graphs/projection-faceted-by-predicatel.pdf",height=4,width=13)
 
-# only "emotive" predicates
+## only "emotive" predicates ----
 mean.proj = mean.proj %>%
   filter(predicateType == "emotive")
-nrow(mean.proj) #150
+nrow(mean.proj) #148
 
 ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = voice)) +
   geom_point() +
@@ -174,7 +174,7 @@ mean.proj = mean.proj %>%
   group_by(verb) %>%
   filter(n()>1) %>%
   ungroup()
-nrow(mean.proj) #12
+nrow(mean.proj) #10
 
 ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
   geom_point() +
@@ -191,25 +191,107 @@ ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
   xlab("Emotive predicate")
 ggsave("../graphs/projection-emotives-verb-adjective-comparison.pdf", height = 4,width = 8)
 
-# only verbal predicates
-## !!!!! based on mean.proj as defined in lines 95-120 !!!!!
-mean.proj = mean.proj %>%
-  filter(!(mean.proj$predicateType == "emotive" & mean.proj$voice == "passive"))
-nrow(mean.proj) #402
 
-ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+# H2: Eventive vs stative ----
+# plot projection by dynamicity to see if dynamicity modulates projection
+
+# create dataset for projection inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) #16291
+
+# create predicateType and Dynamicity columns
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"),
+         Dynamicity = case_when(stative_predicate == "yes" ~ "stative",
+                                dynamic_predicate == "yes" ~ "dynamic",
+                                TRUE ~ "unclear"))
+
+# how many predicates in which predicateType and with which Dynamicity?
+d.proj %>%
+  select(predicateType, verb, Dynamicity) %>% 
+  unique() %>% 
+  group_by(predicateType, Dynamicity) %>% 
+  summarize(count=n()) 
+
+mean.proj = d.proj %>%
+  group_by(predicateType, Dynamicity) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+mean.proj
+nrow(mean.proj) #11
+
+ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = Dynamicity)) +
   geom_point() +
-  geom_hline(yintercept = 0) +
-  theme(legend.position = "top",
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        panel.grid.major.x = element_blank()) +
-  scale_colour_discrete(name = "Predicate type") +  
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1,0,1)) +
+  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
+  geom_hline(yintercept=0) +
+  theme(legend.position="top",
+        axis.ticks.x=element_blank(),
+        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
   ylab("Mean projection rating") +
-  xlab("Verbal predicate")
-ggsave("../graphs/projection-by-verbal-predicate.pdf", height = 4, width = 13)
+  xlab("Predicate type")
+ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf",height=4,width=5)
 
+
+# H3: There is a positive correlation between veridicality and projection ratings ----
+
+# create datasets for projection and veridicality inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) #16291
+d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "conditional"))
+nrow(d.verid) #5401
+
+# create predicateType column
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"))
+
+# color code the predicates
+cols = d.proj %>%
+  select(c(verb_renamed,predicateType)) %>%
+  distinct(verb_renamed,predicateType)
+cols
+nrow(cols) #544
+
+# color-code the predicates
+cols$Colors =  ifelse(cols$predicateType == "comPriv", "pink",
+                      ifelse(cols$predicateType == "emotive", "#D55E00", 
+                             ifelse(cols$predicateType == "cognitive", "#5b43c4", 
+                                    ifelse(cols$predicateType == "communicative", "gray", 
+                                           ifelse(cols$predicateType == "inferential", "green", "black")))))
+cols
+
+# calculate by-predicate projection means 
+mean.proj = d.proj %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+mean.proj
+nrow(mean.proj) #544
+levels(mean.proj$verb_renamed)
+
+# add predicateType, verb and voice to the means
+tmp = d.proj %>%
+  #filter(voice == "active") %>%
+  select(c(verb,verb_renamed,voice,predicateType)) %>%
+  distinct(verb,verb_renamed,voice,predicateType)
+nrow(tmp) #544
+
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj) #544
+
+cols$verb_renamed = factor(cols$verb_renamed, levels = mean.proj$verb_renamed[order(mean.proj$Mean.Proj)], ordered = TRUE)
 
 # calculate by-predicate veridicality means 
 mean.verid = d.verid %>%
@@ -220,7 +302,6 @@ mean.verid
 nrow(mean.verid) #544
 levels(mean.verid$verb_renamed)
 
-## !!!!! based on mean.proj as defined in line 95-112 !!!!!
 mean.proj.verid = mean.proj %>%
   inner_join(mean.verid,by=("verb_renamed"))
 mean.proj.verid
@@ -228,11 +309,9 @@ mean.proj.verid
 # remove "other" and "comPriv" predicates
 mean.proj.verid = mean.proj.verid %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj.verid) #525
-
+nrow(mean.proj.verid) #524
 
 # Mean projection by mean veridicality
-
 ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj, group = predicateType)) +
   geom_point(shape=21) +
   geom_smooth(method = "lm", se = FALSE) +
@@ -245,7 +324,7 @@ ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj, group = predicateType)) +
   scale_x_continuous(limits = c(-1,1)) +
   coord_fixed(ratio = 1) +
   theme(legend.position = "none", axis.title.x = element_text(color="black", size=14), axis.title.y = element_text(color="black", size=14))
-
+ggsave("../graphs/projection-by-veridicality-with-CIs.pdf", height = 4,width = 5)
 
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
   geom_point() +
@@ -257,12 +336,11 @@ ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType
   coord_fixed(ratio = 1)
 ggsave("../graphs/projection-by-veridicality.pdf", height = 4,width = 8)
 
-
-
+# What are the predicates with negative mean projection rating and positive mean veridicality rating?
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
   geom_point(alpha = .3) +
   geom_label_repel(data=subset(mean.proj.verid, Mean.Verid > 0 & Mean.Proj < 0),
-            aes(x = Mean.Verid, y = Mean.Proj, label=verb_renamed)) +
+                   aes(x = Mean.Verid, y = Mean.Proj, label=verb_renamed)) +
   geom_smooth(method = "lm", color = "black", linewidth = 0.5) +
   labs(
     x = "Mean veridicality rating", y = "Mean projection rating",
@@ -276,10 +354,12 @@ ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType
   scale_x_continuous(limits = c(-1,1)) +
   coord_fixed(ratio = 1) + 
   facet_wrap(~predicateType)
-ggsave("../graphs/projection-by-veridicality2.pdf", height = 4,width = 8)
+ggsave("../graphs/projection-by-veridicality2.pdf", height = 4,width = 6)
 
 
-##  end of script for now
+
+
+#  end of script for now ----
 
 tmp = mean.proj %>% 
   left_join(mean.verid)
@@ -298,12 +378,6 @@ ggplot(tmp, aes(x=Mean.Verid, y=Mean.Proj)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
 ggsave("../graphs/H1.pdf",height=4,width=13)
-
-# H2: Eventive vs stative ----
-
-# plot projection by dynamicity to see if dynamicity modulates projection
-
-# H3: There is a positive correlation between veridicality and projection ratings ----
 
 # create data relevant to investigate projection (embedding is negation, conditional or both)
 d_tmp <- droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
