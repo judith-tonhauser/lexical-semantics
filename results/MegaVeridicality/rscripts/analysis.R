@@ -232,10 +232,13 @@ ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = Dynamicity)) +
   theme(legend.position="top",
         axis.ticks.x=element_blank(),
         axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  scale_y_continuous(limits = c(-.2,1),breaks = c(-.2,0,1)) +
   ylab("Mean projection rating") +
   xlab("Predicate type")
 ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf",height=4,width=5)
+
+# H2a: Among the communication predicates, does the CC of the ones that have an emotive meaning component
+# project more than the CCs of those that don't? ----
 
 
 # H3: There is a positive correlation between veridicality and projection ratings ----
