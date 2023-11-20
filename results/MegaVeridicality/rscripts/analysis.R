@@ -191,6 +191,87 @@ ggplot(mean.proj, aes(x = verb, y = Mean.Proj, colour = voice)) +
   xlab("Emotive predicate")
 ggsave("../graphs/projection-emotives-verb-adjective-comparison.pdf", height = 4,width = 8)
 
+# H1a: emotive component ----
+# Among the communication predicates, does the CC of the ones that have an emotive meaning component
+# project more than the CCs of those that don't?
+
+# create dataset for projection inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) #16291
+
+# create predicateType and emotiveComponent columns
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"),
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no")) 
+
+## by-predicateType ----
+# calculate by-predicateType means
+mean.proj = d.proj %>%
+  group_by(predicateType, emotiveComponent) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+mean.proj
+nrow(mean.proj) #7
+levels(mean.proj$predicateType)
+
+ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = emotiveComponent)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
+  geom_hline(yintercept=0) +
+  theme(legend.position="top",
+        axis.ticks.x=element_blank(),
+        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       color ="Emotive component")
+ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf",height = 8, width = 12)
+
+## by-predicate ----
+# calculate by-predicate projection means 
+mean.proj = d.proj %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+mean.proj
+nrow(mean.proj) #544
+levels(mean.proj$verb_renamed)
+
+# add predicateType, verb and emotiveComponent to the means
+tmp = d.proj %>%
+  select(c(verb, verb_renamed, predicateType, emotiveComponent)) %>%
+  distinct(verb, verb_renamed, predicateType, emotiveComponent)
+nrow(tmp) #544
+
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj) #544
+
+# only communicative predicates
+mean.proj = mean.proj %>%
+  filter(predicateType == "communicative")
+nrow(mean.proj) #237
+
+ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, color = emotiveComponent)) +
+  geom_point() +
+  geom_hline(yintercept=0) +
+  theme(legend.position="top",
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major.x = element_blank()) +
+  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       color ="Emotive component")
+ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 4, width = 13)
+
 
 # H2: Eventive vs stative ----
 # plot projection by dynamicity to see if dynamicity modulates projection
@@ -237,8 +318,6 @@ ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = Dynamicity)) +
   xlab("Predicate type")
 ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf",height=4,width=5)
 
-# H2a: Among the communication predicates, does the CC of the ones that have an emotive meaning component
-# project more than the CCs of those that don't? ----
 
 
 # H3: There is a positive correlation between veridicality and projection ratings ----
