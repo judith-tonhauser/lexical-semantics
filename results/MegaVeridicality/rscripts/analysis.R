@@ -319,7 +319,7 @@ table(d3$predicateType)
 #        82           205           101            41 
 
 table(d3$predicateType2)
-# cognitive    emoComm    emotive evidential nonemoComm 
+# cognitive    emoComm    emotive evidential nonEmoComm 
 #        82         41        101         41        164 
 
 # valence by predicate
@@ -617,6 +617,21 @@ ggplot(aes(x = D.Mean.Sum, y = Mean.Proj)) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
   facet_grid(. ~ predicateType2)
 ggsave("../graphs/projection-by-dominance-faceted2.pdf", height = 8, width = 20)
+
+# predicates in both active and passive sentence frames with same predicate type
+d3[duplicated(d3[,cbind(2,4)]),] %>%
+  select(verb, predicateType)
+
+#       verb predicateType
+# 195 grieve       emotive
+# 251 marvel       emotive
+# 276  panic       emotive
+# 427  worry       emotive
+
+# Of the 101 emotives with valence/arousal/dominance ratings, four predicates occur in both
+# sentence frames in the MV data set. The "active" and "passive voice" versions of these 
+# predicates were assigned the same valence/arousal/dominance ratings. Due to the small number
+# of these cases, this should not affect the overall distributions plotted above.
 
 
 # H2: Eventive vs stative ----
