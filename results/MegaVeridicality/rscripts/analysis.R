@@ -44,6 +44,7 @@ d.proj = d.proj %>%
                                  evidential == "yes" ~ "evidential",
                                  TRUE ~ "other"))
 
+
 table(d.proj$predicateType)
 
 # how many predicates in which type and which voice?
@@ -325,6 +326,7 @@ new.scale <- mean.proj2 %>%
                                            V.Mean.Sum < 5 ~ "negative"),
          A.Mean.Sum2 = A.Mean.Sum - 1)
 
+
 # Valence: everything in order? - yes.
 max(mean.proj2$V.Mean.Sum)-min(mean.proj2$V.Mean.Sum)
 # [1] 6.81
@@ -524,12 +526,15 @@ ggsave("../graphs/arousal-by-predicateType2.pdf", height = 8, width = 10)
 
 ## valence + arousal ----
 # valence against arousal: no patterns (clusters) emerge.
-ggplot(new.scale, aes(x = A.Mean.Sum2, y = V.Mean.Sum2)) +
-  geom_point(aes(colour = predicateType2)) +
+library(ggforce)
+ggplot(new.scale, aes(x = A.Mean.Sum2, y = V.Mean.Sum2, colour = predicateType2, 
+                      fill = predicateType2)) +
+  geom_point(size = 2) +
+  geom_mark_hull(alpha = 0.1) +
   labs(
     x = "Mean arousal rating", y = "Mean valence rating",
-    colour = "Predicate type") 
-ggsave("../graphs/valence-by-arousal.pdf", height = 10, width = 10)
+    colour = "Predicate type", fill = "Predicate type")
+ggsave("../graphs/valence-by-arousal.pdf", height = 10, width = 15)
 
 ### by predicate type ----
 # distribution of valence and arousal ratings by predicate type
@@ -669,7 +674,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
         aspect.ratio = 1) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) 
-ggsave("../graphs/projection-by-valence.pdf", height = 10, width = 10)
+ggsave("../graphs/projection-by-valence-with-direction.pdf", height = 10, width = 10)
 
 ##### lm ----
 lm(Mean.Proj ~ V.Mean.Sum2.direction, data = new.scale) %>% 
