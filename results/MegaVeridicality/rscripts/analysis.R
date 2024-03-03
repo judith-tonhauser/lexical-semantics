@@ -12,6 +12,8 @@ source('../../helpers.R')
 library(tidyverse)
 library(dichromat)
 library(ggrepel)
+library(ggforce)
+library(ordinal)
 theme_set(theme_bw())
 
 # load data
@@ -24,7 +26,7 @@ y = read.csv("../data/predicate-coding.csv")
 nrow(y) #544
 names(y)
 
-d = left_join(d,y,by=c("verb","voice"))
+d = left_join(d, y, by = c("verb", "voice"))
 nrow(d) #21692
 
 
@@ -79,17 +81,19 @@ mean.proj
 nrow(mean.proj) # 6
 levels(mean.proj$predicateType)
 
-ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj)) +
+mean.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv") %>% 
+ggplot(aes(x = predicateType, y = Mean.Proj)) +
   geom_point() +
-  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.ticks.x=element_blank(),
-        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(size = 10, angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
-ggsave("../graphs/projection-by-predicateType.pdf",height=4,width=5)
+ggsave("../graphs/projection-by-predicateType.pdf", height = 4, width = 8)
 
 ## by-predicate ----
 # calculate by-predicate projection means 
@@ -119,50 +123,48 @@ mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 nrow(mean.proj) #524
 
-ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color = predicateType)) +
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, fill = predicateType, colour = predicateType)) +
   geom_point() +
-  #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  #theme(axis.text.x = element_text(color=cols$Colors,size=10,angle = 75, hjust = 1)) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   ylab("Mean projection rating") +
   xlab("Predicate")
-ggsave("../graphs/projection-by-predicatel.pdf",height=4,width=13)
+ggsave("../graphs/projection-by-predicatel.pdf", height = 4, width = 13)
 
-ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, fill = predicateType, color = predicateType)) +
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, 
+                      fill = predicateType, colour = predicateType)) +
   geom_point() +
-  #geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
-  facet_grid(. ~ predicateType) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  facet_wrap(~ predicateType, ncol = 4) +
   ylab("Mean projection rating") +
   xlab("Predicate")
-ggsave("../graphs/projection-faceted-by-predicatel.pdf",height=4,width=13)
+ggsave("../graphs/projection-by-predicatel-faceted.pdf", height = 4, width = 13)
 
 ### lm ----
 lm(Mean.Proj ~ predicateType, data = mean.proj) %>% 
   summary()
 # Coefficients:
-#                        Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.24612    0.02020  12.183  < 2e-16 ***
-# predicateTypecommunicative  0.06204    0.02391   2.595  0.00974 ** 
-# predicateTypeemotive        0.47652    0.02589  18.408  < 2e-16 ***
-# predicateTypeevidential     0.06156    0.03591   1.714  0.08705 .
+#                            Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                 0.22668    0.02730   8.304 8.76e-16 ***
+# predicateTypecommunicative  0.08148    0.03014   2.703   0.0071 ** 
+# predicateTypeemotive        0.49596    0.03173  15.629  < 2e-16 ***
+# predicateTypeevidential     0.06220    0.03450   1.803   0.0720 .  
 
 # H1a: emotive component ----
 # Among the communication predicates, does the CC of the ones that have an emotive meaning component
 # project more than the CCs of those that don't?
 
 # create dataset for projection inferences
-d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) #16291
 
 # create predicateType and emotiveComponent columns
@@ -186,18 +188,21 @@ mean.proj
 nrow(mean.proj) #7
 levels(mean.proj$predicateType)
 
-ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = emotiveComponent)) +
+mean.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv") %>% 
+ggplot(aes(x = predicateType, y = Mean.Proj, colour = emotiveComponent)) +
   geom_point() +
-  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.ticks.x=element_blank(),
-        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  geom_hline(yintercept = 0) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(size = 10, angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(x = "Predicate",
        y = "Mean projection rating",
        color ="Emotive component")
-ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf",height = 8, width = 12)
+ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf", 
+       height = 8, width = 12)
 
 ## by-predicate ----
 # calculate by-predicate projection means 
@@ -217,7 +222,7 @@ nrow(tmp) #544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
-  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
 nrow(mean.proj) #544
 
 # only communicative predicates
@@ -225,19 +230,20 @@ mean.proj = mean.proj %>%
   filter(predicateType == "communicative")
 nrow(mean.proj) #237
 
-ggplot(mean.proj, aes(x=verb_renamed, y=Mean.Proj, color = emotiveComponent)) +
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = emotiveComponent)) +
   geom_point() +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
-        panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1,1),breaks = c(-1,0,1)) +
+  geom_hline(yintercept = 0, linetype = 2) +
+  facet_wrap( ~ emotiveComponent) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        strip.text.x = element_blank()) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(x = "Predicate",
        y = "Mean projection rating",
-       color ="Emotive component") +
-  facet_wrap( ~ emotiveComponent)
-ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 4, width = 13)
+       colour = "Emotive component")
+ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 4, width = 6)
 
 lm(Mean.Proj ~ emotiveComponent, data = mean.proj) %>% 
   summary()
@@ -280,26 +286,26 @@ d2 = d2 %>%
                                     predicateType == "other" ~ "other"))
 
 # remove "other" and "comPriv" predicates
-d2 = d2 %>%
+d3 = d2 %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 # how many predicates?
-n_distinct(d2$verb_renamed) # 429
-n_distinct(d2$verb) # 411
+n_distinct(d3$verb_renamed) # 429
+n_distinct(d3$verb) # 411
 
-d3 = d2 %>%
+d3 = d3 %>%
   distinct(verb_renamed, verb, voice, predicateType, predicateType2, V.Mean.Sum, A.Mean.Sum, D.Mean.Sum)
 
 table(d3$predicateType)
 # cognitive communicative       emotive    evidential 
-#        82           205           101            41 
+#        46           205           101            77 
 
 table(d3$predicateType2)
 # cognitive    emoComm    emotive evidential nonEmoComm 
-#        82         41        101         41        164 
+#        46         41        101         77        164 
 
 # create dataset for projection inferences
-d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) #16291
 
 # calculate by-predicate projection means 
@@ -347,7 +353,8 @@ max(new.scale$A.Mean.Sum)-min(new.scale$A.Mean.Sum)
 
 ## valence ----
 ### by predicate ----
-ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y=V.Mean.Sum2, colour = predicateType)) +
+ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2, 
+                      colour = predicateType)) +
   geom_point() +
   labs(x = "Predicate", y = "Mean valence rating", colour = "Predicate type") +
   theme(legend.position = "top",
@@ -357,27 +364,29 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y=V.Mean.Sum2, col
 ggsave("../graphs/valence-by-predicate.pdf", height = 4, width = 13)
 
 # valence by predicate with emotive component distinction for communicatives
-ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y=V.Mean.Sum2, colour = predicateType2)) +
+ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2, 
+                      colour = predicateType2)) +
   geom_point() +
   labs(x = "Predicate", y = "Mean valence rating", colour = "Predicate type") +
   theme(legend.position = "top",
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_colour_discrete(labels = c("cognitive", "communicative with\nemotive component", "emotive",
-                                 "evidential", "communicative without\nemotive component"))
+  scale_colour_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                                   "emotive", "evidential", 
+                                   "communicative without\nemotive component"))
 ggsave("../graphs/valence-by-predicate2.pdf", height = 4, width = 13)
 
 #### lm ----
 lm(V.Mean.Sum2 ~ predicateType2, new.scale) %>% 
   summary()
 # Coefficients:
-#                      Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               1.05793    0.07724  13.697  < 2e-16 ***
-# predicateType2emoComm     0.35841    0.13378   2.679  0.00767 ** 
-# predicateType2emotive     0.71989    0.10397   6.924 1.63e-11 ***
-# predicateType2evidential -0.18573    0.13378  -1.388  0.16577    
-# predicateType2nonEmoComm -0.24341    0.09460  -2.573  0.01042 * 
+#                          Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                1.2930     0.1017  12.709  < 2e-16 ***
+# predicateType2emoComm      0.1233     0.1482   0.832 0.405899    
+# predicateType2emotive      0.4848     0.1227   3.950 9.16e-05 ***
+# predicateType2evidential  -0.4745     0.1286  -3.690 0.000254 ***
+# predicateType2nonEmoComm  -0.4785     0.1151  -4.157 3.91e-05 ***
 
 ### by predicate type ----
 # calculate valence by predicateType means
@@ -411,7 +420,8 @@ ggplot(mean.valence2, aes(x = predicateType2, y = Mean.Valence)) +
   theme(axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
   scale_x_discrete(labels = c("communicative without \n emotive component", "evidential",
-                              "cognitive", "communicative with \n emotive component", "emotive")) +
+                              "cognitive", "communicative with \n emotive component", 
+                              "emotive")) +
   ylab("Mean valence rating") +
   xlab("Predicate type")
 ggsave("../graphs/valence-by-predicateType2.pdf", height = 8, width = 10)
@@ -433,7 +443,8 @@ ggplot(mean.valence3, aes(x = predicateType2, y = Mean.Valence, colour = V.Mean.
   theme(axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
   scale_x_discrete(labels = c("cognitive", "communicative with \n emotive component",
-                              "emotive", "evidential", "communicative without \n emotive component")) +
+                              "emotive", "evidential", 
+                              "communicative without \n emotive component")) +
   labs(y ="Mean valence rating as distance from neutral",
        x = "Predicate type",
        colour = "direction of valence") 
@@ -442,29 +453,32 @@ ggsave("../graphs/valence-by-predicateType-and-direction.pdf", height = 8, width
 
 ## arousal ----
 ### by predicate ----
-ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2, colour = predicateType)) +
+ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2, 
+                      colour = predicateType)) +
   geom_point() +
   labs(x = "Predicate", y = "Mean arousal rating", colour = "Predicate type") +
   theme(legend.position="top",
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(0,8), breaks = c(0, 8), minor_breaks = seq(1:9), 
+  scale_y_continuous(limits = c(0, 8), breaks = c(0, 8), minor_breaks = seq(1:9), 
                      labels = c("completely\ncalm", "completely\nexcited"))
 ggsave("../graphs/arousal-by-predicate.pdf", height = 4, width = 13)
 
 # arousal by predicate with emotive component
-ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2, colour = predicateType2)) +
+ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2, 
+                      colour = predicateType2)) +
   geom_point() +
   labs(x = "Predicate", y = "Mean arousal rating", colour = "Predicate type") +
   theme(legend.position="top",
-        axis.text.x=element_blank(),
-        axis.ticks.x=element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(0,8), breaks = c(0, 8), minor_breaks = seq(1:9), 
+  scale_y_continuous(limits = c(0, 8), breaks = c(0, 8), minor_breaks = seq(1:9), 
                      labels = c("completely\ncalm", "completely\nexcited")) +
-  scale_colour_discrete(labels = c("cognitive", "communicative with\nemotive component", "emotive",
-                                   "evidential", "communicative without\nemotive component"))
+  scale_colour_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                                   "emotive", "evidential", 
+                                   "communicative without\nemotive component"))
 ggsave("../graphs/arousal-by-predicate2.pdf", height = 4, width = 13)
 
 #### lm ----
@@ -472,25 +486,27 @@ lm(A.Mean.Sum2 ~ predicateType, new.scale) %>%
   summary()
 # Coefficients:
 #                            Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 2.88549    0.09418  30.639  < 2e-16 ***
-# predicateTypecommunicative  0.32871    0.11143   2.950  0.00335 ** 
-# predicateTypeemotive        1.06362    0.12677   8.390 7.25e-16 ***
-# predicateTypeevidential     0.18768    0.16312   1.151  0.25055 
+# (Intercept)                 2.99674    0.12590  23.803  < 2e-16 ***
+# predicateTypecommunicative  0.21746    0.13931   1.561    0.119    
+# predicateTypeemotive        0.95237    0.15189   6.270 8.87e-10 ***
+# predicateTypeevidential    -0.07778    0.15912  -0.489    0.625  
 
 lm(A.Mean.Sum2 ~ predicateType2, new.scale) %>% 
   summary()
+# Coefficients:
 #                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               2.88549    0.09281  31.089  < 2e-16 ***
-# predicateType2emoComm     0.76134    0.16076   4.736 2.98e-06 ***
-# predicateType2emotive     1.06362    0.12493   8.514 2.95e-16 ***
-# predicateType2evidential  0.18768    0.16076   1.168    0.244    
-# predicateType2nonEmoComm  0.22055    0.11367   1.940    0.053 . 
+# (Intercept)               2.99674    0.12408  24.151  < 2e-16 ***
+# predicateType2emoComm     0.65009    0.18075   3.597  0.00036 ***
+# predicateType2emotive     0.95237    0.14969   6.362 5.16e-10 ***
+# predicateType2evidential -0.07778    0.15682  -0.496  0.62018    
+# predicateType2nonEmoComm  0.10930    0.14041   0.778  0.43675 
 
 ### by predicate type ----
 # calculate arousal by predicateType means
 mean.arousal = new.scale %>%
   group_by(predicateType) %>%
-  summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), CIHigh = ci.high(A.Mean.Sum2)) %>%
+  summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), 
+            CIHigh = ci.high(A.Mean.Sum2)) %>%
   mutate(YMin.Arousal = Mean.Arousal - CILow, YMax.Arousal = Mean.Arousal + CIHigh, 
          predicateType = fct_reorder(as.factor(predicateType), Mean.Arousal))
 mean.arousal
@@ -507,7 +523,8 @@ ggsave("../graphs/arousal-by-predicateType.pdf", height = 8, width = 10)
 # calculate arousal by predicateType2 means (communicatives with/without emotive component)
 mean.arousal2 = new.scale %>%
   group_by(predicateType2) %>%
-  summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), CIHigh = ci.high(A.Mean.Sum2)) %>%
+  summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), 
+            CIHigh = ci.high(A.Mean.Sum2)) %>%
   mutate(YMin.Arousal = Mean.Arousal - CILow, YMax.Arousal = Mean.Arousal + CIHigh, 
          predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Arousal))
 mean.arousal2
@@ -526,7 +543,6 @@ ggsave("../graphs/arousal-by-predicateType2.pdf", height = 8, width = 10)
 
 ## valence + arousal ----
 # valence against arousal: no patterns (clusters) emerge.
-library(ggforce)
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = V.Mean.Sum2, colour = predicateType2, 
                       fill = predicateType2)) +
   geom_point(size = 2) +
@@ -548,7 +564,7 @@ new.scale %>%
         panel.grid.major.x = element_blank(),
         plot.caption = element_text(hjust = 0)) + 
   labs(y = "Mean valence / arousal rating", fill = "Predicate type",
-       caption = "valence rating: neutral (0) to completely happy / unhappy\narousal rating: completely calm (0) to completely excited (8)") +
+       caption = "valence rating: neutral (0) to completely happy / unhappy (4)\narousal rating: completely calm (0) to completely excited (8)") +
    scale_x_discrete(limits = c("Valence", "Arousal"))
 ggsave("../graphs/valence-arousal-by-predicateType.pdf", height = 8, width = 16)
 
@@ -562,10 +578,11 @@ new.scale %>%
         panel.grid.major.x = element_blank(),
         plot.caption = element_text(hjust = 0)) + 
   labs(y = "Mean valence / arousal rating", fill = "Predicate type",
-       caption = "valence rating: neutral (0) to completely happy / unhappy\narousal rating: completely calm (0) to completely excited (8)") +
+       caption = "valence rating: neutral (0) to completely happy / unhappy (4)\narousal rating: completely calm (0) to completely excited (8)") +
   scale_x_discrete(limits = c("Valence", "Arousal")) +
-  scale_fill_discrete(labels = c("cognitive", "communicative with\nemotive component", "emotive",
-                                 "evidential", "communicative without\nemotive component"))
+  scale_fill_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component"))
 ggsave("../graphs/valence-arousal-by-predicateType2.pdf", height = 8, width = 16)
 
 
@@ -598,8 +615,8 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         axis.title.x = element_text(vjust = -2),
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
-  facet_grid(. ~ predicateType)
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  facet_wrap(~ predicateType, ncol = 4)
 ggsave("../graphs/projection-by-valence-faceted.pdf", height = 8, width = 20)
 
 # projection by valence faceted with emotive component
@@ -619,8 +636,8 @@ ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         axis.title.x = element_text(vjust = -2),
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
-  facet_grid(. ~ predicateType2)
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  facet_wrap(~ predicateType2, ncol = 5)
 ggsave("../graphs/projection-by-valence-faceted2.pdf", height = 8, width = 20)
 
 #### lm ----
@@ -637,27 +654,27 @@ lm(Mean.Proj ~ V.Mean.Sum2 + predicateType2, data = new.scale) %>%
 
 # Coefficients:
 #                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)              0.228570   0.025892   8.828  < 2e-16 ***
-# V.Mean.Sum2              0.008901   0.013555   0.657   0.5117    
-# predicateType2emoComm    0.169532   0.037655   4.502 8.71e-06 ***
-# predicateType2emotive    0.486218   0.030616  15.881  < 2e-16 ***
-# predicateType2evidential 0.073534   0.037425   1.965   0.0501 .  
-# predicateType2nonEmoComm 0.046749   0.026609   1.757   0.0797 .  
+# (Intercept)               0.21939    0.03390   6.471 2.70e-10 ***
+# V.Mean.Sum2               0.01047    0.01377   0.761    0.447    
+# predicateType2emoComm     0.17648    0.04206   4.196 3.31e-05 ***
+# predicateType2emotive     0.49260    0.03544  13.900  < 2e-16 ***
+# predicateType2evidential  0.05132    0.03704   1.385    0.167    
+# predicateType2nonEmoComm  0.05465    0.03330   1.641    0.102 
 
 lm(Mean.Proj ~ V.Mean.Sum2 * predicateType2, data = new.scale) %>% 
   summary()
 # Coefficients:
 #                                       Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                           0.226211   0.038666   5.850 9.90e-09 ***
-# V.Mean.Sum2                           0.011132   0.030348   0.367   0.7140    
-# predicateType2emoComm                 0.107320   0.073389   1.462   0.1444    
-# predicateType2emotive                 0.498413   0.061763   8.070 7.51e-15 ***
-# predicateType2evidential              0.148465   0.065131   2.279   0.0231 *  
-# predicateType2nonEmoComm              0.043884   0.046172   0.950   0.3424    
-# V.Mean.Sum2:predicateType2emoComm     0.043360   0.048966   0.886   0.3764    
-# V.Mean.Sum2:predicateType2emotive    -0.007763   0.039187  -0.198   0.8431    
-# V.Mean.Sum2:predicateType2evidential -0.085435   0.057543  -1.485   0.1384    
-# V.Mean.Sum2:predicateType2nonEmoComm  0.004185   0.039127   0.107   0.9149   
+# (Intercept)                           0.243533   0.058783   4.143 4.15e-05 ***
+# V.Mean.Sum2                          -0.008197   0.039578  -0.207    0.836    
+# predicateType2emoComm                 0.089998   0.085950   1.047    0.296    
+# predicateType2emotive                 0.481092   0.076154   6.317 6.81e-10 ***
+# predicateType2evidential              0.043393   0.070030   0.620    0.536    
+# predicateType2nonEmoComm              0.026562   0.064023   0.415    0.678    
+# V.Mean.Sum2:predicateType2emoComm     0.062688   0.055306   1.133    0.258    
+# V.Mean.Sum2:predicateType2emotive     0.011566   0.046771   0.247    0.805    
+# V.Mean.Sum2:predicateType2evidential -0.001142   0.054615  -0.021    0.983    
+# V.Mean.Sum2:predicateType2nonEmoComm  0.023513   0.046721   0.503    0.615  
 
 
 #### with direction ----
@@ -673,7 +690,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
         aspect.ratio = 1) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) 
 ggsave("../graphs/projection-by-valence-with-direction.pdf", height = 10, width = 10)
 
 ##### lm ----
@@ -702,8 +719,7 @@ lm(Mean.Proj ~ V.Mean.Sum2 + V.Mean.Sum2.direction, data = new.scale) %>%
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_point(aes(colour = predicateType)) +
   geom_smooth(method = "lm") +
-  labs(
-    x = "Mean arousal rating", y = "Mean projection rating",
+  labs(x = "Mean arousal rating", y = "Mean projection rating",
     colour = "Predicate type") +
   theme(legend.position = "top",
         panel.spacing.x = unit(1, "cm"),
@@ -712,15 +728,14 @@ ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
         aspect.ratio = 1) +
   scale_x_continuous(limits = c(0, 8), breaks = c(0, 4, 8), minor_breaks = seq(1:9), 
                      labels = c("completely\ncalm", "neutral", "completely\nexcited")) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1))
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1))
 ggsave("../graphs/projection-by-arousal.pdf", height = 10, width = 10)
 
 # projection by arousal faceted
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_point(aes(colour = predicateType)) +
   geom_smooth(method = "lm") +
-  labs(
-    x = "Mean arousal rating", y = "Mean projection rating") +
+  labs(x = "Mean arousal rating", y = "Mean projection rating") +
   theme(legend.position = "none",
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(vjust = -2),
@@ -728,8 +743,8 @@ ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   scale_x_continuous(limits = c(0, 8), breaks = c(0, 4, 8), minor_breaks = seq(1:9), 
                      labels = c("completely\ncalm", "neutral", "completely\nexcited")) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
-  facet_grid(. ~ predicateType)
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  facet_wrap(~ predicateType, ncol = 4)
 ggsave("../graphs/projection-by-arousal-faceted.pdf", height = 8, width = 20)
 
 # projection by arousal faceted with emotive component
@@ -751,8 +766,8 @@ ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   scale_x_continuous(limits = c(0, 8), breaks = c(0, 4, 8), minor_breaks = seq(1:9), 
                      labels = c("completely\ncalm", "neutral", "completely\nexcited")) +
-  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
-  facet_grid(. ~ predicateType2)
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  facet_wrap(~ predicateType2, ncol = 5)
 ggsave("../graphs/projection-by-arousal-faceted2.pdf", height = 8, width = 20)
 
 #### lm ----
@@ -769,27 +784,27 @@ lm(Mean.Proj ~ A.Mean.Sum2 + predicateType2, data = new.scale) %>%
 
 # Coefficients:
 #                           Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.264298   0.039032   6.771 4.28e-11 ***
-# A.Mean.Sum2              -0.009118   0.011278  -0.809   0.4192    
-# predicateType2emoComm     0.179664   0.038306   4.690 3.69e-06 ***
-# predicateType2emotive     0.502325   0.031394  16.001  < 2e-16 ***
-# predicateType2evidential  0.073592   0.037391   1.968   0.0497 *  
-# predicateType2nonEmoComm  0.046593   0.026514   1.757   0.0796 . 
+# (Intercept)               0.255471   0.044474   5.744 1.77e-08 ***
+# A.Mean.Sum2              -0.007521   0.011293  -0.666    0.506    
+# predicateType2emoComm     0.182665   0.042668   4.281 2.30e-05 ***
+# predicateType2emotive     0.504842   0.036434  13.856  < 2e-16 ***
+# predicateType2evidential  0.045762   0.036479   1.254    0.210    
+# predicateType2nonEmoComm  0.050458   0.032674   1.544    0.123 
 
 lm(Mean.Proj ~ A.Mean.Sum2 * predicateType2, data = new.scale) %>% 
   summary()
 # Coefficients:
-#                                       Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                           0.289064   0.090316   3.201 0.001476 ** 
-# A.Mean.Sum2                          -0.017701   0.030405  -0.582 0.560761    
-# predicateType2emoComm                -0.056464   0.157469  -0.359 0.720096    
-# predicateType2emotive                 0.430007   0.120133   3.579 0.000385 ***
-# predicateType2evidential              0.347911   0.163373   2.130 0.033791 *  
-# predicateType2nonEmoComm              0.043027   0.108552   0.396 0.692031    
-# A.Mean.Sum2:predicateType2emoComm     0.066541   0.045897   1.450 0.147866    
-# A.Mean.Sum2:predicateType2emotive     0.020624   0.036096   0.571 0.568057    
-# A.Mean.Sum2:predicateType2evidential -0.088738   0.052816  -1.680 0.093678 .  
-# A.Mean.Sum2:predicateType2nonEmoComm  0.001758   0.035729   0.049 0.960789  
+#                                      Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                           0.36809    0.12319   2.988  0.00297 **
+# A.Mean.Sum2                          -0.04510    0.03997  -1.128  0.25978   
+# predicateType2emoComm                -0.13549    0.17904  -0.757  0.44962   
+# predicateType2emotive                 0.35099    0.14677   2.391  0.01722 * 
+# predicateType2evidential              0.01309    0.15583   0.084  0.93309   
+# predicateType2nonEmoComm             -0.03599    0.13731  -0.262  0.79334   
+# A.Mean.Sum2:predicateType2emoComm     0.09394    0.05288   1.776  0.07638 . 
+# A.Mean.Sum2:predicateType2emotive     0.04802    0.04451   1.079  0.28125   
+# A.Mean.Sum2:predicateType2evidential  0.01019    0.05107   0.200  0.84191   
+# A.Mean.Sum2:predicateType2nonEmoComm  0.02916    0.04421   0.660  0.50994  
 
 ### valence + arousal ----
 #### lm ----
@@ -810,6 +825,75 @@ lm(Mean.Proj ~ V.Mean.Sum2 + A.Mean.Sum2, data = new.scale) %>%
 # (Intercept)  0.13318    0.04553   2.925  0.00363 ** 
 # V.Mean.Sum2  0.09428    0.01688   5.586 4.15e-08 ***
 # A.Mean.Sum2  0.04612    0.01450   3.182  0.00157 ** 
+
+### ordinal models ----
+d.proj2 = droplevels(subset(d2, d2$polarity == "negative" | 
+                              d2$conditional2 == "conditional")) %>% 
+  mutate(V.Mean.Sum2 = abs(V.Mean.Sum - 5),
+         V.Mean.Sum2.direction = case_when(V.Mean.Sum >= 5 ~ "positive",
+                                           V.Mean.Sum < 5 ~ "negative"),
+         A.Mean.Sum2 = A.Mean.Sum - 1) %>% 
+  distinct(verb_renamed, verb, voice, participant, predicateType, predicateType2, 
+           veridicality, veridicality_num, V.Mean.Sum2, V.Mean.Sum2.direction, 
+           A.Mean.Sum2)
+  
+
+clmm(as.factor(veridicality) ~ A.Mean.Sum2 + (1 | verb_renamed) * 
+       V.Mean.Sum2 + (1 | participant), data = d.proj2)
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality) ~ A.Mean.Sum2 + (1 | verb_renamed) * V.Mean.Sum2 + 
+# (1 | participant)
+# data:    d.proj2
+# 
+# link  threshold nobs  logLik    AIC      niter     max.grad
+# logit flexible  13066 -10138.94 20289.88 661(2648) 1.34e-02
+# 
+# Random effects:
+#   Groups       Name        Variance Std.Dev.
+#   verb_renamed (Intercept) 1.0275   1.014   
+#   participant  (Intercept) 0.6593   0.812   
+# Number of groups:  verb_renamed 445,  participant 290 
+# 
+# Coefficients:
+# A.Mean.Sum2 V.Mean.Sum2 
+#      0.2226      0.4343 
+# 
+# Thresholds:
+# maybe|no   no|yes 
+#    1.197    1.523 
+
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | verb_renamed) * 
+       V.Mean.Sum2 + (1 | participant), data = d.proj2)
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | verb_renamed) *  
+#   V.Mean.Sum2 + (1 | participant)
+# data:    d.proj2
+# 
+# link  threshold nobs  logLik    AIC      niter     max.grad
+# logit flexible  13066 -10033.43 20078.86 382(1931) 5.48e-03
+# 
+# Random effects:
+#   Groups       Name        Variance Std.Dev.
+#   verb_renamed (Intercept) 1.0194   1.0097  
+#   participant  (Intercept) 0.7765   0.8812  
+# Number of groups:  verb_renamed 445,  participant 290 
+# 
+# Coefficients:
+# A.Mean.Sum2 V.Mean.Sum2 
+#      0.2063      0.4329 
+# 
+# Thresholds:
+#   -1|0    0|1 
+# -2.223  1.477 
+
+# WHY ARE THE RESULTS ABOVE DIFFERENT?
+
+
+# clmm(as.factor(veridicality) ~ A.Mean.Sum2 + (1 | verb_renamed) * 
+#        V.Mean.Sum2 + (1 + A.Mean.Sum2 * V.Mean.Sum2 | participant), data = d.proj2)
+# My computer refuses to calculate this.
 
 
 ## possible issues with the analysis ----
@@ -834,7 +918,7 @@ d3[duplicated(d3[,cbind(2,4)]),] %>%
 # plot projection by dynamicity to see if dynamicity modulates projection
 
 # create dataset for projection inferences
-d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) #16291
 
 # create predicateType and Dynamicity columns
@@ -858,30 +942,33 @@ d.proj %>%
 
 mean.proj = d.proj %>%
   group_by(predicateType, Dynamicity) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
 mean.proj
 nrow(mean.proj) #11
 
-ggplot(mean.proj, aes(x=predicateType, y=Mean.Proj, color = Dynamicity)) +
+mean.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv") %>% 
+ggplot(aes(x = predicateType, y = Mean.Proj, colour = Dynamicity)) +
   geom_point() +
-  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),width=0) +
-  geom_hline(yintercept=0) +
-  theme(legend.position="top",
-        axis.ticks.x=element_blank(),
-        axis.text.x = element_text(size=10,angle = 75, hjust = 1)) +
-  scale_y_continuous(limits = c(-.2,1),breaks = c(-.2,0,1)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(size = 10, angle = 75, hjust = 1)) +
+  scale_y_continuous(limits = c(0, 1)) +
   ylab("Mean projection rating") +
   xlab("Predicate type")
-ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf",height=4,width=5)
+ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf", height = 4, width = 6)
 
 
 # H3: Veridicality and projection ratings: positive correlation ----
 
 # create datasets for projection and veridicality inferences
-d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) #16291
-d.verid = droplevels(subset(d,d$polarity != "negative" & d$conditional2 != "conditional"))
+d.verid = droplevels(subset(d, d$polarity != "negative" & d$conditional2 != "conditional"))
 nrow(d.verid) #5401
 
 # create predicateType column
@@ -896,8 +983,10 @@ d.proj = d.proj %>%
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
 nrow(mean.proj) #544
 levels(mean.proj$verb_renamed)
@@ -911,7 +1000,7 @@ nrow(tmp) #544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
-  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
 nrow(mean.proj) #544
 
 # calculate by-predicate veridicality means 
@@ -924,7 +1013,7 @@ nrow(mean.verid) #544
 levels(mean.verid$verb_renamed)
 
 mean.proj.verid = mean.proj %>%
-  inner_join(mean.verid,by=("verb_renamed"))
+  inner_join(mean.verid, by = ("verb_renamed"))
 mean.proj.verid
 
 # remove "other" and "comPriv" predicates
@@ -933,49 +1022,51 @@ mean.proj.verid = mean.proj.verid %>%
 nrow(mean.proj.verid) #524
 
 # Mean projection by mean veridicality
-ggplot(mean.proj.verid, aes(x=Mean.Verid,y=Mean.Proj, group = predicateType)) +
-  geom_point(shape=21) +
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType)) +
+  geom_point(shape = 21) +
   geom_smooth(method = "lm", se = FALSE) +
-  geom_errorbarh(aes(xmin=YMin.Verid,xmax=YMax.Verid),alpha=.8,color="gray") +
-  geom_errorbar(aes(ymin=YMin.Proj,ymax=YMax.Proj),alpha=.8,color="gray") +
-  #geom_abline(intercept=0,slope=1, color="gray", linetype="dashed") +
-  xlab("Mean veridicality rating") +
-  ylab("Mean projection rating") +
-  scale_y_continuous(limits = c(-1,1)) +
-  scale_x_continuous(limits = c(-1,1)) +
-  coord_fixed(ratio = 1) +
-  theme(legend.position = "none", axis.title.x = element_text(color="black", size=14), axis.title.y = element_text(color="black", size=14))
-ggsave("../graphs/projection-by-veridicality-with-CIs.pdf", height = 4,width = 5)
+  geom_errorbarh(aes(xmin = YMin.Verid, xmax = YMax.Verid), alpha = .8, colour = "grey") +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), alpha = .8, colour ="grey") +
+  labs(x = "Mean veridicality rating",
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  theme(legend.position = "top") +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  coord_fixed(ratio = 1)
+ggsave("../graphs/projection-by-veridicality-with-CIs.pdf", height = 4, width = 8)
 
-ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  labs(
-    x = "Mean veridicality rating", y = "Mean projection rating",
-    color = "Predicate type") +
+  labs(x = "Mean veridicality rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
   theme(legend.position = "top") +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
   coord_fixed(ratio = 1)
-ggsave("../graphs/projection-by-veridicality.pdf", height = 4,width = 8)
+ggsave("../graphs/projection-by-veridicality.pdf", height = 4, width = 8)
 
 # What are the predicates with negative mean projection rating and positive mean veridicality rating?
-ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, color = predicateType)) +
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj)) +
   geom_point(alpha = .3) +
-  geom_label_repel(data=subset(mean.proj.verid, Mean.Verid > 0 & Mean.Proj < 0),
-                   aes(x = Mean.Verid, y = Mean.Proj, label=verb_renamed)) +
-  geom_smooth(method = "lm", color = "black", linewidth = 0.5) +
-  labs(
-    x = "Mean veridicality rating", y = "Mean projection rating",
-    color = "Predicate type") +
+  geom_label_repel(data = subset(mean.proj.verid, Mean.Verid > 0 & Mean.Proj < 0),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0) +
+  geom_smooth(method = "lm", colour = "black", linewidth = 0.5) +
+  labs(x = "Mean veridicality rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
   theme(panel.grid = element_blank(),
         legend.position = "none") +
-  geom_abline(intercept=0,slope=0, color="gray", linetype="dashed") +
-  #geom_abline(intercept=0,slope=0, color="gray", linetype="dashed") +
-  geom_vline(xintercept=0, color="gray", linetype="dashed") +
-  scale_y_continuous(limits = c(-1,1)) +
-  scale_x_continuous(limits = c(-1,1)) +
+  geom_abline(intercept = 0, slope = 0, colour="grey", linetype = 2) +
+  geom_vline(xintercept = 0, colour = "grey", linetype = 2) +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
   coord_fixed(ratio = 1) + 
   facet_wrap(~predicateType)
-ggsave("../graphs/projection-by-veridicality2.pdf", height = 4,width = 6)
+ggsave("../graphs/projection-by-veridicality2.pdf", height = 6, width = 6)
 
 
 
