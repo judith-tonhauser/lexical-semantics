@@ -47,7 +47,7 @@ cols2 =  c(cognitive = "coral",
 
 # create dataset for projection inferences
 d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
-nrow(d.proj) #16291
+nrow(d.proj) # 16291
 
 # create predicateType column
 d.proj = d.proj %>%
@@ -60,8 +60,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -84,8 +86,10 @@ d.proj %>%
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   group_by(predicateType) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType), Mean.Proj))
 mean.proj
 nrow(mean.proj) # 6
 levels(mean.proj$predicateType)
@@ -94,16 +98,16 @@ levels(mean.proj$predicateType)
 mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv") %>% 
 ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
-  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   theme(legend.position = "none",
         axis.ticks.x = element_blank(),
         axis.text.x = element_text(size = 10),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   ylab("Mean projection rating") +
   xlab("Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-predicateType.pdf", height = 6, width = 9)
 
@@ -112,8 +116,10 @@ ggsave("../graphs/projection-by-predicateType.pdf", height = 6, width = 9)
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
 nrow(mean.proj) #544
 levels(mean.proj$verb_renamed)
@@ -142,10 +148,10 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) 
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(x = "Predicate",
        y = "Mean projection rating",
        colour = "Predicate type") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-predicate.pdf", height = 4, width = 13)
 
@@ -156,12 +162,12 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) 
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
-  facet_wrap(~ predicateType, ncol = 4) +
   labs(x = "Predicate",
-    y = "Mean projection rating", 
-    colour = "Predicate type") + 
-  scale_colour_manual(values = cols)
+       y = "Mean projection rating", 
+       colour = "Predicate type") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols) +
+  facet_wrap(~ predicateType, ncol = 4)
 ggsave("../graphs/projection-by-predicate-faceted.pdf", height = 4, width = 9)
 
 #### linear model ----
@@ -184,18 +190,16 @@ d.proj = d.proj %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ predicateType + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: 
-# as.factor(veridicality_num) ~ predicateType + (1 | participant) +  
+# formula: as.factor(veridicality_num) ~ predicateType + (1 | participant) +  
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter    
-# logit flexible  15662 -11343.24 22700.49 549(2742)
-# max.grad
-# 3.04e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11343.24 22700.49 549(2742) 3.04e-03 4.1e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -204,16 +208,17 @@ clmm(as.factor(veridicality_num) ~ predicateType + (1 | participant) +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#     predicateTypecognitive 
-#                     -2.260 
-# predicateTypecommunicative 
-#                     -1.875 
-#    predicateTypeevidential 
-#                     -1.954 
+#                            Estimate Std. Error z value Pr(>|z|)    
+# predicateTypecognitive     -2.25959    0.06799  -33.23   <2e-16 ***
+# predicateTypecommunicative -1.87484    0.04689  -39.98   <2e-16 ***
+# predicateTypeevidential    -1.95400    0.05748  -33.99   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.871 -1.240 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.8712     0.4094 -11.899
+# 0|1   -1.2395     0.4071  -3.045
 
 
 # with predicate type with emotive component distinction
@@ -222,18 +227,16 @@ d.proj = d.proj %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: 
-# as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +  
+# formula: as.factor(veridicality_num) ~ predicateType2 + (1 | participant) + 
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC     
-# logit flexible  15662 -11306.94 22629.88
-# niter       max.grad
-# 2316(11576) 2.12e-03
+# link  threshold nobs  logLik    AIC      niter       max.grad cond.H 
+# logit flexible  15662 -11306.94 22629.88 2316(11576) 2.12e-03 4.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -242,14 +245,18 @@ clmm(as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#   predicateType2cognitive    predicateType2emoComm 
-#                    -2.262                   -1.444 
-#  predicateType2evidential predicateType2nonEmoComm 
-#                    -1.955                   -1.984 
+#                          Estimate Std. Error z value Pr(>|z|)    
+# predicateType2cognitive  -2.26169    0.06806  -33.23   <2e-16 ***
+# predicateType2emoComm    -1.44407    0.06899  -20.93   <2e-16 ***
+# predicateType2evidential -1.95526    0.05753  -33.99   <2e-16 ***
+# predicateType2nonEmoComm -1.98363    0.04874  -40.70   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.883 -1.238 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.8831     0.4111 -11.879
+# 0|1   -1.2379     0.4087  -3.029
 
 
 ## H1.2: communicatives: with/without emotive component ----
@@ -258,7 +265,7 @@ clmm(as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +
 
 # create dataset for projection inferences
 d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
-nrow(d.proj) #16291
+nrow(d.proj) # 16291
 
 # create predicateType and emotiveComponent columns
 d.proj = d.proj %>%
@@ -271,8 +278,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -286,8 +295,10 @@ d.proj = d.proj %>%
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   group_by(predicateType, emotiveComponent) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
 mean.proj
 nrow(mean.proj) # 7
 levels(mean.proj$predicateType)
@@ -296,9 +307,9 @@ levels(mean.proj$predicateType)
 mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv") %>% 
 ggplot(aes(x = predicateType, y = Mean.Proj, colour = emotiveComponent)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
-  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   theme(legend.position = "top",
         axis.ticks.x = element_blank(),
         axis.text.x = element_text(size = 10),
@@ -314,27 +325,29 @@ ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf", height = 6,
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
-nrow(mean.proj) #544
+nrow(mean.proj) # 544
 levels(mean.proj$verb_renamed)
 
 # add predicateType, verb and emotiveComponent to the means
 tmp = d.proj %>%
   select(c(verb, verb_renamed, predicateType, emotiveComponent)) %>%
   distinct(verb, verb_renamed, predicateType, emotiveComponent)
-nrow(tmp) #544
+nrow(tmp) # 544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj) #544
+nrow(mean.proj) # 544
 
 # only communicative predicates
 mean.proj = mean.proj %>%
   filter(predicateType == "communicative")
-nrow(mean.proj) #236
+nrow(mean.proj) # 236
 
 #### plot ----
 ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = emotiveComponent)) +
@@ -344,14 +357,14 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = emotiveComponent
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(x = "Predicate",
        y = "Mean projection rating",
        colour = "Emotive component") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("deepskyblue2", "green3")) +
   facet_wrap( ~ emotiveComponent, 
               labeller = as_labeller(c("no" = "communicatives\nwithout emotive component", 
-                                       "yes" = "communicatives\nwith emotive component"))) +
-  scale_colour_manual(values = c("deepskyblue2", "green3"))
+                                       "yes" = "communicatives\nwith emotive component")))
 ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 6, width = 9)
 
 #### linear model ----
@@ -368,15 +381,16 @@ d.proj = d.proj %>%
   filter(predicateType == "communicative")
 
 clmm(as.factor(veridicality_num) ~ emotiveComponent + (1 | participant) + 
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ emotiveComponent + (1 | participant) + 
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs logLik   AIC      niter     max.grad
-# logit flexible  7069 -5259.36 10528.71 272(1609) 3.09e-04
+# link  threshold nobs logLik   AIC      niter     max.grad cond.H 
+# logit flexible  7069 -5259.36 10528.71 272(1609) 3.09e-04 3.8e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -385,12 +399,15 @@ clmm(as.factor(veridicality_num) ~ emotiveComponent + (1 | participant) +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#  emotiveComponentyes 
-#               0.5849 
+#                     Estimate Std. Error z value Pr(>|z|)    
+# emotiveComponentyes  0.58492    0.06701   8.728   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -3.1856  0.7887 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -3.1856     0.5546  -5.744
+# 0|1    0.7887     0.5526   1.427 
 
 
 # H2: valence and arousal ----
@@ -417,8 +434,10 @@ d2 = d2 %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -433,7 +452,8 @@ n_distinct(d3$verb_renamed) # 428
 n_distinct(d3$verb) # 410
 
 d3 = d3 %>%
-  distinct(verb_renamed, verb, voice, predicateType, predicateType2, V.Mean.Sum, A.Mean.Sum, D.Mean.Sum)
+  distinct(verb_renamed, verb, voice, predicateType, predicateType2, V.Mean.Sum, 
+           A.Mean.Sum, D.Mean.Sum)
 
 table(d3$predicateType)
 # cognitive communicative       emotive    evidential 
@@ -450,8 +470,10 @@ nrow(d.proj) # 16291
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
-  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), CIHigh = ci.high(veridicality_num)) %>%
-  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 nrow(mean.proj) # 544
 
 # combine projection and valence/arousal/dominance ratings in one data frame
@@ -519,9 +541,10 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2,
        y = "Mean valence rating", 
        colour = "Predicate type") +
   scale_y_continuous(limits = c(0, 1)) +
-  scale_colour_manual(values = cols2, labels = c("cognitive", "communicative with\nemotive component", 
-                                                 "emotive", "evidential", 
-                                                 "communicative without\nemotive component"))
+  scale_colour_manual(values = cols2, 
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component"))
 ggsave("../graphs/valence-by-predicate2.pdf", height = 4, width = 13)
 
 #### linear model ----
@@ -540,7 +563,8 @@ lm(V.Mean.Sum2 ~ predicateType2, new.scale) %>%
 # calculate valence by predicateType means
 mean.valence = new.scale %>%
   group_by(predicateType) %>%
-  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), CIHigh = ci.high(V.Mean.Sum2)) %>%
+  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
+            CIHigh = ci.high(V.Mean.Sum2)) %>%
   mutate(YMin.Valence = Mean.Valence - CILow, YMax.Valence = Mean.Valence + CIHigh, 
          predicateType = fct_reorder(as.factor(predicateType), Mean.Valence))
 mean.valence
@@ -559,7 +583,8 @@ ggsave("../graphs/valence-by-predicateType.pdf", height = 8, width = 10)
 # calculate valence by predicateType2 means (communicatives with/without emotive component)
 mean.valence2 = new.scale %>%
   group_by(predicateType2) %>%
-  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), CIHigh = ci.high(V.Mean.Sum2)) %>%
+  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
+            CIHigh = ci.high(V.Mean.Sum2)) %>%
   mutate(YMin.Valence = Mean.Valence - CILow, YMax.Valence = Mean.Valence + CIHigh, 
          predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Valence))
 mean.valence2
@@ -582,7 +607,8 @@ ggsave("../graphs/valence-by-predicateType2.pdf", height = 8, width = 10)
 # calculate valence by predicateType2 means and direction of valence
 mean.valence3 = new.scale %>%
   group_by(predicateType2, V.Mean.Sum2.direction) %>%
-  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), CIHigh = ci.high(V.Mean.Sum2)) %>%
+  summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
+            CIHigh = ci.high(V.Mean.Sum2)) %>%
   mutate(YMin.Valence = Mean.Valence - CILow, YMax.Valence = Mean.Valence + CIHigh, 
          predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Valence))
 mean.valence3
@@ -590,7 +616,8 @@ nrow(mean.valence3) # 10
 
 # valence by predicate type and direction of valence
 #### plot ----
-ggplot(mean.valence3, aes(x = predicateType2, y = Mean.Valence, colour = V.Mean.Sum2.direction)) +
+ggplot(mean.valence3, aes(x = predicateType2, y = Mean.Valence, 
+                          colour = V.Mean.Sum2.direction)) +
   geom_point(position = position_dodge(0.2)) +
   geom_errorbar(aes(ymin = YMin.Valence, ymax = YMax.Valence), width = 0, 
                 position = position_dodge(0.2)) +
@@ -690,7 +717,7 @@ ggplot(mean.arousal, aes(x = predicateType, y = Mean.Arousal, colour = predicate
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Arousal, ymax = YMax.Arousal), width = 0) +
   theme(legend.position = "none",
-    axis.ticks.x = element_blank(),
+        axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
   labs(x = "Predicate type",
        y = "Mean arousal rating (calm >>> excited)") +
@@ -712,7 +739,8 @@ ggplot(mean.arousal2, aes(x = predicateType2, y = Mean.Arousal, colour = predica
   theme(legend.position = "none",
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_x_discrete(labels = c("cognitive", "evidential", "communicative without \n emotive component",
+  scale_x_discrete(labels = c("cognitive", "evidential", 
+                              "communicative without \n emotive component",
                               "communicative with \n emotive component", "emotive")) +
   labs(x = "Predicate type",
        y = "Mean arousal rating (calm >>> excited)") +
@@ -794,8 +822,7 @@ ggsave("../graphs/valence-arousal-by-predicateType2.pdf", height = 6, width = 10
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType)) +
-  geom_smooth(method = "lm") +
-  xlim(0, 1) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "top",
         panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
@@ -804,6 +831,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating",
        colour = "Predicate type") +
+  xlim(0, 1) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-valence.pdf", height = 6, width = 6)
@@ -812,8 +840,7 @@ ggsave("../graphs/projection-by-valence.pdf", height = 6, width = 6)
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType2)) +
-  geom_smooth(method = "lm") +
-  xlim(0, 1) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "top",
         panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
@@ -822,19 +849,19 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating",
        colour = "Predicate type") +
+  xlim(0, 1) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
                                  "emotive", "evidential", 
                                  "communicative without\nemotive component"))
-ggsave("../graphs/projection-by-valence.pdf", height = 6, width = 8)
+ggsave("../graphs/projection-by-valence2.pdf", height = 6, width = 8)
 
 # projection by valence faceted
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType)) +
-  geom_smooth(method = "lm") +
-  xlim(0, 1) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(vjust = -2),
@@ -842,6 +869,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating") +
+  xlim(0, 1) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   facet_wrap(~ predicateType, ncol = 4) +
   scale_colour_manual(values = cols)
@@ -858,8 +886,7 @@ predicateType2_names <- c( "cognitive" = "cognitive",
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType2)) +
-  geom_smooth(method = "lm") +
-  xlim(0, 1) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(vjust = -2),
@@ -867,6 +894,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating") +
+  xlim(0, 1) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2) +
   facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
@@ -908,6 +936,7 @@ lm(Mean.Proj ~ V.Mean.Sum2 * predicateType2, data = new.scale) %>%
 
 ##### largest residuals ----
 # For which predicates does the linear model make the least accurate predictions?
+# I don't remember why we were wondering about this. :)
 residual <- resid(lm(Mean.Proj ~ V.Mean.Sum2, data = new.scale))
 cbind(new.scale, residual) %>% 
   arrange(desc(abs(residual))) %>% 
@@ -1006,15 +1035,16 @@ d.proj2 = d.proj2 %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + (1 | environment),
-     data = d.proj2)
+     data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) +  
+# formula: as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + 
 #   (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  12817 -10002.21 20014.42 256(1285) 1.55e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  12817 -10002.21 20014.42 256(1285) 1.55e-03 3.4e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1023,12 +1053,15 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + (1 | enviro
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# V.Mean.Sum2 
-# 1.988 
+#             Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2  1.98765    0.09765   20.35   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -2.6331  0.8454 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.6331     0.3930  -6.700
+# 0|1    0.8454     0.3918   2.158 
 
 # with predicate type
 # set emotives as reference level
@@ -1036,15 +1069,16 @@ d.proj2 = d.proj2 %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj2)
+       (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ V.Mean.Sum2 * predicateType + 
-#   (1 | participant) + (1 | environment)
+#   (1 |  participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter      max.grad
-# logit flexible  12817 -9339.41 18700.82 1059(5275) 1.08e-02
+# link  threshold nobs  logLik   AIC      niter      max.grad cond.H 
+# logit flexible  12817 -9339.41 18700.82 1059(5275) 1.08e-02 4.5e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1053,18 +1087,21 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * predicateType + (1 | participan
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                          V.Mean.Sum2                 predicateTypecognitive 
-#                              0.11479                               -2.29976 
-#           predicateTypecommunicative                predicateTypeevidential 
-#                             -2.06256                               -2.03960 
-#   V.Mean.Sum2:predicateTypecognitive V.Mean.Sum2:predicateTypecommunicative 
-#                              0.02889                                0.74117 
-#  V.Mean.Sum2:predicateTypeevidential 
-#                              0.15116 
+#                                        Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2                             0.11479    0.23714   0.484  0.62834    
+# predicateTypecognitive                 -2.29976    0.16421 -14.005  < 2e-16 ***
+# predicateTypecommunicative             -2.06256    0.12442 -16.577  < 2e-16 ***
+# predicateTypeevidential                -2.03960    0.13913 -14.659  < 2e-16 ***
+# V.Mean.Sum2:predicateTypecognitive      0.02889    0.39297   0.074  0.94139    
+# V.Mean.Sum2:predicateTypecommunicative  0.74117    0.28397   2.610  0.00905 ** 
+# V.Mean.Sum2:predicateTypeevidential     0.15116    0.38522   0.392  0.69477    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.913 -1.216 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.9126     0.4424 -11.105
+# 0|1   -1.2158     0.4398  -2.765 
 
 #### with direction ----
 # projection by valence with direction
@@ -1072,8 +1109,8 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * predicateType + (1 | participan
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType2)) +
-  geom_smooth(method = "lm", aes(linetype = V.Mean.Sum2.direction)) +
-  xlim(0, 1) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
   theme(panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
@@ -1082,6 +1119,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
        y = "Mean projection rating",
        colour = "Predicate type", 
        linetype = "Direction of valence") +
+  xlim(0, 1) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
@@ -1116,15 +1154,16 @@ lm(Mean.Proj ~ V.Mean.Sum2 * V.Mean.Sum2.direction, data = new.scale) %>%
 
 ##### ordinal models ----
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) + 
-       (1 | environment), data = d.proj2)
+       (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) + 
+# formula: as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) +  
 #   (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  12817 -10165.16 20340.33 697(2818) 1.68e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  12817 -10165.16 20340.33 697(2818) 1.68e-03 3.3e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1133,24 +1172,28 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# V.Mean.Sum2.directionpositive 
-# -0.3851 
+#                               Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2.directionpositive -0.38510    0.03787  -10.17   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#     -1|0      0|1 
-# -3.35891  0.05278 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0 -3.35891    0.38461  -8.733
+# 0|1   0.05278    0.38275   0.138
 
 # with predicate type
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * predicateType + 
-       (1 | participant) + (1 | environment), data = d.proj2)
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ V.Mean.Sum2.direction * predicateType +  
 #   (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter       max.grad
-# logit flexible  12817 -9323.44 18668.88 2231(11123) 5.55e-03
+# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
+# logit flexible  12817 -9323.44 18668.88 2231(11123) 5.55e-03 4.6e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1159,35 +1202,33 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * predicateType +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# V.Mean.Sum2.directionpositive 
-# 0.2351 
-# predicateTypecognitive 
-# -1.8422 
-# predicateTypecommunicative 
-# -1.7418 
-# predicateTypeevidential 
-# -2.4270 
-# V.Mean.Sum2.directionpositive:predicateTypecognitive 
-# -0.7685 
-# V.Mean.Sum2.directionpositive:predicateTypecommunicative 
-# -0.3941 
-# V.Mean.Sum2.directionpositive:predicateTypeevidential 
-# 0.3716 
+#                                                          Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2.directionpositive                             0.23513    0.09751   2.411 0.015897 *  
+# predicateTypecognitive                                   -1.84218    0.12411 -14.844  < 2e-16 ***
+# predicateTypecommunicative                               -1.74181    0.07155 -24.344  < 2e-16 ***
+# predicateTypeevidential                                  -2.42698    0.11303 -21.472  < 2e-16 ***
+# V.Mean.Sum2.directionpositive:predicateTypecognitive     -0.76852    0.16188  -4.748 2.06e-06 ***
+# V.Mean.Sum2.directionpositive:predicateTypecommunicative -0.39415    0.11163  -3.531 0.000414 ***
+# V.Mean.Sum2.directionpositive:predicateTypeevidential     0.37161    0.14582   2.548 0.010823 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.886 -1.183 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.8855     0.4302 -11.356
+# 0|1   -1.1826     0.4275  -2.766
 
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction + 
-       (1 | participant) + (1 | environment), data = d.proj2)
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction +  
+# formula: as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction + 
 #   (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter     max.grad
-# logit flexible  12817 -9963.00 19940.00 518(2587) 8.67e-04
+# link  threshold nobs  logLik   AIC      niter     max.grad cond.H 
+# logit flexible  12817 -9963.00 19940.00 518(2587) 8.67e-04 3.5e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1196,26 +1237,30 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                               V.Mean.Sum2             V.Mean.Sum2.directionpositive 
-#                                   2.30633                                  -0.08326 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive 
-#                                  -0.77539 
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2                                2.30633    0.14125  16.328  < 2e-16 ***
+# V.Mean.Sum2.directionpositive             -0.08326    0.06704  -1.242    0.214    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive -0.77539    0.19396  -3.998  6.4e-05 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -2.7210  0.7709
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.7210     0.3976  -6.844
+# 0|1    0.7709     0.3963   1.945
 
 # with predicate type
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction * predicateType + 
-       (1 | participant) + (1 | environment), data = d.proj2)
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction *  
 #   predicateType + (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter       max.grad
-# logit flexible  12817 -9305.11 18648.22 4334(21673) 6.44e-03
+# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
+# logit flexible  12817 -9305.11 18648.22 4334(21673) 6.44e-03 2.6e+03
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1224,40 +1269,29 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction * predica
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# V.Mean.Sum2 
-# -0.274440 
-# V.Mean.Sum2.directionpositive 
-# -0.269435 
-# predicateTypecognitive 
-# -2.117461 
-# predicateTypecommunicative 
-# -2.119193 
-# predicateTypeevidential 
-# -2.514091 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive 
-# 1.180177 
-# V.Mean.Sum2:predicateTypecognitive 
-# 0.852998 
-# V.Mean.Sum2:predicateTypecommunicative 
-# 1.264739 
-# V.Mean.Sum2:predicateTypeevidential 
-# -0.007226 
-# V.Mean.Sum2.directionpositive:predicateTypecognitive 
-# -0.254990 
-# V.Mean.Sum2.directionpositive:predicateTypecommunicative 
-# 0.218646 
-# V.Mean.Sum2.directionpositive:predicateTypeevidential 
-# 0.822475 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecognitive 
-# -1.355088 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecommunicative 
-# -1.518771 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypeevidential 
-# -0.835773 
+#                                                                       Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2                                                          -0.274440   0.300927  -0.912 0.361778    
+# V.Mean.Sum2.directionpositive                                        -0.269435   0.235251  -1.145 0.252081    
+# predicateTypecognitive                                               -2.117461   0.250029  -8.469  < 2e-16 ***
+# predicateTypecommunicative                                           -2.119193   0.165335 -12.818  < 2e-16 ***
+# predicateTypeevidential                                              -2.514091   0.201503 -12.477  < 2e-16 ***
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive                             1.180177   0.496357   2.378 0.017422 *  
+# V.Mean.Sum2:predicateTypecognitive                                    0.852998   0.718565   1.187 0.235194    
+# V.Mean.Sum2:predicateTypecommunicative                                1.264739   0.373175   3.389 0.000701 ***
+# V.Mean.Sum2:predicateTypeevidential                                  -0.007226   0.661066  -0.011 0.991279    
+# V.Mean.Sum2.directionpositive:predicateTypecognitive                 -0.254990   0.340984  -0.748 0.454577    
+# V.Mean.Sum2.directionpositive:predicateTypecommunicative              0.218646   0.252784   0.865 0.387066    
+# V.Mean.Sum2.directionpositive:predicateTypeevidential                 0.822475   0.287855   2.857 0.004273 ** 
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecognitive     -1.355088   0.897267  -1.510 0.130982    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecommunicative -1.518771   0.587195  -2.586 0.009696 ** 
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypeevidential    -0.835773   0.852682  -0.980 0.327002    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -5.022 -1.309 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -5.0217     0.4535 -11.074
+# 0|1   -1.3090     0.4508  -2.904
 
 
 ### H2.4.2 arousal ----
@@ -1266,7 +1300,7 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction * predica
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType)) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "top",
         panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
@@ -1285,7 +1319,7 @@ ggsave("../graphs/projection-by-arousal.pdf", height = 6, width = 6)
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType)) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(vjust = -2),
@@ -1311,7 +1345,7 @@ predicateType2_names <- c( "cognitive" = "cognitive",
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = predicateType2)) +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
         panel.spacing.x = unit(1, "cm"),
         axis.title.x = element_text(vjust = -2),
@@ -1362,15 +1396,16 @@ lm(Mean.Proj ~ A.Mean.Sum2 * predicateType2, data = new.scale) %>%
 
 #### ordinal models ----
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | environment), 
-     data = d.proj2)
+     data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) +
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) +  
 #   (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik    AIC      niter    max.grad
-# logit flexible  12817 -10097.57 20205.14 237(985) 2.72e-03
+# link  threshold nobs  logLik    AIC      niter    max.grad cond.H 
+# logit flexible  12817 -10097.57 20205.14 237(985) 2.72e-03 3.4e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1379,23 +1414,27 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | enviro
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# A.Mean.Sum2 
-# 2.518 
+#             Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2   2.5182     0.1646    15.3   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -2.126  1.313 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.1261     0.3909  -5.439
+# 0|1    1.3130     0.3901   3.366
 
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj2)
+       (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + 
-#   (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + (1 | participant) + 
+#   (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter     max.grad
-# logit flexible  12817 -9351.48 18724.97 975(4722) 2.58e-03
+# link  threshold nobs  logLik   AIC      niter     max.grad cond.H 
+# logit flexible  12817 -9351.48 18724.97 975(4722) 2.58e-03 1.1e+03
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1404,18 +1443,21 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + (1 | participan
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                           A.Mean.Sum2                 predicateTypecognitive 
-#                                0.1030                                -1.7109 
-#            predicateTypecommunicative                predicateTypeevidential 
-#                               -1.9705                                -1.8554 
-#    A.Mean.Sum2:predicateTypecognitive A.Mean.Sum2:predicateTypecommunicative 
-#                               -1.5503                                 0.1705 
-#   A.Mean.Sum2:predicateTypeevidential 
-#                               -0.4523 
+#                                        Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                              0.1030     0.3762   0.274   0.7843    
+# predicateTypecognitive                  -1.7109     0.3115  -5.493 3.94e-08 ***
+# predicateTypecommunicative              -1.9705     0.2188  -9.007  < 2e-16 ***
+# predicateTypeevidential                 -1.8554     0.2730  -6.797 1.07e-11 ***
+# A.Mean.Sum2:predicateTypecognitive      -1.5503     0.7415  -2.091   0.0366 *  
+# A.Mean.Sum2:predicateTypecommunicative   0.1705     0.4548   0.375   0.7078    
+# A.Mean.Sum2:predicateTypeevidential     -0.4523     0.6429  -0.704   0.4817    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.903 -1.214 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.9034     0.4666 -10.508
+# 0|1   -1.2139     0.4641  -2.615
 
 ### H2.4.3 valence + arousal ----
 #### linear models ----
@@ -1439,15 +1481,16 @@ lm(Mean.Proj ~ V.Mean.Sum2 + A.Mean.Sum2, data = new.scale) %>%
 
 #### ordinal models ----
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant) + 
-       (1 | environment), data = d.proj2)
+       (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + 
-#   (1 |  participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant) + 
+#   (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter     max.grad
-# logit flexible  12817 -9970.04 19954.07 557(2765) 6.24e-04
+# link  threshold nobs  logLik   AIC      niter     max.grad cond.H 
+# logit flexible  12817 -9970.04 19954.07 557(2765) 6.24e-04 1.0e+03
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1456,23 +1499,29 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant)
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#   A.Mean.Sum2             V.Mean.Sum2 A.Mean.Sum2:V.Mean.Sum2 
-#        0.8755                  0.9661                  1.5885 
+#                         Estimate Std. Error z value Pr(>|z|)   
+# A.Mean.Sum2               0.8755     0.3247   2.696  0.00701 **
+# V.Mean.Sum2               0.9661     0.3786   2.552  0.01071 * 
+# A.Mean.Sum2:V.Mean.Sum2   1.5885     0.8274   1.920  0.05488 . 
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -2.373  1.116  
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.3733     0.4135  -5.739
+# 0|1    1.1157     0.4128   2.703
 
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * predicateType +
-       (1 | participant) + (1 | environment), data = d.proj2)
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * predicateType +  
 #   (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter       max.grad
-# logit flexible  12817 -9323.78 18685.57 4376(21845) 3.76e-04
+# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
+# logit flexible  12817 -9323.78 18685.57 4376(21845) 3.76e-04 3.9e+04
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1481,26 +1530,29 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * predicateType +
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                      A.Mean.Sum2                                        V.Mean.Sum2 
-#                                          -1.7379                                            -1.7131 
-#                           predicateTypecognitive                         predicateTypecommunicative 
-#                                          -4.6417                                            -2.6759 
-#                          predicateTypeevidential                            A.Mean.Sum2:V.Mean.Sum2 
-#                                          -2.5772                                             3.7650 
-#               A.Mean.Sum2:predicateTypecognitive             A.Mean.Sum2:predicateTypecommunicative 
-#                                           5.8393                                             1.1949 
-#              A.Mean.Sum2:predicateTypeevidential                 V.Mean.Sum2:predicateTypecognitive 
-#                                           0.9035                                             7.6438 
-#           V.Mean.Sum2:predicateTypecommunicative                V.Mean.Sum2:predicateTypeevidential 
-#                                           2.1078                                             1.5716 
-#   A.Mean.Sum2:V.Mean.Sum2:predicateTypecognitive A.Mean.Sum2:V.Mean.Sum2:predicateTypecommunicative 
-#                                         -19.0356                                            -2.6265 
-#  A.Mean.Sum2:V.Mean.Sum2:predicateTypeevidential 
-#                                          -2.5030 
+#                                                    Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                         -1.7379     1.1148  -1.559  0.11901    
+# V.Mean.Sum2                                         -1.7131     1.1006  -1.557  0.11957    
+# predicateTypecognitive                              -4.6417     0.7468  -6.216 5.12e-10 ***
+# predicateTypecommunicative                          -2.6759     0.5696  -4.698 2.63e-06 ***
+# predicateTypeevidential                             -2.5772     0.6282  -4.102 4.09e-05 ***
+# A.Mean.Sum2:V.Mean.Sum2                              3.7650     2.2080   1.705  0.08817 .  
+# A.Mean.Sum2:predicateTypecognitive                   5.8393     1.7909   3.261  0.00111 ** 
+# A.Mean.Sum2:predicateTypecommunicative               1.1949     1.2051   0.992  0.32142    
+# A.Mean.Sum2:predicateTypeevidential                  0.9035     1.4225   0.635  0.52530    
+# V.Mean.Sum2:predicateTypecognitive                   7.6438     1.7001   4.496 6.92e-06 ***
+# V.Mean.Sum2:predicateTypecommunicative               2.1078     1.2944   1.628  0.10345    
+# V.Mean.Sum2:predicateTypeevidential                  1.5716     1.6270   0.966  0.33406    
+# A.Mean.Sum2:V.Mean.Sum2:predicateTypecognitive     -19.0356     4.0479  -4.703 2.57e-06 ***
+# A.Mean.Sum2:V.Mean.Sum2:predicateTypecommunicative  -2.6265     2.6351  -0.997  0.31890    
+# A.Mean.Sum2:V.Mean.Sum2:predicateTypeevidential     -2.5030     3.6562  -0.685  0.49360    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -5.743 -2.039 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -5.7435     0.6865  -8.366
+# 0|1   -2.0387     0.6846  -2.978
 
 
 ## possible issues with the analysis ----
@@ -1518,7 +1570,7 @@ d3[duplicated(d3[,cbind(2,4)]),] %>%
 # Of the 101 emotives with valence/arousal/dominance ratings, four predicates occur in both
 # sentence frames in the MV data set. The "active" and "passive voice" versions of these 
 # predicates were assigned the same valence/arousal/dominance ratings. Due to the small number
-# of these cases, this should not affect the overall distributions plotted above.
+# of these cases, this should not affect the overall distributions investigated above.
 
 
 # H3: dynamic/activity/CoS predicates and projection----
@@ -1539,8 +1591,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -1601,30 +1655,43 @@ mean.proj = d.proj %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
          verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
-nrow(mean.proj) #544
+nrow(mean.proj) # 544
 levels(mean.proj$verb_renamed)
 
 # add verb and predicateType to the means
 tmp = d.proj %>%
   select(c(verb, verb_renamed, predicateType, predicateType2, dynamicity)) %>%
   distinct(verb, verb_renamed, predicateType, predicateType2, dynamicity)
-nrow(tmp) #544
+nrow(tmp) # 544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj) #544
+nrow(mean.proj) # 544
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) #523
+nrow(mean.proj) # 523
+
+# how many stative predicates are in each predicate type category?
+mean.proj %>% 
+  filter(dynamicity == "stative") %>% 
+  group_by(predicateType) %>% 
+  summarise(n())
+# # A tibble: 3 × 2
+# predicateType `n()`
+#   <chr>         <int>
+# 1 cognitive        37
+# 2 emotive         148
+# 3 evidential        7
 
 #### plots ----
 # projection by predicate with dynamic predicates highlighted
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
   geom_point(data = mean.proj %>% filter(dynamicity == "dynamic"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = dynamicity), 
              size = 4,  shape = 1, colour = "violetred3", alpha = 0.7, stroke = 1.2) +
@@ -1642,7 +1709,8 @@ ggsave("../graphs/projection-by-predicate-dynamic.pdf", height = 4, width = 13)
 
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType), 
              show.legend = FALSE) +
   geom_point(data = mean.proj %>% filter(dynamicity == "dynamic"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = dynamicity), 
@@ -1663,7 +1731,8 @@ ggsave("../graphs/projection-by-predicate-dynamic-faceted.pdf", height = 6, widt
 # projection by predicate with stative predicates highlighted
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
   geom_point(data = mean.proj %>% filter(dynamicity == "stative"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = dynamicity), 
              size = 4,  shape = 1, colour = "aquamarine4", alpha = 0.7, stroke = 1.2) +
@@ -1678,6 +1747,27 @@ ggplot() +
   scale_fill_discrete(name = element_blank(), labels = c("stative predicate")) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-predicate-stative.pdf", height = 4, width = 13)
+
+ggplot() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
+             show.legend = FALSE) +
+  geom_point(data = mean.proj %>% filter(dynamicity == "stative"), 
+             aes(x = verb_renamed, y = Mean.Proj, fill = dynamicity), 
+             size = 4,  shape = 1, colour = "aquamarine4", alpha = 0.7, stroke = 1.2) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating", 
+       x = "Predicate",
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_fill_discrete(name = element_blank(), labels = c("stative predicate")) +
+  scale_colour_manual(values = cols) +
+  facet_wrap(~ predicateType) 
+ggsave("../graphs/projection-by-predicate-stative-faceted.pdf", height = 4, width = 13)
 
 #### linear models ----
 lm(Mean.Proj ~ dynamicity, data = mean.proj) %>%  
@@ -1716,14 +1806,16 @@ d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 clmm(as.factor(veridicality_num) ~ dynamicity + (1 | participant) + (1 | environment), 
-     data = d.proj)
+     data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ dynamicity + (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ dynamicity + (1 | participant) + 
+#   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -11833.45 23676.90 349(1749) 3.15e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11833.45 23676.90 349(1749) 3.15e-03 4.0e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1732,12 +1824,15 @@ clmm(as.factor(veridicality_num) ~ dynamicity + (1 | participant) + (1 | environ
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#   dynamicitystative 
-#               1.312 
+#                   Estimate Std. Error z value Pr(>|z|)    
+# dynamicitystative  1.31164    0.03764   34.84   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -2.859  0.657
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.8588     0.3855  -7.416
+# 0|1    0.6570     0.3843   1.710
 
 # with predicate type
 # set emotives as reference level
@@ -1745,7 +1840,8 @@ d.proj = d.proj %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ dynamicity * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 2 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
@@ -1753,8 +1849,8 @@ clmm(as.factor(veridicality_num) ~ dynamicity * predicateType + (1 | participant
 #   (1 |  participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -11338.67 22695.33 846(4234) 8.45e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11338.67 22695.33 846(4234) 8.45e-03 5.7e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1763,16 +1859,19 @@ clmm(as.factor(veridicality_num) ~ dynamicity * predicateType + (1 | participant
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                        dynamicitystative                   predicateTypecognitive 
-#                                 -0.06604                                 -2.59982 
-#               predicateTypecommunicative                  predicateTypeevidential 
-#                                 -1.94137                                 -2.01538 
-# dynamicitystative:predicateTypecognitive 
-#                                  0.43691 
+#                                          Estimate Std. Error z value Pr(>|z|)    
+# dynamicitystative                        -0.06604    0.15150  -0.436   0.6629    
+# predicateTypecognitive                   -2.59982    0.19049 -13.648   <2e-16 ***
+# predicateTypecommunicative               -1.94137    0.15857 -12.243   <2e-16 ***
+# predicateTypeevidential                  -2.01538    0.15053 -13.389   <2e-16 ***
+# dynamicitystative:predicateTypecognitive  0.43691    0.19653   2.223   0.0262 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.940 -1.306 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.9400     0.4366 -11.314
+# 0|1   -1.3058     0.4344  -3.006
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -1780,7 +1879,8 @@ d.proj = d.proj %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ dynamicity * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 3 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
@@ -1788,8 +1888,8 @@ clmm(as.factor(veridicality_num) ~ dynamicity * predicateType2 + (1 | participan
 #   (1 |  participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11302.32 22624.65 1169(5850) 5.46e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11302.32 22624.65 1169(5850) 5.46e-03 5.6e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1798,22 +1898,26 @@ clmm(as.factor(veridicality_num) ~ dynamicity * predicateType2 + (1 | participan
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#         dynamicitystative                   predicateType2cognitive 
-#                  -0.07058                                  -2.60753 
-#     predicateType2emoComm                  predicateType2evidential 
-#                  -1.51483                                  -2.02081 
-#  predicateType2nonEmoComm dynamicitystative:predicateType2cognitive 
-#                  -2.05478                                   0.44300 
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# dynamicitystative                         -0.07058    0.15159  -0.466   0.6415    
+# predicateType2cognitive                   -2.60753    0.19064 -13.678   <2e-16 ***
+# predicateType2emoComm                     -1.51483    0.16637  -9.105   <2e-16 ***
+# predicateType2evidential                  -2.02081    0.15062 -13.417   <2e-16 ***
+# predicateType2nonEmoComm                  -2.05478    0.15926 -12.902   <2e-16 ***
+# dynamicitystative:predicateType2cognitive  0.44300    0.19669   2.252   0.0243 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.957 -1.309 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.9565     0.4382 -11.312
+# 0|1   -1.3089     0.4359  -3.002
 
 
 ## H3.2 change of state ----
 # create dataset for projection inferences
 d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
-nrow(d.proj) #16291
+nrow(d.proj) # 16291
 
 # create predicateType, emotiveComponent, change-of-state, environment columns
 d.proj = d.proj %>%
@@ -1826,8 +1930,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -1862,10 +1968,10 @@ ggplot(mean.proj, aes(x = predicateType, y = Mean.Proj, colour = changeOfState))
         axis.ticks.x = element_blank(),
         axis.text.x = element_text(size = 10),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(0, 1)) +
   labs(y = "Mean projection rating",
        x = "Predicate type",
        colour = "Change-of-state predicate") +
+  scale_y_continuous(limits = c(0, 1)) +
   scale_colour_manual(values = c("no" = "darkblue", "yes" = "gold3"))
 ggsave("../graphs/projection-by-predicateType-and-CoS.pdf", height = 6, width = 9)
 
@@ -1897,11 +2003,26 @@ mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 nrow(mean.proj) # 523
 
+# how many change-of-state predicates are in each predicate type category?
+mean.proj %>% 
+  filter(changeOfState == "yes") %>% 
+  group_by(predicateType) %>% 
+  summarise(n())
+# # A tibble: 2 × 2
+# predicateType `n()`
+#   <chr>         <int>
+# 1 cognitive         4 <<< !!!
+# 2 evidential       37
+
+# The small number of CoS predicates amongst the cognitives is the reason for the
+# different pattern.
+
 #### plots -----
 # projection by predicate with change-of-state predicates highlighted
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
   geom_point(data = mean.proj %>% filter(changeOfState == "yes"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = changeOfState), 
              size = 4,  shape = 1, colour = "gold3", alpha = 0.7, stroke = 1.2) +
@@ -1919,7 +2040,8 @@ ggsave("../graphs/projection-by-predicate-CoS.pdf", height = 4, width = 13)
 
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
              show.legend = FALSE) +
   geom_point(data = mean.proj %>% filter(changeOfState == "yes"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = changeOfState), 
@@ -1973,15 +2095,16 @@ d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 clmm(as.factor(veridicality_num) ~ changeOfState + (1 | participant) + (1 | environment), 
-     data = d.proj)
+     data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
-
+# 
 # formula: as.factor(veridicality_num) ~ changeOfState + (1 | participant) +  
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -12469.05 24948.11 249(1243) 1.54e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -12469.05 24948.11 249(1243) 1.54e-03 3.6e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -1990,12 +2113,15 @@ clmm(as.factor(veridicality_num) ~ changeOfState + (1 | participant) + (1 | envi
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#  changeOfStateyes 
-#           -0.3673 
+#                  Estimate Std. Error z value Pr(>|z|)    
+# changeOfStateyes -0.36734    0.06149  -5.974 2.32e-09 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -3.1684  0.1523 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -3.1684     0.3618  -8.758
+# 0|1    0.1523     0.3603   0.423
 
 # with predicate type
 # set emotives as reference level
@@ -2003,16 +2129,17 @@ d.proj = d.proj %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ changeOfState * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 2 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ changeOfState * predicateType +  
+# formula: as.factor(veridicality_num) ~ changeOfState * predicateType + 
 #   (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -11311.51 22641.02 852(4255) 4.56e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11311.51 22641.02 852(4255) 4.56e-03 4.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2021,16 +2148,19 @@ clmm(as.factor(veridicality_num) ~ changeOfState * predicateType + (1 | particip
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                         changeOfStateyes                  predicateTypecognitive 
-#                                  0.06689                                -2.38912 
-#               predicateTypecommunicative                 predicateTypeevidential 
-#                                 -1.87847                                -1.98605 
-#  changeOfStateyes:predicateTypecognitive 
-#                                  1.56224 
+#                                         Estimate Std. Error z value Pr(>|z|)    
+# changeOfStateyes                         0.06689    0.08387   0.798    0.425    
+# predicateTypecognitive                  -2.38912    0.07017 -34.047  < 2e-16 ***
+# predicateTypecommunicative              -1.87847    0.04694 -40.019  < 2e-16 ***
+# predicateTypeevidential                 -1.98605    0.06764 -29.363  < 2e-16 ***
+# changeOfStateyes:predicateTypecognitive  1.56224    0.22677   6.889 5.62e-12 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.885 -1.241
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.8850     0.4110 -11.887
+# 0|1   -1.2410     0.4087  -3.037
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -2038,7 +2168,8 @@ d.proj = d.proj %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ changeOfState * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 3 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
@@ -2046,8 +2177,8 @@ clmm(as.factor(veridicality_num) ~ changeOfState * predicateType2 + (1 | partici
 #   (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -11275.36 22570.73 970(4844) 3.68e-03
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11275.36 22570.73 970(4844) 3.68e-03 4.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2056,16 +2187,20 @@ clmm(as.factor(veridicality_num) ~ changeOfState * predicateType2 + (1 | partici
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#         changeOfStateyes                  predicateType2cognitive 
-#                  0.06689                                 -2.39112 
-#    predicateType2emoComm                 predicateType2evidential 
-#                 -1.44825                                 -1.98728 
-# predicateType2nonEmoComm changeOfStateyes:predicateType2cognitive 
-#                 -1.98713                                  1.55916 
+#                                          Estimate Std. Error z value Pr(>|z|)    
+# changeOfStateyes                          0.06689    0.08395   0.797    0.426    
+# predicateType2cognitive                  -2.39112    0.07025 -34.036  < 2e-16 ***
+# predicateType2emoComm                    -1.44825    0.06905 -20.973  < 2e-16 ***
+# predicateType2evidential                 -1.98728    0.06769 -29.356  < 2e-16 ***
+# predicateType2nonEmoComm                 -1.98713    0.04879 -40.728  < 2e-16 ***
+# changeOfStateyes:predicateType2cognitive  1.55916    0.22691   6.871 6.36e-12 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.897 -1.239 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.8969     0.4126 -11.869
+# 0|1   -1.2394     0.4103  -3.021
 
 
 ## H3.3: activity ----
@@ -2085,8 +2220,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -2157,11 +2294,24 @@ mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 nrow(mean.proj) # 523
 
+# how many activity predicates are in each predicate type category?
+mean.proj %>% 
+  filter(activity == "yes") %>% 
+  group_by(predicateType) %>% 
+  summarise(n())
+# # A tibble: 3 × 2
+# predicateType `n()`
+#   <chr>         <int>
+# 1 cognitive        12
+# 2 communicative   139
+# 3 evidential       12
+
 #### plots ----
 # projection by predicate with activity predicates highlighted
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
   geom_point(data = mean.proj %>% filter(activity == "yes"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = activity), 
              size = 4,  shape = 1, colour = "red3", alpha = 0.7, stroke = 1.2) +
@@ -2169,17 +2319,18 @@ ggplot() +
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(y = "Mean projection rating", 
        x = "Predicate",
        colour = "Predicate type") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_fill_discrete(name = element_blank(), labels = c("activity")) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-predicate-activity.pdf", height = 4, width = 13)
 
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = predicateType),
              show.legend = FALSE) +
   geom_point(data = mean.proj %>% filter(activity == "yes"), 
              aes(x = verb_renamed, y = Mean.Proj, fill = activity), 
@@ -2188,9 +2339,9 @@ ggplot() +
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
-  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   labs(y = "Mean projection rating", 
        x = "Predicate") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_fill_discrete(name = element_blank(), labels = c("activity")) +
   scale_colour_manual(values = cols) +
   facet_wrap(~ predicateType) 
@@ -2233,14 +2384,15 @@ d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 clmm(as.factor(veridicality_num) ~ activity + (1 | participant) + (1 | environment), 
-     data = d.proj)
+     data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ activity + (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -12348.98 24707.97 288(1445) 6.14e-04
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -12348.98 24707.97 288(1445) 6.14e-04 3.7e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2249,12 +2401,15 @@ clmm(as.factor(veridicality_num) ~ activity + (1 | participant) + (1 | environme
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#   activityyes 
-#       -0.5989 
+#             Estimate Std. Error z value Pr(>|z|)    
+# activityyes -0.59887    0.03622  -16.53   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#      -1|0       0|1 
-# -3.368996 -0.007945 
+# Threshold coefficients:
+#       Estimate Std. Error z value
+# -1|0 -3.368996   0.365502  -9.217
+# 0|1  -0.007945   0.363860  -0.022
 
 # with predicate type
 # set emotives as reference level
@@ -2262,15 +2417,17 @@ d.proj = d.proj %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ activity * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
+# design is column rank deficient so dropping 1 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ activity * predicateType + 
-#   (1 |  participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ activity * predicateType + (1 |  participant) +
+#   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11306.23 22632.47 1068(5323) 6.08e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11306.23 22632.47 1068(5323) 6.08e-03 6.1e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2279,16 +2436,20 @@ clmm(as.factor(veridicality_num) ~ activity * predicateType + (1 | participant) 
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                        activityyes                 predicateTypecognitive 
-#                             0.2923                                -2.0389 
-#         predicateTypecommunicative                predicateTypeevidential 
-#                            -1.9786                                -1.9996 
-# activityyes:predicateTypecognitive activityyes:predicateTypecommunicative 
-#                            -1.2720                                -0.1214 
+#                                        Estimate Std. Error z value Pr(>|z|)    
+# activityyes                             0.29233    0.12017   2.433    0.015 *  
+# predicateTypecognitive                 -2.03889    0.07377 -27.637  < 2e-16 ***
+# predicateTypecommunicative             -1.97864    0.05572 -35.512  < 2e-16 ***
+# predicateTypeevidential                -1.99960    0.05996 -33.350  < 2e-16 ***
+# activityyes:predicateTypecognitive     -1.27201    0.17731  -7.174  7.3e-13 ***
+# activityyes:predicateTypecommunicative -0.12142    0.13041  -0.931    0.352    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.892 -1.240 
+# Threshold coefficients:
+#       Estimate Std. Error z value
+# -1|0  -4.8917     0.4104 -11.920
+# 0|1   -1.2398     0.4080  -3.039
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -2296,15 +2457,17 @@ d.proj = d.proj %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ activity * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
+# design is column rank deficient so dropping 1 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ activity * predicateType2 + 
-#   (1 |  participant) + (1 | environment)
+#   (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11275.35 22574.71 1178(5882) 7.02e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11275.35 22574.71 1178(5882) 7.02e-03 4.3e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2313,16 +2476,22 @@ clmm(as.factor(veridicality_num) ~ activity * predicateType2 + (1 | participant)
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                         activityyes              predicateType2cognitive                predicateType2emoComm 
-#                             0.02598                             -2.04032                             -1.38758 
-#            predicateType2evidential             predicateType2nonEmoComm  activityyes:predicateType2cognitive 
-#                            -1.99994                             -2.00045                             -1.00777 
-#   activityyes:predicateType2emoComm activityyes:predicateType2evidential 
-#                            -0.08907                              0.26513 
+#                                      Estimate Std. Error z value Pr(>|z|)    
+# activityyes                           0.02598    0.05607   0.463   0.6432    
+# predicateType2cognitive              -2.04032    0.07385 -27.629  < 2e-16 ***
+# predicateType2emoComm                -1.38758    0.23340  -5.945 2.76e-09 ***
+# predicateType2evidential             -1.99994    0.06000 -33.333  < 2e-16 ***
+# predicateType2nonEmoComm             -2.00045    0.05623 -35.576  < 2e-16 ***
+# activityyes:predicateType2cognitive  -1.00777    0.14178  -7.108 1.18e-12 ***
+# activityyes:predicateType2emoComm    -0.08907    0.24446  -0.364   0.7156    
+# activityyes:predicateType2evidential  0.26513    0.13259   2.000   0.0455 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -4.902 -1.239 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -4.9019     0.4118 -11.904
+# 0|1   -1.2387     0.4095  -3.025
 
 ## H3.4 dynamic/activity/CoS comparison ----
 # create dataset for projection inferences
@@ -2340,14 +2509,17 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
                                     predicateType == "other" ~ "other"),
          stateActivityCoS = case_when(stative_predicate == "yes" ~ "state",
-                                      change_of_state_predicate == "yes" ~ "change-of-state predicate",
+                                      change_of_state_predicate == "yes" ~ 
+                                        "change-of-state predicate",
                                       activity_predicate == "yes" ~ "activity",
                                       TRUE ~ "other"),
          environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
@@ -2500,15 +2672,16 @@ d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 clmm(as.factor(veridicality_num) ~ stateActivityCoS + (1 | participant) + (1 | environment), 
-     data = d.proj)
+     data = d.proj) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ stateActivityCoS + (1 | participant) + 
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11829.72 23673.44 1817(9089) 5.76e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11829.72 23673.44 1817(9089) 5.76e-03 4.1e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2517,14 +2690,17 @@ clmm(as.factor(veridicality_num) ~ stateActivityCoS + (1 | participant) + (1 | e
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#   stateActivityCoSchange-of-state predicate                     stateActivityCoSother 
-#                                     0.04006                                  -0.10736 
-#                       stateActivityCoSstate 
-#                                     1.27397 
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# stateActivityCoSchange-of-state predicate  0.04006    0.06913   0.579    0.562    
+# stateActivityCoSother                     -0.10736    0.04497  -2.387    0.017 *  
+# stateActivityCoSstate                      1.27397    0.04324  29.461   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -2.8975  0.6196 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.8975     0.3861  -7.504
+# 0|1    0.6196     0.3848   1.610
 
 # with predicate type
 # set emotives as reference level
@@ -2532,16 +2708,17 @@ d.proj = d.proj %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 6 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType + 
+# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType +  
 #   (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11263.34 22552.69 1705(8529) 5.18e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11263.34 22552.69 1705(8529) 5.18e-03 8.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2550,28 +2727,23 @@ clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType + (1 | parti
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# stateActivityCoSchange-of-state predicate 
-# -0.2607 
-# stateActivityCoSother 
-# -0.3385 
-# stateActivityCoSstate 
-# -0.3257 
-# predicateTypecognitive 
-# -3.3513 
-# predicateTypecommunicative 
-# -2.1377 
-# predicateTypeevidential 
-# -2.0295 
-# stateActivityCoSchange-of-state predicate:predicateTypecognitive 
-# 4.0798 
-# stateActivityCoSstate:predicateTypecognitive 
-# 1.1840 
-# stateActivityCoSother:predicateTypecommunicative 
-# 0.1685 
+#                                                                  Estimate Std. Error z value Pr(>|z|)    
+# stateActivityCoSchange-of-state predicate                         -0.2607     0.1289  -2.023  0.04305 *  
+# stateActivityCoSother                                             -0.3385     0.1313  -2.578  0.00993 ** 
+# stateActivityCoSstate                                             -0.3257     0.1836  -1.774  0.07606 .  
+# predicateTypecognitive                                            -3.3513     0.2214 -15.140  < 2e-16 ***
+# predicateTypecommunicative                                        -2.1377     0.1907 -11.210  < 2e-16 ***
+# predicateTypeevidential                                           -2.0295     0.1509 -13.445  < 2e-16 ***
+# stateActivityCoSchange-of-state predicate:predicateTypecognitive   4.0798     0.4210   9.692  < 2e-16 ***
+# stateActivityCoSstate:predicateTypecognitive                       1.1840     0.2264   5.231 1.69e-07 ***
+# stateActivityCoSother:predicateTypecommunicative                   0.1685     0.1407   1.197  0.23120    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -5.232 -1.567
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -5.2325     0.4517 -11.583
+# 0|1   -1.5670     0.4493  -3.487
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -2579,16 +2751,17 @@ d.proj = d.proj %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj)
+       (1 | environment), data = d.proj) %>% 
+  summary()
 # design is column rank deficient so dropping 8 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 +  
+# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + 
 #   (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -11232.51 22495.02 1878(9395) 7.82e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11232.51 22495.02 1878(9395) 7.82e-03 7.1e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2597,32 +2770,25 @@ clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + (1 | part
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-# stateActivityCoSchange-of-state predicate 
-# -0.25927 
-# stateActivityCoSother 
-# -0.02492 
-# stateActivityCoSstate 
-# -0.32841 
-# predicateType2cognitive 
-# -3.35767 
-# predicateType2emoComm 
-# -1.78334 
-# predicateType2evidential 
-# -2.03365 
-# predicateType2nonEmoComm 
-# -2.30739 
-# stateActivityCoSchange-of-state predicate:predicateType2cognitive 
-# 4.07932 
-# stateActivityCoSstate:predicateType2cognitive 
-# 1.18881 
-# stateActivityCoSother:predicateType2emoComm 
-# 0.08842 
-# stateActivityCoSother:predicateType2evidential 
-# -0.31195 
+#                                                                   Estimate Std. Error z value Pr(>|z|)    
+# stateActivityCoSchange-of-state predicate                         -0.25927    0.12895  -2.011   0.0444 *  
+# stateActivityCoSother                                             -0.02492    0.05615  -0.444   0.6572    
+# stateActivityCoSstate                                             -0.32841    0.18369  -1.788   0.0738 .  
+# predicateType2cognitive                                           -3.35767    0.22153 -15.157  < 2e-16 ***
+# predicateType2emoComm                                             -1.78334    0.19673  -9.065  < 2e-16 ***
+# predicateType2evidential                                          -2.03365    0.15103 -13.465  < 2e-16 ***
+# predicateType2nonEmoComm                                          -2.30739    0.19224 -12.002  < 2e-16 ***
+# stateActivityCoSchange-of-state predicate:predicateType2cognitive  4.07932    0.42105   9.688  < 2e-16 ***
+# stateActivityCoSstate:predicateType2cognitive                      1.18881    0.22654   5.248 1.54e-07 ***
+# stateActivityCoSother:predicateType2emoComm                        0.08842    0.24469   0.361   0.7178    
+# stateActivityCoSother:predicateType2evidential                    -0.31195    0.14275  -2.185   0.0289 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -5.245 -1.568 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -5.2454     0.4531  -11.58
+# 0|1   -1.5684     0.4506   -3.48
 
 
 # H4: veridicality and projection ----
@@ -2646,8 +2812,10 @@ d.proj = d.proj %>%
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
                                       TRUE ~ "no"),
          predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
-                                    predicateType == "communicative" & emotiveComponent == "yes" ~ "emoComm",
-                                    predicateType == "communicative" & emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
                                     predicateType == "emotive" ~ "emotive",
                                     predicateType == "cognitive" ~ "cognitive",
                                     predicateType == "evidential" ~ "evidential",
@@ -2698,7 +2866,7 @@ mean.proj.verid
 # remove "other" and "comPriv" predicates
 mean.proj.verid = mean.proj.verid %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj.verid) #523
+nrow(mean.proj.verid) # 523
 
 # Mean projection by mean veridicality
 ### plots ----
@@ -2784,14 +2952,16 @@ d.proj.mean.verid = d.proj.mean.verid %>%
 nrow(d.proj.mean.verid) # 15662
 
 clmm(as.factor(veridicality_num) ~ Mean.Verid + (1 | participant) + (1 | environment), 
-     data = d.proj.mean.verid)
+     data = d.proj.mean.verid) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ Mean.Verid + (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ Mean.Verid + (1 | participant) + 
+#   (1 | environment)
 # data:    d.proj.mean.verid
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad
-# logit flexible  15662 -11471.23 22952.46 312(1565) 4.46e-04
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11471.23 22952.46 312(1565) 4.46e-04 3.9e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2800,12 +2970,15 @@ clmm(as.factor(veridicality_num) ~ Mean.Verid + (1 | participant) + (1 | environ
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#  Mean.Verid 
-#       2.177 
+#            Estimate Std. Error z value Pr(>|z|)    
+# Mean.Verid  2.17693    0.05093   42.74   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#   -1|0    0|1 
-# -2.151  1.535 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.1511     0.3881  -5.542
+# 0|1    1.5347     0.3877   3.959
 
 # with predicate type
 # set emotives as reference level
@@ -2813,15 +2986,16 @@ d.proj.mean.verid = d.proj.mean.verid %>%
   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj.mean.verid)
+       (1 | environment), data = d.proj.mean.verid) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ Mean.Verid * predicateType + 
 #   (1 |  participant) + (1 | environment)
 # data:    d.proj.mean.verid
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -10830.87 21683.74 1834(9175) 9.11e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -10830.87 21683.74 1834(9175) 9.11e-03 5.3e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2830,18 +3004,21 @@ clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType + (1 | participant
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                          Mean.Verid                predicateTypecognitive 
-#                              1.9710                               -1.4094 
-#          predicateTypecommunicative               predicateTypeevidential 
-#                             -1.1555                               -1.3837 
-#   Mean.Verid:predicateTypecognitive Mean.Verid:predicateTypecommunicative 
-#                              0.4451                               -0.5961 
-#  Mean.Verid:predicateTypeevidential 
-#                             -0.1916 
+#                                       Estimate Std. Error z value Pr(>|z|)    
+# Mean.Verid                              1.9710     0.1593  12.372  < 2e-16 ***
+# predicateTypecognitive                 -1.4094     0.1465  -9.619  < 2e-16 ***
+# predicateTypecommunicative             -1.1555     0.1400  -8.253  < 2e-16 ***
+# predicateTypeevidential                -1.3837     0.1495  -9.256  < 2e-16 ***
+# Mean.Verid:predicateTypecognitive       0.4451     0.2116   2.104 0.035409 *  
+# Mean.Verid:predicateTypecommunicative  -0.5961     0.1759  -3.388 0.000703 ***
+# Mean.Verid:predicateTypeevidential     -0.1916     0.1951  -0.982 0.326084    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -3.5283  0.3261 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -3.5283     0.4409  -8.003
+# 0|1    0.3261     0.4390   0.743
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -2849,15 +3026,16 @@ d.proj.mean.verid = d.proj.mean.verid %>%
   mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
 
 clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj.mean.verid)
+       (1 | environment), data = d.proj.mean.verid) %>% 
+  summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + (1 | participant) +
-#   (1 | environment)
+# formula: as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + 
+#   (1 |  participant) + (1 | environment)
 # data:    d.proj.mean.verid
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad
-# logit flexible  15662 -10810.30 21646.60 1920(9605) 2.55e-03
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -10810.30 21646.60 1920(9605) 2.55e-03 5.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2866,16 +3044,23 @@ clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + (1 | participan
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                       Mean.Verid             predicateType2cognitive               predicateType2emoComm 
-#                          1.96870                            -1.41271                            -1.20920 
-#         predicateType2evidential            predicateType2nonEmoComm  Mean.Verid:predicateType2cognitive 
-#                         -1.38672                            -1.15359                             0.44972 
-# Mean.Verid:predicateType2emoComm Mean.Verid:predicateType2evidential Mean.Verid:predicateType2nonEmoComm 
-#                         -0.09059                            -0.18650                            -0.73468 
+#                                     Estimate Std. Error z value Pr(>|z|)    
+# Mean.Verid                           1.96870    0.15937  12.353  < 2e-16 ***
+# predicateType2cognitive             -1.41271    0.14662  -9.635  < 2e-16 ***
+# predicateType2emoComm               -1.20920    0.21042  -5.747 9.11e-09 ***
+# predicateType2evidential            -1.38672    0.14957  -9.271  < 2e-16 ***
+# predicateType2nonEmoComm            -1.15359    0.14108  -8.177 2.91e-16 ***
+# Mean.Verid:predicateType2cognitive   0.44972    0.21169   2.124   0.0336 *  
+# Mean.Verid:predicateType2emoComm    -0.09059    0.27473  -0.330   0.7416    
+# Mean.Verid:predicateType2evidential -0.18650    0.19516  -0.956   0.3393    
+# Mean.Verid:predicateType2nonEmoComm -0.73468    0.17850  -4.116 3.86e-05 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
-# Thresholds:
-#    -1|0     0|1 
-# -3.5351  0.3248 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -3.5351     0.4422  -7.995
+# 0|1    0.3248     0.4403   0.738
 
 ## H4.2 with "factives" ----
 # mean projection by mean veridicality with canonically projective predicates highlighted
