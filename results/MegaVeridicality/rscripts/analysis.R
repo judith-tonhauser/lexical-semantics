@@ -13,6 +13,7 @@ library(dichromat)
 library(ggrepel)
 library(ggforce)
 library(ordinal)
+library(patchwork)
 theme_set(theme_bw())
 
 # load data
@@ -74,15 +75,8 @@ d.proj = d.proj %>%
 
 table(d.proj$predicateType)
 
-# how many predicates in which type and which voice?
-d.proj %>%
-  select(predicateType, verb, voice) %>% 
-  unique() %>% 
-  group_by(predicateType,voice) %>% 
-  summarize(count=n())
-
-
 ### by-predicateType ----
+#### plots ----
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   group_by(predicateType) %>%
@@ -94,7 +88,6 @@ mean.proj
 nrow(mean.proj) # 6
 levels(mean.proj$predicateType)
 
-#### plot ----
 mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv") %>% 
 ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
@@ -103,13 +96,55 @@ ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
   theme(legend.position = "none",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        plot.margin = margin(5.5, 5.5, 22, 5.5, "pt"),
         panel.grid.major.x = element_blank()) +
   ylab("Mean projection rating") +
   xlab("Predicate type") +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = cols)
-ggsave("../graphs/projection-by-predicateType.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType.pdf", height = 4, width = 10)
+
+# calculate by-predicateType2 means
+mean.proj = d.proj %>%
+  group_by(predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj))
+mean.proj
+nrow(mean.proj) # 7
+levels(mean.proj$predicateType2)
+
+mean.proj %>%
+  filter(predicateType2 != "other" & predicateType2 != "comPriv") %>% 
+  ggplot(aes(
+    x = factor(predicateType2, c("cognitive", "evidential", "nonEmoComm", 
+                                 "emoComm", "emotive")), 
+    y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = c("cognitive", "evidential", 
+                              "communicative without\nemotive component", 
+                              "communicative with\nemotive component", "emotive")) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/projection-by-predicateType2.pdf", height = 4, width = 10)
+
+
 
 
 ### by-predicate ----
@@ -121,24 +156,50 @@ mean.proj = d.proj %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
          verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
 mean.proj
-nrow(mean.proj) #544
+nrow(mean.proj) # 544
 levels(mean.proj$verb_renamed)
 
-# add predicateType, verb and voice to the means
+# add predicateType and verb to the means
 tmp = d.proj %>%
-  select(c(verb,verb_renamed,voice,predicateType)) %>%
-  distinct(verb,verb_renamed,voice,predicateType)
-nrow(tmp) #544
+  select(c(verb, verb_renamed, predicateType, predicateType2)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2)
+nrow(tmp) # 544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
   distinct() %>%
-  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
-nrow(mean.proj) #544
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj) # 544
+
+# how many predicates in which type?
+mean.proj %>%
+  select(predicateType, verb_renamed) %>% 
+  unique() %>% 
+  group_by(predicateType) %>% 
+  summarize(count=n())
+# predicateType count
+#   <chr>         <int>
+# 1 cognitive        53
+# 2 comPriv           9
+# 3 communicative   236
+# 4 emotive         148
+# 5 evidential       86
+# 6 other            12
+
+# predicateType2 count
+#   <chr>          <int>
+# 1 cognitive         53
+# 2 comPriv            9
+# 3 emoComm           47
+# 4 emotive          148
+# 5 evidential        86
+# 6 nonEmoComm       189
+# 7 other             12
+
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) #523
+nrow(mean.proj) # 523
 
 #### plots ----
 ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
@@ -170,15 +231,51 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) 
   facet_wrap(~ predicateType, ncol = 4)
 ggsave("../graphs/projection-by-predicate-faceted.pdf", height = 4, width = 9)
 
-#### linear model ----
-lm(Mean.Proj ~ predicateType, data = mean.proj) %>% 
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(alpha = 0.8) +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap( ~ predicateType2, 
+              labeller = as_labeller(predicateType2_names), ncol = 5)
+ggsave("../graphs/projection-by-predicate-faceted2.pdf", height = 4, width = 10)
+
+
+
+#### linear models ----
+lm(Mean.Proj ~ fct_relevel(predicateType, "emotive"), data = mean.proj) %>% 
   summary()
 # Coefficients:
-#                            Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.21871    0.02756   7.937 1.29e-14 ***
-# predicateTypecommunicative  0.08920    0.03039   2.935  0.00348 ** 
-# predicateTypeemotive        0.50393    0.03195  15.771  < 2e-16 ***
-# predicateTypeevidential     0.07522    0.03463   2.172  0.03031 * 
+#                                                    Estimate Std. Error z value Pr(>|z|)    
+# fct_relevel(predicateType, "emotive")cognitive     -2.27319    0.06720  -33.83   <2e-16 ***
+# fct_relevel(predicateType, "emotive")communicative -1.87493    0.04689  -39.98   <2e-16 ***
+# fct_relevel(predicateType, "emotive")evidential    -1.93886    0.05782  -33.53   <2e-16 ***
+
+lm(Mean.Proj ~ fct_relevel(predicateType2, "emotive"), data = mean.proj) %>% 
+  summary()
+# Coefficients:
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.72264    0.01585   45.59   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")cognitive  -0.50635    0.03087  -16.40   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.29769    0.03229   -9.22   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential -0.42547    0.02615  -16.27   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.44383    0.02117  -20.97   <2e-16 ***
 
 #### ordinal models ----
 # remove "other" and "comPriv" predicates
@@ -186,40 +283,21 @@ d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
 # set emotives as reference level for predicate type
-d.proj = d.proj %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
+# d.proj = d.proj %>% 
+#   mutate(predicateType = fct_relevel(predicateType, "emotive"))
 
-clmm(as.factor(veridicality_num) ~ predicateType + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ fct_relevel(predicateType, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj) %>% 
   summary()
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ predicateType + (1 | participant) +  
-#   (1 | environment)
-# data:    d.proj
-# 
-# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -11343.24 22700.49 549(2742) 3.04e-03 4.1e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7750   0.8803  
-# environment (Intercept) 0.4843   0.6959  
-# Number of groups:  participant 290,  environment 3 
-# 
 # Coefficients:
-#                            Estimate Std. Error z value Pr(>|z|)    
-# predicateTypecognitive     -2.25959    0.06799  -33.23   <2e-16 ***
-# predicateTypecommunicative -1.87484    0.04689  -39.98   <2e-16 ***
-# predicateTypeevidential    -1.95400    0.05748  -33.99   <2e-16 ***
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -4.8712     0.4094 -11.899
-# 0|1   -1.2395     0.4071  -3.045
+#                                                  Estimate Std. Error z value Pr(>|z|)    
+# fct_relevel(predicateType2, "emotive")cognitive  -2.27552    0.06727  -33.83   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -1.44396    0.06900  -20.93   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential -1.93997    0.05786  -33.53   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -1.98376    0.04874  -40.70   <2e-16 ***
 
+# The output for ordinal models with categorical variables as predictors is not
+# informative as there is no intercept.
 
 # with predicate type with emotive component distinction
 # set emotives as reference level
@@ -231,35 +309,36 @@ clmm(as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ predicateType2 + (1 | participant) + 
+# formula: as.factor(veridicality_num) ~ predicateType2 + (1 | participant) +  
 #   (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter       max.grad cond.H 
-# logit flexible  15662 -11306.94 22629.88 2316(11576) 2.12e-03 4.2e+02
+# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
+# logit flexible  15662 -11304.76 22625.53 633(3161) 4.91e-03 4.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7755   0.8806  
-# environment (Intercept) 0.4883   0.6988  
+# participant (Intercept) 0.7760   0.8809  
+# environment (Intercept) 0.4886   0.6990  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
 #                          Estimate Std. Error z value Pr(>|z|)    
-# predicateType2cognitive  -2.26169    0.06806  -33.23   <2e-16 ***
-# predicateType2emoComm    -1.44407    0.06899  -20.93   <2e-16 ***
-# predicateType2evidential -1.95526    0.05753  -33.99   <2e-16 ***
-# predicateType2nonEmoComm -1.98363    0.04874  -40.70   <2e-16 ***
+# predicateType2cognitive  -2.27552    0.06727  -33.83   <2e-16 ***
+# predicateType2emoComm    -1.44396    0.06900  -20.93   <2e-16 ***
+# predicateType2evidential -1.93997    0.05786  -33.53   <2e-16 ***
+# predicateType2nonEmoComm -1.98376    0.04874  -40.70   <2e-16 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -4.8831     0.4111 -11.879
-# 0|1   -1.2379     0.4087  -3.029
+#       Estimate Std. Error z value
+# -1|0  -4.8836     0.4112 -11.877
+# 0|1   -1.2377     0.4089  -3.027
 
 
-## H1.2: communicatives: with/without emotive component ----
+## H1.2: communicatives: ----
+### H1.2.1 with/without emotive component ----
 # Amongst the communication predicates, does the CC of those that have an emotive 
 # meaning component project more than the CCs of those that don't?
 
@@ -291,7 +370,8 @@ d.proj = d.proj %>%
                                  polarity == "negative" & conditional == "True" ~ "q+cond+neg"))
 
 
-### by-predicateType ----
+#### by-predicateType ----
+##### plot ----
 # calculate by-predicateType means
 mean.proj = d.proj %>%
   group_by(predicateType, emotiveComponent) %>%
@@ -303,7 +383,6 @@ mean.proj
 nrow(mean.proj) # 7
 levels(mean.proj$predicateType)
 
-#### plot ----
 mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv") %>% 
 ggplot(aes(x = predicateType, y = Mean.Proj, colour = emotiveComponent)) +
@@ -312,16 +391,21 @@ ggplot(aes(x = predicateType, y = Mean.Proj, colour = emotiveComponent)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
   theme(legend.position = "top",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(x = "Predicate type",
        y = "Mean projection rating",
        colour ="Emotive component") +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   scale_colour_manual(values = c("no" = "sienna4", "yes" = "green3"))
-ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType-emotiveComponent.pdf", height = 4, width = 5)
 
-### by-predicate ----
+
+#### by-predicate ----
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
@@ -335,8 +419,8 @@ levels(mean.proj$verb_renamed)
 
 # add predicateType, verb and emotiveComponent to the means
 tmp = d.proj %>%
-  select(c(verb, verb_renamed, predicateType, emotiveComponent)) %>%
-  distinct(verb, verb_renamed, predicateType, emotiveComponent)
+  select(c(verb, verb_renamed, predicateType, predicateType2, emotiveComponent)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2, emotiveComponent)
 nrow(tmp) # 544
 
 mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
@@ -349,7 +433,7 @@ mean.proj = mean.proj %>%
   filter(predicateType == "communicative")
 nrow(mean.proj) # 236
 
-#### plot ----
+##### plots ----
 ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = emotiveComponent)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
@@ -365,9 +449,10 @@ ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = emotiveComponent
   facet_wrap( ~ emotiveComponent, 
               labeller = as_labeller(c("no" = "communicatives\nwithout emotive component", 
                                        "yes" = "communicatives\nwith emotive component")))
-ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-communicative-with-out-emo.pdf", height = 6, width = 9)
 
-#### linear model ----
+
+##### linear models ----
 lm(Mean.Proj ~ emotiveComponent, data = mean.proj) %>% 
   summary()
 # Coefficients:
@@ -375,7 +460,7 @@ lm(Mean.Proj ~ emotiveComponent, data = mean.proj) %>%
 # (Intercept)          0.27881    0.01271  21.939  < 2e-16 ***
 # emotiveComponentyes  0.14614    0.02848   5.132 6.03e-07 ***
 
-#### ordinal model ----
+##### ordinal model ----
 # only communicative predicates
 d.proj = d.proj %>%
   filter(predicateType == "communicative")
@@ -408,6 +493,183 @@ clmm(as.factor(veridicality_num) ~ emotiveComponent + (1 | participant) +
 #      Estimate Std. Error z value
 # -1|0  -3.1856     0.5546  -5.744
 # 0|1    0.7887     0.5526   1.427 
+
+### H1.2.2 pure/discourse participation/state changing ----
+# Amongst the communication predicates, does the CC of any particular subtype/s 
+# project more strongly?
+
+# create dataset for projection inferences
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) # 16291
+
+# create predicateType and emotiveComponent columns
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"),
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "emotive" ~ "emotive",
+                                    predicateType == "cognitive" ~ "cognitive",
+                                    predicateType == "evidential" ~ "evidential",
+                                    predicateType == "other" ~ "other"),
+         environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
+                                 polarity == "positive" & conditional == "True" ~ "q+cond",
+                                 polarity == "negative" & conditional == "True" ~ "q+cond+neg"),
+         commType = case_when(pure_comm == "yes" ~ "pure",
+                              discourse_participation_comm == "yes" ~ "discourse participation",
+                              state_changing_comm == "yes" ~ "state changing"))
+
+
+#### by-predicateType ----
+##### plot ----
+# calculate by-predicateType means
+mean.proj = d.proj %>%
+  filter(predicateType == "communicative") %>% 
+  group_by(commType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         commType = fct_reorder(as.factor(commType), Mean.Proj))
+nrow(mean.proj$commType) # 3
+
+mean.proj %>%
+  ggplot(aes(x = commType, y = Mean.Proj, colour = commType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank(),
+        plot.margin = margin(5.5, 132, 5.5, 132)) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_x_discrete(labels = c("state\nchanging", "discourse\nparticipation", "pure")) + 
+  scale_colour_manual(values = c("pure" = "orange", 
+                                 "discourse participation" = "darkorange", 
+                                 "state changing" = "orangered"))
+ggsave("../graphs/projection-by-predicateType-commType.pdf", height = 4, width = 10)
+
+
+#### by-predicate ----
+# calculate by-predicate projection means 
+mean.proj = d.proj %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj) # 544
+
+# add predicateType, verb and emotiveComponent to the means
+tmp = d.proj %>%
+  select(c(verb, verb_renamed, predicateType, predicateType2, commType)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2, commType)
+nrow(tmp) # 544
+
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj) # 544
+
+# only communicatives
+mean.proj = mean.proj %>%
+  filter(predicateType == "communicative")
+nrow(mean.proj) # 236
+
+mean.proj %>%
+  select(commType, verb_renamed) %>% 
+  unique() %>% 
+  group_by(commType) %>% 
+  summarize(count=n())
+
+#   commType                count
+#   <chr>                   <int>
+# 1 discourse participation   114
+# 2 pure                       95
+# 3 state changing             27
+
+##### plots ----
+ggplot(mean.proj, aes(x = verb_renamed, y = Mean.Proj, colour = commType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.text = element_text(size = 12),
+        panel.grid.major.x = element_blank(),
+        plot.margin = margin(5.5, 132, 5.5, 132, "pt")) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("pure" = "orange",
+                                 "discourse participation" = "darkorange",
+                                 "state changing" = "orangered")) +
+  facet_wrap( ~ factor(commType, levels = c("pure", "discourse participation", 
+                                            "state changing")))
+ggsave("../graphs/projection-by-communicative-predicate.pdf", height = 4, width = 10)
+
+
+##### linear model ----
+lm(Mean.Proj ~ fct_relevel(commType, "state changing"), data = mean.proj) %>% 
+  summary()
+# Coefficients:
+#                        Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)             0.29914    0.01671  17.898  < 2e-16 ***
+# commTypepure            0.05140    0.02479   2.073  0.03926 *  
+# commTypestate changing -0.10421    0.03820  -2.728  0.00685 ** 
+
+# *** significant for all three types of communicatives.
+
+##### ordinal model ----
+# only communicative predicates
+d.proj = d.proj %>%
+  filter(predicateType == "communicative")
+
+clmm(as.factor(veridicality_num) ~ commType + (1 | participant) + 
+       (1 | environment), data = d.proj) %>% 
+  summary()
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality_num) ~ commType + (1 | participant) + (1 | environment)
+# data:    d.proj
+# 
+# link  threshold nobs logLik   AIC      niter     max.grad cond.H 
+# logit flexible  7069 -5280.66 10573.32 348(2057) 8.19e-05 3.7e+02
+# 
+# Random effects:
+# Groups      Name        Variance Std.Dev.
+# participant (Intercept) 0.7444   0.8628  
+# environment (Intercept) 0.8876   0.9421  
+# Number of groups:  participant 290,  environment 3 
+# 
+# Coefficients:
+#                        Estimate Std. Error z value Pr(>|z|)    
+# commTypepure            0.17559    0.05609   3.130 0.001746 ** 
+# commTypestate changing -0.34393    0.08849  -3.887 0.000102 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -3.2547     0.5500  -5.918
+# 0|1    0.7010     0.5479   1.279
 
 
 # H2: valence and arousal ----
@@ -457,11 +719,11 @@ d3 = d3 %>%
 
 table(d3$predicateType)
 # cognitive communicative       emotive    evidential 
-#        45           205           101            77 
+#        46           205           101            76 
 
 table(d3$predicateType2)
 # cognitive    emoComm    emotive evidential nonEmoComm 
-#        45         41        101         77        164 
+#        46         41        101         76        164 
 
 # create dataset for projection inferences
 d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
@@ -473,7 +735,7 @@ mean.proj = d.proj %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
-         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+         verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
 nrow(mean.proj) # 544
 
 # combine projection and valence/arousal/dominance ratings in one data frame
@@ -525,7 +787,7 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2,
   labs(x = "Predicate", 
        y = "Mean valence rating", 
        colour = "Predicate type") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/valence-by-predicate.pdf", height = 4, width = 13)
 
@@ -540,7 +802,7 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2,
   labs(x = "Predicate", 
        y = "Mean valence rating", 
        colour = "Predicate type") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
                                  "emotive", "evidential", 
@@ -548,15 +810,15 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, V.Mean.Sum2), y = V.Mean.Sum2,
 ggsave("../graphs/valence-by-predicate2.pdf", height = 4, width = 13)
 
 #### linear model ----
-lm(V.Mean.Sum2 ~ predicateType2, new.scale) %>% 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emotive"), new.scale) %>% 
   summary()
 # Coefficients:
-#                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.32411    0.02572  12.602  < 2e-16 ***
-# predicateType2emoComm     0.02997    0.03725   0.805 0.421427    
-# predicateType2emotive     0.12034    0.03092   3.892 0.000115 ***
-# predicateType2evidential -0.11612    0.03237  -3.587 0.000373 ***
-# predicateType2nonEmoComm -0.12048    0.02903  -4.150 4.02e-05 ***
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.44446    0.01720  25.846  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")cognitive  -0.12581    0.03074  -4.093 5.11e-05 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.09037    0.03200  -2.824  0.00497 ** 
+# fct_relevel(predicateType2, "emotive")evidential -0.23469    0.02624  -8.943  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.24083    0.02186 -11.017  < 2e-16 ***
 
 ### by predicate type ----
 #### plots ----
@@ -634,16 +896,17 @@ ggplot(mean.valence3, aes(x = predicateType2, y = Mean.Valence,
 ggsave("../graphs/valence-by-predicateType-and-direction.pdf", height = 8, width = 10)
 
 #### linear model ----
-lm(V.Mean.Sum2 ~ predicateType2 + V.Mean.Sum2.direction, new.scale) %>% 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emotive") + V.Mean.Sum2.direction, 
+   new.scale) %>% 
   summary()
 # Coefficients:
-#                                Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                    0.318320   0.028711  11.087  < 2e-16 ***
-# predicateType2emoComm          0.033382   0.038026   0.878 0.380512    
-# predicateType2emotive          0.123152   0.031558   3.902 0.000111 ***
-# predicateType2evidential      -0.116573   0.032418  -3.596 0.000361 ***
-# predicateType2nonEmoComm      -0.119807   0.029098  -4.117 4.61e-05 ***
-# V.Mean.Sum2.directionpositive  0.008144   0.017880   0.455 0.649005  
+#                                                   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.441194   0.018421  23.951  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")cognitive  -0.128746   0.031329  -4.110 4.77e-05 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.089714   0.032058  -2.798  0.00537 ** 
+# fct_relevel(predicateType2, "emotive")evidential -0.238335   0.027274  -8.738  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.243157   0.022376 -10.867  < 2e-16 ***
+# V.Mean.Sum2.directionpositive                     0.008902   0.017919   0.497  0.61960 
 
 
 ## H2.2 arousal ----
@@ -659,8 +922,7 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2,
   labs(x = "Predicate", 
        y = "Mean arousal rating", 
        colour = "Predicate type") +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8), 
-                     labels = c("completely\ncalm", "completely\nexcited")) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/arousal-by-predicate.pdf", height = 4, width = 13)
 
@@ -675,8 +937,7 @@ ggplot(new.scale, aes(x = reorder(verb_renamed, A.Mean.Sum2), y = A.Mean.Sum2,
   labs(x = "Predicate", 
        y = "Mean arousal rating", 
        colour = "Predicate type") +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8), 
-                     labels = c("completely\ncalm", "completely\nexcited")) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
                                  "emotive", "evidential", "communicative without\nemotive component"))
@@ -687,20 +948,20 @@ lm(A.Mean.Sum2 ~ predicateType, new.scale) %>%
   summary()
 # Coefficients:
 #                             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.374028   0.015927  23.483  < 2e-16 ***
-# predicateTypecommunicative  0.027747   0.017589   1.578    0.115    
-# predicateTypeemotive        0.119611   0.019150   6.246 1.02e-09 ***
-# predicateTypeevidential    -0.008102   0.020048  -0.404    0.686  
+# (Intercept)                 0.373071   0.015754  23.681  < 2e-16 ***
+# predicateTypecommunicative  0.028704   0.017432   1.647    0.100    
+# predicateTypeemotive        0.120568   0.019006   6.344 5.76e-10 ***
+# predicateTypeevidential    -0.006673   0.019960  -0.334    0.738   
 
 lm(A.Mean.Sum2 ~ predicateType2, new.scale) %>% 
   summary()
 # Coefficients:
 #                           Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.374028   0.015697  23.827  < 2e-16 ***
-# predicateType2emoComm     0.081826   0.022734   3.599 0.000357 ***
-# predicateType2emotive     0.119611   0.018873   6.338 5.98e-10 ***
-# predicateType2evidential -0.008102   0.019759  -0.410 0.681963    
-# predicateType2nonEmoComm  0.014227   0.017721   0.803 0.422517 
+# (Intercept)               0.373071   0.015527  24.028  < 2e-16 ***
+# predicateType2emoComm     0.082783   0.022618   3.660 0.000284 ***
+# predicateType2emotive     0.120568   0.018732   6.437 3.32e-10 ***
+# predicateType2evidential -0.006673   0.019672  -0.339 0.734635    
+# predicateType2nonEmoComm  0.015184   0.017570   0.864 0.387966 
 
 ### by predicate type ----
 #### plots ----
@@ -720,7 +981,7 @@ ggplot(mean.arousal, aes(x = predicateType, y = Mean.Arousal, colour = predicate
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
   labs(x = "Predicate type",
-       y = "Mean arousal rating (calm >>> excited)") +
+       y = "Mean arousal rating") +
   scale_colour_manual(values = cols)
 ggsave("../graphs/arousal-by-predicateType.pdf", height = 8, width = 10)
 
@@ -743,7 +1004,7 @@ ggplot(mean.arousal2, aes(x = predicateType2, y = Mean.Arousal, colour = predica
                               "communicative without \n emotive component",
                               "communicative with \n emotive component", "emotive")) +
   labs(x = "Predicate type",
-       y = "Mean arousal rating (calm >>> excited)") +
+       y = "Mean arousal rating") +
   scale_colour_manual(values = cols2)
 ggsave("../graphs/arousal-by-predicateType2.pdf", height = 8, width = 10)
 
@@ -755,16 +1016,17 @@ ggplot(new.scale, aes(x = A.Mean.Sum2, y = V.Mean.Sum2, colour = predicateType2,
                       fill = predicateType2)) +
   geom_point(size = 2) +
   geom_mark_hull(alpha = 0.1) +
-  xlim(0, 1) + 
-  ylim(0, 1) +
-  theme(legend.position = "top",
-        axis.title = element_text(size = 14),
-        legend.title = element_text(size = 14),
-        legend.text = element_text(size = 12)) +
+  theme(axis.title = element_text(size = 26),
+        axis.text = element_text(size = 24),
+        legend.title = element_text(size = 26),
+        legend.text = element_text(size = 24)) +
   labs(x = "Mean arousal rating", 
        y = "Mean valence rating",
        colour = "Predicate type", 
        fill = "Predicate type") +
+  coord_equal() + 
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_colour_manual(values = cols2, 
                       labels=c("cognitive", "communicative with\nemotive component", 
                                "emotive", "evidential", 
@@ -773,7 +1035,7 @@ ggplot(new.scale, aes(x = A.Mean.Sum2, y = V.Mean.Sum2, colour = predicateType2,
                     labels=c("cognitive", "communicative with\nemotive component", 
                              "emotive", "evidential", 
                              "communicative without\nemotive component"))
-ggsave("../graphs/valence-by-arousal.pdf", height = 9, width = 10)
+ggsave("../graphs/valence-by-arousal.pdf", height = 8, width = 12)
 
 ### by predicate type ----
 ##### plots ----
@@ -801,12 +1063,16 @@ new.scale %>%
   ggplot(aes(x = variable, y = value, fill = predicateType2)) +
   geom_violin() +
   theme(legend.position = "top",
-    axis.title.x = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank(),
-        plot.caption = element_text(hjust = 0, size = 10)) + 
+        plot.caption = element_text(hjust = 0, size = 12)) + 
   labs(y = "Mean valence / arousal rating", 
        fill = "Predicate type",
-       caption = "valence rating: neutral (0) to completely happy / unhappy (1)\narousal rating: completely calm (0) to completely excited (1)") +
+       caption = "valence rating: neutral (0) to completely happy / unhappy (1)\narousal rating: completely calm (0) to completely aroused (1)") +
   scale_x_discrete(limits = c("Valence", "Arousal")) +
   scale_fill_manual(values = cols2, 
                     labels = c("cognitive", "communicative with\nemotive component", 
@@ -821,17 +1087,15 @@ ggsave("../graphs/valence-arousal-by-predicateType2.pdf", height = 6, width = 10
 # projection by valence
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType)) +
+  geom_point(aes(colour = predicateType), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "top",
-        panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
-        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
         aspect.ratio = 1) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating",
        colour = "Predicate type") +
-  xlim(0, 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-valence.pdf", height = 6, width = 6)
@@ -839,17 +1103,15 @@ ggsave("../graphs/projection-by-valence.pdf", height = 6, width = 6)
 # projection by valence with emotive component
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "top",
-        panel.spacing.x = unit(1, "cm"),
         panel.grid.minor.y = element_blank(), 
-        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
         aspect.ratio = 1) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating",
        colour = "Predicate type") +
-  xlim(0, 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
@@ -860,16 +1122,15 @@ ggsave("../graphs/projection-by-valence2.pdf", height = 6, width = 8)
 # projection by valence faceted
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType)) +
+  geom_point(aes(colour = predicateType), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
-        panel.spacing.x = unit(1, "cm"),
-        axis.title.x = element_text(vjust = -2),
-        panel.grid.minor.y = element_blank(), 
+        panel.spacing.x = unit(0.3, "cm"),
+        panel.grid.minor.y = element_blank(),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating") +
-  xlim(0, 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   facet_wrap(~ predicateType, ncol = 4) +
   scale_colour_manual(values = cols)
@@ -884,21 +1145,24 @@ predicateType2_names <- c( "cognitive" = "cognitive",
                            "nonEmoComm" = "communicative without\nemotive component")
 
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
-  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
-        panel.spacing.x = unit(1, "cm"),
-        axis.title.x = element_text(vjust = -2),
+        panel.spacing.x = unit(0.3, "cm"),
         panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating") +
-  xlim(0, 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2) +
   facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
-ggsave("../graphs/projection-by-valence-faceted2.pdf", height = 6, width = 12)
+ggsave("../graphs/projection-by-valence-faceted2.pdf", height = 4, width = 9)
 
 #### linear models ----
 lm(Mean.Proj ~ V.Mean.Sum2, data = new.scale) %>% 
@@ -908,31 +1172,31 @@ lm(Mean.Proj ~ V.Mean.Sum2, data = new.scale) %>%
 # (Intercept)  0.26078    0.02190  11.905  < 2e-16 ***
 # V.Mean.Sum2  0.46441    0.06252   7.428 6.06e-13 ***
 
-lm(Mean.Proj ~ V.Mean.Sum2 + predicateType2, data = new.scale) %>% 
+lm(Mean.Proj ~ V.Mean.Sum2 + fct_relevel(predicateType2, "emotive"), data = new.scale) %>% 
   summary()
 # Coefficients:
-#                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.20938    0.03420   6.122 2.12e-09 ***
-# V.Mean.Sum2               0.04522    0.05513   0.820   0.4126    
-# predicateType2emoComm     0.18532    0.04227   4.384 1.47e-05 ***
-# predicateType2emotive     0.50114    0.03569  14.043  < 2e-16 ***
-# predicateType2evidential  0.06526    0.03726   1.751   0.0806 .  
-# predicateType2nonEmoComm  0.06398    0.03359   1.905   0.0575 . 
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.71014    0.03123  22.736   <2e-16 ***
+# V.Mean.Sum2                                       0.04606    0.05499   0.838    0.403    
+# fct_relevel(predicateType2, "emotive")cognitive  -0.50493    0.03545 -14.244   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.31574    0.03653  -8.642   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential -0.43246    0.03236 -13.362   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.43695    0.02805 -15.580   <2e-16 ***
 
-lm(Mean.Proj ~ V.Mean.Sum2 * predicateType2, data = new.scale) %>% 
+lm(Mean.Proj ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emotive"), data = new.scale) %>% 
   summary()
 # Coefficients:
-#                                        Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                           0.2313635  0.0590803   3.916 0.000105 ***
-# V.Mean.Sum2                          -0.0226087  0.1583924  -0.143 0.886565    
-# predicateType2emoComm                 0.1021673  0.0861543   1.186 0.236350    
-# predicateType2emotive                 0.4932607  0.0763843   6.458 2.96e-10 ***
-# predicateType2evidential              0.0574599  0.0706088   0.814 0.416235    
-# predicateType2nonEmoComm              0.0387308  0.0642963   0.602 0.547248    
-# V.Mean.Sum2:predicateType2emoComm     0.2405746  0.2212810   1.087 0.277579    
-# V.Mean.Sum2:predicateType2emotive     0.0360841  0.1871523   0.193 0.847205    
-# V.Mean.Sum2:predicateType2evidential -0.0003783  0.2193152  -0.002 0.998624    
-# V.Mean.Sum2:predicateType2nonEmoComm  0.0838729  0.1869497   0.449 0.653925 
+#                                                              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                   0.724624   0.048371  14.981  < 2e-16 ***
+# V.Mean.Sum2                                                   0.013475   0.099596   0.135    0.892    
+# fct_relevel(predicateType2, "emotive")cognitive              -0.507184   0.074957  -6.766 4.48e-11 ***
+# fct_relevel(predicateType2, "emotive")emoComm                -0.391093   0.079149  -4.941 1.13e-06 ***
+# fct_relevel(predicateType2, "emotive")evidential             -0.428041   0.062186  -6.883 2.15e-11 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm             -0.454530   0.054609  -8.323 1.23e-15 ***
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive  -0.005788   0.184362  -0.031    0.975    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm     0.204490   0.183718   1.113    0.266    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential -0.057535   0.182061  -0.316    0.752    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm  0.047789   0.140582   0.340    0.734  
 
 ##### largest residuals ----
 # For which predicates does the linear model make the least accurate predictions?
@@ -1027,8 +1291,8 @@ d.proj2 = droplevels(subset(d2, d2$polarity == "negative" |
                                  polarity == "positive" & conditional == "True" ~ "q+cond",
                                  polarity == "negative" & conditional == "True" ~ "q+cond+neg")) %>% 
   distinct(verb_renamed, verb, voice, participant, predicateType, predicateType2, 
-           veridicality, veridicality_num, V.Mean.Sum2, V.Mean.Sum2.direction, 
-           A.Mean.Sum2, environment)
+           veridicality, veridicality_num, V.Mean.Sum, A.Mean.Sum, V.Mean.Sum2, 
+           V.Mean.Sum2.direction, A.Mean.Sum2, environment)
 
 # remove "other" and "comPriv" predicates
 d.proj2 = d.proj2 %>%
@@ -1078,54 +1342,87 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * predicateType + (1 | participan
 # data:    d.proj2
 # 
 # link  threshold nobs  logLik   AIC      niter      max.grad cond.H 
-# logit flexible  12817 -9339.41 18700.82 1059(5275) 1.08e-02 4.5e+02
+# logit flexible  12817 -9337.43 18696.86 1045(5205) 6.99e-03 4.5e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7829   0.8848  
-# environment (Intercept) 0.5317   0.7292  
+# participant (Intercept) 0.7831   0.8850  
+# environment (Intercept) 0.5322   0.7295  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
 #                                        Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2                             0.11479    0.23714   0.484  0.62834    
-# predicateTypecognitive                 -2.29976    0.16421 -14.005  < 2e-16 ***
-# predicateTypecommunicative             -2.06256    0.12442 -16.577  < 2e-16 ***
-# predicateTypeevidential                -2.03960    0.13913 -14.659  < 2e-16 ***
-# V.Mean.Sum2:predicateTypecognitive      0.02889    0.39297   0.074  0.94139    
-# V.Mean.Sum2:predicateTypecommunicative  0.74117    0.28397   2.610  0.00905 ** 
-# V.Mean.Sum2:predicateTypeevidential     0.15116    0.38522   0.392  0.69477    
+# V.Mean.Sum2                              0.1154     0.2371   0.487  0.62646    
+# predicateTypecognitive                  -2.3579     0.1618 -14.577  < 2e-16 ***
+# predicateTypecommunicative              -2.0626     0.1244 -16.577  < 2e-16 ***
+# predicateTypeevidential                 -2.0055     0.1396 -14.364  < 2e-16 ***
+# V.Mean.Sum2:predicateTypecognitive       0.1545     0.3879   0.398  0.69030    
+# V.Mean.Sum2:predicateTypecommunicative   0.7406     0.2840   2.608  0.00911 ** 
+# V.Mean.Sum2:predicateTypeevidential      0.0578     0.3866   0.150  0.88114    
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.9126     0.4424 -11.105
-# 0|1   -1.2158     0.4398  -2.765 
+# -1|0  -4.9131     0.4425 -11.102
+# 0|1   -1.2155     0.4399  -2.763
 
 #### with direction ----
 # projection by valence with direction
-##### plot ----
+##### plots ----
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
               aes(linetype = V.Mean.Sum2.direction)) +
-  theme(panel.spacing.x = unit(1, "cm"),
-        panel.grid.minor.y = element_blank(), 
-        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         aspect.ratio = 1) +
   labs(x = "Mean valence rating", 
        y = "Mean projection rating",
        colour = "Predicate type", 
        linetype = "Direction of valence") +
-  xlim(0, 1) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2, 
                       labels = c("cognitive", "communicative with\nemotive component", 
                                  "emotive", "evidential", 
                                  "communicative without\nemotive component")) 
-ggsave("../graphs/projection-by-valence-with-direction.pdf", height = 6, width = 8)
+ggsave("../graphs/projection-by-valence-with-direction.pdf", height = 3.5, width = 6)
+
+# projection by valence faceted with emotive component
+# labels for facets
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-valence-and-direction-of-valence-faceted2.pdf", 
+       height = 6, width = 10)
 
 ##### linear models ----
 lm(Mean.Proj ~ V.Mean.Sum2.direction, data = new.scale) %>% 
@@ -1183,40 +1480,42 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) +
 # 0|1   0.05278    0.38275   0.138
 
 # with predicate type
-clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * predicateType + 
+clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * fct_relevel(predicateType2, "emotive") + 
        (1 | participant) + (1 | environment), data = d.proj2) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ V.Mean.Sum2.direction * predicateType +  
-#   (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ V.Mean.Sum2.direction * fct_relevel(predicateType2,
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
-# logit flexible  12817 -9323.44 18668.88 2231(11123) 5.55e-03 4.6e+02
+# link  threshold nobs  logLik   AIC      niter      max.grad cond.H 
+# logit flexible  12817 -9301.52 18629.03 1856(9284) 8.36e-03 4.5e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7807   0.8836  
-# environment (Intercept) 0.5298   0.7278  
+# participant (Intercept) 0.7849   0.8859  
+# environment (Intercept) 0.5338   0.7306  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                                          Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2.directionpositive                             0.23513    0.09751   2.411 0.015897 *  
-# predicateTypecognitive                                   -1.84218    0.12411 -14.844  < 2e-16 ***
-# predicateTypecommunicative                               -1.74181    0.07155 -24.344  < 2e-16 ***
-# predicateTypeevidential                                  -2.42698    0.11303 -21.472  < 2e-16 ***
-# V.Mean.Sum2.directionpositive:predicateTypecognitive     -0.76852    0.16188  -4.748 2.06e-06 ***
-# V.Mean.Sum2.directionpositive:predicateTypecommunicative -0.39415    0.11163  -3.531 0.000414 ***
-# V.Mean.Sum2.directionpositive:predicateTypeevidential     0.37161    0.14582   2.548 0.010823 *  
+#                                                                                Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2.directionpositive                                                   0.23379    0.09755   2.397 0.016543 *  
+# fct_relevel(predicateType2, "emotive")cognitive                                -1.93736    0.12063 -16.060  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                                  -1.33776    0.09329 -14.340  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential                               -2.38802    0.11560 -20.658  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                               -1.93638    0.07728 -25.058  < 2e-16 ***
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive  -0.67512    0.15917  -4.242 2.22e-05 ***
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm    -0.57056    0.16557  -3.446 0.000569 ***
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential  0.33189    0.14784   2.245 0.024775 *  
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm -0.22773    0.11583  -1.966 0.049293 *  
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.8855     0.4302 -11.356
-# 0|1   -1.1826     0.4275  -2.766
+# -1|0  -4.8948     0.4318 -11.335
+# 0|1   -1.1831     0.4291  -2.757
 
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction + 
        (1 | participant) + (1 | environment), data = d.proj2) %>% 
@@ -1250,85 +1549,112 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction +
 # 0|1    0.7709     0.3963   1.945
 
 # with predicate type
-clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction * predicateType + 
-       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(V.Mean.Sum2.direction, "negative") * 
+       fct_relevel(predicateType2, "emotive") +  (1 | participant) + (1 | environment), 
+     data = d.proj2) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
 # formula: as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction *  
-#   predicateType + (1 | participant) + (1 | environment)
+#   fct_relevel(predicateType2, "emotive") + (1 | participant) +  (1 | environment)
 # data:    d.proj2
 # 
 # link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
-# logit flexible  12817 -9305.11 18648.22 4334(21673) 6.44e-03 2.6e+03
+# logit flexible  12817 -9285.06 18616.13 3580(17904) 5.14e-03 2.9e+03
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7871   0.8872  
-# environment (Intercept) 0.5338   0.7306  
+# participant (Intercept) 0.7894   0.8885  
+# environment (Intercept) 0.5367   0.7326  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                                                       Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2                                                          -0.274440   0.300927  -0.912 0.361778    
-# V.Mean.Sum2.directionpositive                                        -0.269435   0.235251  -1.145 0.252081    
-# predicateTypecognitive                                               -2.117461   0.250029  -8.469  < 2e-16 ***
-# predicateTypecommunicative                                           -2.119193   0.165335 -12.818  < 2e-16 ***
-# predicateTypeevidential                                              -2.514091   0.201503 -12.477  < 2e-16 ***
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive                             1.180177   0.496357   2.378 0.017422 *  
-# V.Mean.Sum2:predicateTypecognitive                                    0.852998   0.718565   1.187 0.235194    
-# V.Mean.Sum2:predicateTypecommunicative                                1.264739   0.373175   3.389 0.000701 ***
-# V.Mean.Sum2:predicateTypeevidential                                  -0.007226   0.661066  -0.011 0.991279    
-# V.Mean.Sum2.directionpositive:predicateTypecognitive                 -0.254990   0.340984  -0.748 0.454577    
-# V.Mean.Sum2.directionpositive:predicateTypecommunicative              0.218646   0.252784   0.865 0.387066    
-# V.Mean.Sum2.directionpositive:predicateTypeevidential                 0.822475   0.287855   2.857 0.004273 ** 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecognitive     -1.355088   0.897267  -1.510 0.130982    
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypecommunicative -1.518771   0.587195  -2.586 0.009696 ** 
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive:predicateTypeevidential    -0.835773   0.852682  -0.980 0.327002    
+#                                                                                            Estimate Std. Error z value
+# V.Mean.Sum2                                                                                -0.28373    0.30119  -0.942
+# V.Mean.Sum2.directionpositive                                                              -0.27539    0.23537  -1.170
+# fct_relevel(predicateType2, "emotive")cognitive                                            -2.34061    0.23817  -9.828
+# fct_relevel(predicateType2, "emotive")emoComm                                              -2.06669    0.22201  -9.309
+# fct_relevel(predicateType2, "emotive")evidential                                           -2.45000    0.20487 -11.959
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                           -2.09417    0.16884 -12.403
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive                                                   1.18838    0.49662   2.393
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                                 1.40089    0.69424   2.018
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                                   2.08293    0.53550   3.890
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential                               -0.15928    0.66644  -0.239
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm                                0.40676    0.40681   1.000
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive              -0.03438    0.33260  -0.103
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm                 0.32990    0.35514   0.929
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential              0.75686    0.29019   2.608
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm              0.19495    0.25724   0.758
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive  -1.89680    0.87879  -2.158
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm    -2.47369    0.80086  -3.089
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential -0.67952    0.85691  -0.793
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm -0.73837    0.63579  -1.161
+#                                                                                            Pr(>|z|)    
+# V.Mean.Sum2                                                                                 0.34617    
+# V.Mean.Sum2.directionpositive                                                               0.24199    
+# fct_relevel(predicateType2, "emotive")cognitive                                             < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                                               < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential                                            < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                            < 2e-16 ***
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive                                                   0.01671 *  
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                                 0.04360 *  
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                                   0.00010 ***
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential                                0.81111    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm                                0.31737    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive               0.91766    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm                 0.35293    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential              0.00910 ** 
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm              0.44853    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive   0.03089 *  
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm     0.00201 ** 
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential  0.42778    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm  0.24550    
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -5.0217     0.4535 -11.074
-# 0|1   -1.3090     0.4508  -2.904
+#       Estimate Std. Error z value
+# -1|0  -5.0330     0.4546 -11.072
+# 0|1   -1.3133     0.4519  -2.906
 
 
 ### H2.4.2 arousal ----
 # projection by arousal
-#### plots ----
+#### H2.4.2.1 overall ----
+##### plots ----
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
-  theme(legend.position = "top",
-        panel.spacing.x = unit(1, "cm"),
-        panel.grid.minor.y = element_blank(), 
-        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm"),
+  theme(panel.grid.minor.y = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         aspect.ratio = 1) +
   labs(x = "Mean arousal rating", 
        y = "Mean projection rating",
        colour = "Predicate type") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8), 
-                     labels = c("completely\ncalm", "completely\nexcited")) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
-  scale_colour_manual(values = cols)
-ggsave("../graphs/projection-by-arousal.pdf", height = 6, width = 6)
+  scale_colour_manual(values = cols2, 
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component")) 
+ggsave("../graphs/projection-by-arousal2.pdf", height = 3.5, width = 6)
 
 # projection by arousal faceted
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType)) +
+  geom_point(aes(colour = predicateType), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
-        panel.spacing.x = unit(1, "cm"),
-        axis.title.x = element_text(vjust = -2),
+        axis.text.x = element_text(hjust = c(0, 1)),
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean arousal rating", 
        y = "Mean projection rating") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8), 
-                     labels = c("completely\ncalm", "completely\nexcited")) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols) +
   facet_wrap(~ predicateType, ncol = 4)
@@ -1343,24 +1669,24 @@ predicateType2_names <- c( "cognitive" = "cognitive",
                            "nonEmoComm" = "communicative without\nemotive component")
 
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
-  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
-  geom_point(aes(colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
   geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
   theme(legend.position = "none",
-        panel.spacing.x = unit(1, "cm"),
-        axis.title.x = element_text(vjust = -2),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
         panel.grid.minor.y = element_blank(), 
         plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
   labs(x = "Mean arousal rating", 
        y = "Mean projection rating") +
-  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8), 
-                     labels = c("completely\ncalm", "completely\nexcited")) +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = cols2) +
   facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
-ggsave("../graphs/projection-by-arousal-faceted2.pdf", height = 6, width = 12)
+ggsave("../graphs/projection-by-arousal-faceted2.pdf", height = 6, width = 10)
 
-#### linear models ----
+##### linear models ----
 lm(Mean.Proj ~ A.Mean.Sum2, data = new.scale) %>% 
   summary()
 # Coefficients:
@@ -1368,33 +1694,33 @@ lm(Mean.Proj ~ A.Mean.Sum2, data = new.scale) %>%
 # (Intercept)  0.13319    0.04723    2.82  0.00502 ** 
 # A.Mean.Sum2  0.63149    0.10982    5.75  1.7e-08 ***
 
-lm(Mean.Proj ~ A.Mean.Sum2 + predicateType2, data = new.scale) %>% 
+lm(Mean.Proj ~ A.Mean.Sum2 + fct_relevel(predicateType2, "emotive"), data = new.scale) %>% 
   summary()
 # Coefficients:
-#                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.24646    0.04464   5.521 5.91e-08 ***
-# A.Mean.Sum2              -0.05996    0.09036  -0.664   0.5073    
-# predicateType2emoComm     0.19158    0.04289   4.467 1.02e-05 ***
-# predicateType2emotive     0.51375    0.03670  13.999  < 2e-16 ***
-# predicateType2evidential  0.05952    0.03673   1.621   0.1058    
-# predicateType2nonEmoComm  0.05939    0.03296   1.802   0.0723 .
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.76030    0.04862  15.637   <2e-16 ***
+# A.Mean.Sum2                                      -0.06015    0.09027  -0.666    0.506    
+# fct_relevel(predicateType2, "emotive")cognitive  -0.51798    0.03644 -14.214   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.32218    0.03637  -8.859   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential -0.45093    0.03183 -14.165   <2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.45438    0.02650 -17.149   <2e-16 ***
 
-lm(Mean.Proj ~ A.Mean.Sum2 * predicateType2, data = new.scale) %>% 
+lm(Mean.Proj ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emotive"), data = new.scale) %>% 
   summary()
 # Coefficients:
-#                                       Estimate Std. Error t value Pr(>|t|)   
-# (Intercept)                           0.369642   0.123176   3.001  0.00285 **
-# A.Mean.Sum2                          -0.389292   0.319972  -1.217  0.22443   
-# predicateType2emoComm                -0.137042   0.179015  -0.766  0.44439   
-# predicateType2emotive                 0.349429   0.146751   2.381  0.01771 * 
-# predicateType2evidential              0.009649   0.156016   0.062  0.95072   
-# predicateType2nonEmoComm             -0.037551   0.137295  -0.274  0.78460   
-# A.Mean.Sum2:predicateType2emoComm     0.780008   0.423200   1.843  0.06602 . 
-# A.Mean.Sum2:predicateType2emotive     0.412674   0.356292   1.158  0.24742   
-# A.Mean.Sum2:predicateType2evidential  0.128998   0.408837   0.316  0.75252   
-# A.Mean.Sum2:predicateType2nonEmoComm  0.261742   0.353883   0.740  0.45994 
+#                                                              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                   0.71907    0.07970   9.022  < 2e-16 ***
+# A.Mean.Sum2                                                   0.02338    0.15659   0.149 0.881369    
+# fct_relevel(predicateType2, "emotive")cognitive              -0.36285    0.14607  -2.484 0.013380 *  
+# fct_relevel(predicateType2, "emotive")emoComm                -0.48647    0.15231  -3.194 0.001510 ** 
+# fct_relevel(predicateType2, "emotive")evidential             -0.33047    0.12472  -2.650 0.008361 ** 
+# fct_relevel(predicateType2, "emotive")nonEmoComm             -0.38698    0.10012  -3.865 0.000129 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive  -0.38882    0.35527  -1.094 0.274397    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm     0.36733    0.31798   1.155 0.248658    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential -0.29975    0.29887  -1.003 0.316461    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm -0.15093    0.21756  -0.694 0.488228  
 
-#### ordinal models ----
+##### ordinal models ----
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | environment), 
      data = d.proj2) %>% 
   summary()
@@ -1424,40 +1750,264 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | enviro
 # -1|0  -2.1261     0.3909  -5.439
 # 0|1    1.3130     0.3901   3.366
 
-clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj2) %>% 
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * predicateType + (1 | participant) + 
-#   (1 | environment)
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2,
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
-# link  threshold nobs  logLik   AIC      niter     max.grad cond.H 
-# logit flexible  12817 -9351.48 18724.97 975(4722) 2.58e-03 1.1e+03
+# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
+# logit flexible  12817 -9319.27 18664.53 3708(18515) 5.44e-01 1.3e+03
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7769   0.8814  
-# environment (Intercept) 0.5284   0.7269  
+# participant (Intercept) 0.7813   0.8839  
+# environment (Intercept) 0.5455   0.7386  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                        Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2                              0.1030     0.3762   0.274   0.7843    
-# predicateTypecognitive                  -1.7109     0.3115  -5.493 3.94e-08 ***
-# predicateTypecommunicative              -1.9705     0.2188  -9.007  < 2e-16 ***
-# predicateTypeevidential                 -1.8554     0.2730  -6.797 1.07e-11 ***
-# A.Mean.Sum2:predicateTypecognitive      -1.5503     0.7415  -2.091   0.0366 *  
-# A.Mean.Sum2:predicateTypecommunicative   0.1705     0.4548   0.375   0.7078    
-# A.Mean.Sum2:predicateTypeevidential     -0.4523     0.6429  -0.704   0.4817    
+#                                                              Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                                    0.1796     0.3762   0.477   0.6331    
+# fct_relevel(predicateType2, "emotive")cognitive               -1.7259     0.3105  -5.559 2.71e-08 ***
+# fct_relevel(predicateType2, "emotive")emoComm                 -2.0103     0.3245  -6.194 5.86e-10 ***
+# fct_relevel(predicateType2, "emotive")evidential              -1.7623     0.2734  -6.445 1.15e-10 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm              -1.6825     0.2256  -7.459 8.74e-14 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive   -1.5457     0.7408  -2.087   0.0369 *  
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm      1.1015     0.6759   1.630   0.1032    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential  -0.6425     0.6441  -0.997   0.3186    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm  -0.8006     0.4807  -1.665   0.0959 .  
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.9034     0.4666 -10.508
-# 0|1   -1.2139     0.4641  -2.615
+# -1|0  -4.8115     0.4755 -10.119
+# 0|1   -1.1099     0.4732  -2.346
+
+#### H2.4.2.2 with direction of valence ----
+##### plots ----
+ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component")) 
+ggsave("../graphs/projection-by-arousal-with-direction.pdf", height = 3.5, width = 6)
+
+# projection by arousal faceted with emotive component
+# labels for facets
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+       # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                     "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-arousal-and-direction-of-valence-faceted2.pdf", 
+       height = 6, width = 10)
+
+
+##### ordinal models ----
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2.direction + 
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                 2.3729     0.2514   9.439   <2e-16 ***
+# V.Mean.Sum2.directionpositive              -0.1158     0.1484  -0.780    0.435    
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive  -0.2808     0.3422  -0.821    0.412   
+
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * 
+       fct_relevel(V.Mean.Sum2.direction, "positive") * 
+       fct_relevel(predicateType2, "nonEmoComm") + 
+       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+  summary()
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2.direction *  
+#   fct_relevel(predicateType2, "emotive") + (1 | participant) +      (1 | environment)
+# data:    d.proj2
+# 
+# link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
+# logit flexible  12817 -9280.62 18607.25 4238(21169) 2.92e-03 1.7e+04
+# 
+# Random effects:
+# Groups      Name        Variance Std.Dev.
+# participant (Intercept) 0.7928   0.8904  
+# environment (Intercept) 0.5377   0.7333  
+# Number of groups:  participant 290,  environment 3 
+# 
+# Coefficients:
+#                                                                                            Estimate Std. Error z value
+# A.Mean.Sum2                                                                                 -1.1438     0.5111  -2.238
+# V.Mean.Sum2.directionpositive                                                               -1.3151     0.3865  -3.403
+# fct_relevel(predicateType2, "emotive")cognitive                                             -2.3311     0.8863  -2.630
+# fct_relevel(predicateType2, "emotive")emoComm                                               -2.7789     0.4168  -6.668
+# fct_relevel(predicateType2, "emotive")evidential                                            -3.0259     0.4481  -6.753
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                            -2.3869     0.3361  -7.103
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive                                                    3.2468     0.7813   4.156
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                                  0.6294     2.2488   0.280
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                                    3.1297     0.8829   3.545
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential                                 1.2588     0.9961   1.264
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm                                 0.8274     0.6803   1.216
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive                1.2713     0.9637   1.319
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm                  0.6973     0.7653   0.911
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential               1.8385     0.5826   3.156
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm               1.5685     0.4669   3.359
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive   -4.3340     2.4205  -1.791
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm     -3.0235     1.5340  -1.971
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential  -3.0965     1.3473  -2.298
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm  -3.9895     1.0073  -3.961
+# Pr(>|z|)    
+# A.Mean.Sum2                                                                                0.025218 *  
+# V.Mean.Sum2.directionpositive                                                              0.000667 ***
+# fct_relevel(predicateType2, "emotive")cognitive                                            0.008537 ** 
+# fct_relevel(predicateType2, "emotive")emoComm                                              2.60e-11 ***
+# fct_relevel(predicateType2, "emotive")evidential                                           1.45e-11 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                           1.23e-12 ***
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive                                                  3.25e-05 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                                0.779585    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                                  0.000393 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential                               0.206353    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm                               0.223900    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive              0.187100    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm                0.362205    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential             0.001602 ** 
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm             0.000782 ***
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive  0.073371 .  
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm    0.048723 *  
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential 0.021545 *  
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm 7.47e-05 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -5.4885     0.5070 -10.825
+# 0|1   -1.7692     0.5044  -3.508
+
+
+
+# data frames for only negative/positive models
+d.proj2.neg <- d.proj2 %>% filter(V.Mean.Sum2.direction == "negative")
+nrow(d.proj2.neg) # 5536
+d.proj2.pos <- d.proj2 %>% filter(V.Mean.Sum2.direction == "positive")
+nrow(d.proj2.pos) # 7281
+
+# how many predicates in each predicate types within the two valence categories?
+new.scale %>% 
+  count(V.Mean.Sum2.direction, predicateType2)
+#    V.Mean.Sum2.direction predicateType2   n
+# 1               negative      cognitive  14
+# 2               negative        emoComm  29
+# 3               negative        emotive  64
+# 4               negative     evidential  17
+# 5               negative     nonEmoComm  61
+
+# 6               positive      cognitive  32
+# 7               positive        emoComm  12
+# 8               positive        emotive  37
+# 9               positive     evidential  59
+# 10              positive     nonEmoComm 103
+
+###### negative valence ----
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | environment), 
+     data = d.proj2.neg) %>% 
+  summary()
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + 
+#   (1 | environment)
+# data:    d.proj2.neg
+# 
+# link  threshold nobs logLik   AIC     niter     max.grad cond.H 
+# logit flexible  5536 -4514.00 9038.01 293(1473) 5.39e-03 1.1e+02
+# 
+# Random effects:
+# Groups      Name        Variance Std.Dev.
+# participant (Intercept) 0.6790   0.8240  
+# environment (Intercept) 0.2248   0.4742  
+# Number of groups:  participant 290,  environment 3 
+# 
+# Coefficients:
+#             Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2   2.1924     0.2483   8.831   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -2.1010     0.3041  -6.910
+# 0|1    0.9844     0.3014   3.266
+
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj2.neg) %>% 
+  summary()
+# Coefficients:
+#                                                              Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                                   -0.9701     0.5121  -1.894  0.05817 .  
+# fct_relevel(predicateType2, "emotive")cognitive               -2.1614     0.8672  -2.492  0.01269 *  
+# fct_relevel(predicateType2, "emotive")emoComm                 -2.3653     0.4168  -5.674 1.39e-08 ***
+# fct_relevel(predicateType2, "emotive")evidential              -2.7906     0.4420  -6.314 2.73e-10 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm              -2.1627     0.3356  -6.445 1.16e-10 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive    0.4910     2.1969   0.223  0.82317    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm      2.3866     0.8803   2.711  0.00671 ** 
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential   1.0132     0.9749   1.039  0.29868    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm   0.6547     0.6765   0.968  0.33319  
+ 
+
+###### positive valence ----
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj2.pos) %>% 
+  summary()
+# Coefficients:
+#                                                              Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                                    2.0290     0.5986   3.390 0.000700 ***
+# fct_relevel(predicateType2, "emotive")cognitive               -1.2462     0.3879  -3.212 0.001317 ** 
+# fct_relevel(predicateType2, "emotive")emoComm                 -2.5019     0.6621  -3.779 0.000158 ***
+# fct_relevel(predicateType2, "emotive")evidential              -1.3093     0.3833  -3.416 0.000635 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm              -0.9913     0.3308  -2.997 0.002730 ** 
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive   -3.4989     0.9205  -3.801 0.000144 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm      0.8182     1.2931   0.633 0.526898    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential  -1.8043     0.9347  -1.930 0.053565 .  
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm  -3.0534     0.7594  -4.021  5.8e-05 ***
 
 ### H2.4.3 valence + arousal ----
 #### linear models ----
@@ -1511,61 +2061,124 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant)
 # -1|0  -2.3733     0.4135  -5.739
 # 0|1    1.1157     0.4128   2.703
 
-clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * predicateType +
-       (1 | participant) + (1 | environment), data = d.proj2) %>% 
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
+       fct_relevel(predicateType2, "emotive") + (1 | participant) + (1 | environment), 
+     data = d.proj2) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * predicateType +  
-#   (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
+#   fct_relevel(predicateType2, "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj2
 # 
 # link  threshold nobs  logLik   AIC      niter       max.grad cond.H 
-# logit flexible  12817 -9323.78 18685.57 4376(21845) 3.76e-04 3.9e+04
+# logit flexible  12817 -9298.41 18642.82 3518(17546) 8.24e-04 4.8e+04
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7891   0.8883  
-# environment (Intercept) 0.5337   0.7305  
+# participant (Intercept) 0.7912   0.8895  
+# environment (Intercept) 0.5380   0.7335  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                                    Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2                                         -1.7379     1.1148  -1.559  0.11901    
-# V.Mean.Sum2                                         -1.7131     1.1006  -1.557  0.11957    
-# predicateTypecognitive                              -4.6417     0.7468  -6.216 5.12e-10 ***
-# predicateTypecommunicative                          -2.6759     0.5696  -4.698 2.63e-06 ***
-# predicateTypeevidential                             -2.5772     0.6282  -4.102 4.09e-05 ***
-# A.Mean.Sum2:V.Mean.Sum2                              3.7650     2.2080   1.705  0.08817 .  
-# A.Mean.Sum2:predicateTypecognitive                   5.8393     1.7909   3.261  0.00111 ** 
-# A.Mean.Sum2:predicateTypecommunicative               1.1949     1.2051   0.992  0.32142    
-# A.Mean.Sum2:predicateTypeevidential                  0.9035     1.4225   0.635  0.52530    
-# V.Mean.Sum2:predicateTypecognitive                   7.6438     1.7001   4.496 6.92e-06 ***
-# V.Mean.Sum2:predicateTypecommunicative               2.1078     1.2944   1.628  0.10345    
-# V.Mean.Sum2:predicateTypeevidential                  1.5716     1.6270   0.966  0.33406    
-# A.Mean.Sum2:V.Mean.Sum2:predicateTypecognitive     -19.0356     4.0479  -4.703 2.57e-06 ***
-# A.Mean.Sum2:V.Mean.Sum2:predicateTypecommunicative  -2.6265     2.6351  -0.997  0.31890    
-# A.Mean.Sum2:V.Mean.Sum2:predicateTypeevidential     -2.5030     3.6562  -0.685  0.49360    
+#                                                                          Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                                               -1.7285     1.1109  -1.556 0.119716    
+# V.Mean.Sum2                                                               -1.7239     1.0962  -1.573 0.115824    
+# fct_relevel(predicateType2, "emotive")cognitive                           -4.7666     0.7417  -6.426 1.31e-10 ***
+# fct_relevel(predicateType2, "emotive")emoComm                             -3.7346     0.7608  -4.909 9.15e-07 ***
+# fct_relevel(predicateType2, "emotive")evidential                          -2.4985     0.6270  -3.985 6.75e-05 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                          -2.5897     0.5770  -4.488 7.18e-06 ***
+# A.Mean.Sum2:V.Mean.Sum2                                                    3.7770     2.1992   1.717 0.085906 .  
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                6.0329     1.7844   3.381 0.000722 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                  4.1514     1.6364   2.537 0.011182 *  
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential               0.7733     1.4196   0.545 0.585931    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm               0.9905     1.2317   0.804 0.421281    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                7.9517     1.6901   4.705 2.54e-06 ***
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                  5.4070     1.8488   2.925 0.003448 ** 
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential               1.3441     1.6253   0.827 0.408225    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm               2.2152     1.4017   1.580 0.114025    
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive  -19.5512     4.0359  -4.844 1.27e-06 ***
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm     -9.3454     3.6288  -2.575 0.010013 *  
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential  -2.1323     3.6509  -0.584 0.559190    
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm  -3.8938     2.9564  -1.317 0.187805    
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -5.7435     0.6865  -8.366
-# 0|1   -2.0387     0.6846  -2.978
+# -1|0  -5.7500     0.6861  -8.381
+# 0|1   -2.0355     0.6842  -2.975
+
+##### positive valence predicates only ----
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant) + 
+       (1 | environment), data = d.proj2.pos) %>% 
+  summary()
+# Coefficients:
+#                         Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2              -0.1573     0.4570  -0.344    0.731    
+# V.Mean.Sum2              -0.6874     0.4996  -1.376    0.169    
+# A.Mean.Sum2:V.Mean.Sum2   4.9661     1.1372   4.367 1.26e-05 ***
+
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
+       fct_relevel(predicateType2, "emotive")+ (1 | participant) + (1 | environment), 
+     data = d.proj2.pos) %>% 
+  summary()
+# Cumulative Link Mixed Model fitted with the Laplace approximation
+# 
+# formula: as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
+#   fct_relevel(predicateType2, "emotive") + (1 | participant) + (1 | environment)
+# data:    d.proj2.pos
+# 
+# link  threshold nobs logLik   AIC      niter       max.grad cond.H 
+# logit flexible  7281 -5154.25 10354.50 6691(26840) 4.49e-01 7.6e+04
+# 
+# Random effects:
+# Groups      Name        Variance Std.Dev.
+# participant (Intercept) 0.7518   0.8671  
+# environment (Intercept) 0.8056   0.8975  
+# Number of groups:  participant 290,  environment 3 
+# 
+# Coefficients:
+#                                                                          Estimate Std. Error z value Pr(>|z|)    
+# A.Mean.Sum2                                                               -4.6269     1.8590  -2.489 0.012812 *  
+# V.Mean.Sum2                                                               -5.2751     1.6688  -3.161 0.001572 ** 
+# fct_relevel(predicateType2, "emotive")cognitive                           -5.9638     1.0166  -5.866 4.45e-09 ***
+# fct_relevel(predicateType2, "emotive")emoComm                             -3.5637     1.6684  -2.136 0.032680 *  
+# fct_relevel(predicateType2, "emotive")evidential                          -3.3507     0.9696  -3.456 0.000549 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                          -3.8522     0.8824  -4.365 1.27e-05 ***
+# A.Mean.Sum2:V.Mean.Sum2                                                   13.2162     3.6156   3.655 0.000257 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive                8.4712     2.4767   3.420 0.000625 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                  4.4644     3.3479   1.333 0.182377    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential               3.1371     2.3123   1.357 0.174873    
+# A.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm               3.7575     1.9993   1.879 0.060186 .  
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive               11.0554     2.1922   5.043 4.58e-07 ***
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm                  0.6984     4.0563   0.172 0.863306    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential               2.8567     2.3817   1.199 0.230360    
+# V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm               6.4515     2.1208   3.042 0.002349 ** 
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")cognitive  -27.7129     5.3002  -5.229 1.71e-07 ***
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")emoComm     -5.0419     7.4321  -0.678 0.497524    
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")evidential  -6.6536     5.6962  -1.168 0.242771    
+# A.Mean.Sum2:V.Mean.Sum2:fct_relevel(predicateType2, "emotive")nonEmoComm -14.4054     4.8492  -2.971 0.002971 ** 
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Threshold coefficients:
+#      Estimate Std. Error z value
+# -1|0  -7.2356     0.9851  -7.345
+# 0|1   -3.1942     0.9821  -3.252
 
 
 ## possible issues with the analysis ----
 
 # predicates in both active and passive sentence frames with same predicate type
 d3[duplicated(d3[,cbind(2,4)]),] %>%
-  select(verb, predicateType)
+  select(verb, predicateType2)
 
-#       verb predicateType
-# 195 grieve       emotive
-# 251 marvel       emotive
-# 276  panic       emotive
-# 427  worry       emotive
+#       verb predicateType2
+# 195 grieve        emotive
+# 251 marvel        emotive
+# 276  panic        emotive
+# 426  worry        emotive
 
 # Of the 101 emotives with valence/arousal/dominance ratings, four predicates occur in both
 # sentence frames in the MV data set. The "active" and "passive voice" versions of these 
@@ -1610,40 +2223,48 @@ d.proj = d.proj %>%
 
 # # how many predicates in which predicateType and with which dynamicity?
 d.proj %>%
-  select(predicateType, verb, dynamicity) %>%
+  select(predicateType2, verb, dynamicity) %>%
   unique() %>%
-  group_by(predicateType, dynamicity) %>%
+  group_by(predicateType2, dynamicity) %>%
   summarize(count=n())
 
 mean.proj = d.proj %>%
-  group_by(predicateType, dynamicity) %>%
+  group_by(predicateType2, dynamicity) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
-         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
 mean.proj
-nrow(mean.proj) # 11
+nrow(mean.proj) # 12
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) # 6
+nrow(mean.proj) # 7
 
 #### plot ----
-ggplot(mean.proj, aes(x = predicateType, y = Mean.Proj, colour = dynamicity)) +
+ggplot(mean.proj, aes(x = predicateType2, y = Mean.Proj, colour = dynamicity)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(position = position_dodge(0.2)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
                 position = position_dodge(0.2)) +
   theme(legend.position = "top",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(x = "Predicate type",
        y = "Mean projection rating", 
        colour = "Dynamicity") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                              "emotive", "evidential", 
+                              "communicative without\nemotive component")) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = c("dynamic" = "violetred3", "stative" = "aquamarine4"))
-ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType-and-Dynamicity.pdf", height = 4, width = 10)
 
 
 ### by predicate ---- 
@@ -1682,9 +2303,9 @@ mean.proj %>%
 # # A tibble: 3 × 2
 # predicateType `n()`
 #   <chr>         <int>
-# 1 cognitive        37
+# 1 cognitive        39
 # 2 emotive         148
-# 3 evidential        7
+# 3 evidential        3
 
 #### plots ----
 # projection by predicate with dynamic predicates highlighted
@@ -1774,31 +2395,32 @@ lm(Mean.Proj ~ dynamicity, data = mean.proj) %>%
   summary()
 # Coefficients:
 #                   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)        0.29756    0.01270   23.44   <2e-16 ***
-# dynamicitystative  0.31777    0.02095   15.16   <2e-16 ***
+# (Intercept)        0.29798    0.01263   23.59   <2e-16 ***
+# dynamicitystative  0.31997    0.02096   15.27   <2e-16 ***
 
 lm(Mean.Proj ~ dynamicity + predicateType, data = mean.proj) %>%  
   summary()
 # Coefficients:
 #                            Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.17310    0.04455   3.886 0.000115 ***
-# dynamicitystative           0.06286    0.04827   1.302 0.193381    
-# predicateTypecommunicative  0.13481    0.04635   2.908 0.003789 ** 
-# predicateTypeemotive        0.48668    0.03457  14.077  < 2e-16 ***
-# predicateTypeevidential     0.11582    0.04658   2.486 0.013216 *  
+# (Intercept)                 0.15311    0.04805   3.186  0.00153 ** 
+# dynamicitystative           0.08586    0.05405   1.589  0.11278    
+# predicateTypecommunicative  0.15480    0.04972   3.113  0.00195 ** 
+# predicateTypeemotive        0.48367    0.03452  14.011  < 2e-16 ***
+# predicateTypeevidential     0.14106    0.05110   2.761  0.00597 **   
 
-lm(Mean.Proj ~ dynamicity * predicateType, data = mean.proj) %>%  
+lm(Mean.Proj ~ fct_relevel(dynamicity, "dynamic") * fct_relevel(predicateType2, "evidential"), 
+   data = mean.proj) %>%  
   summary()
 # Coefficients: (2 not defined because of singularities)
-# Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                   0.14310    0.05255   2.723  0.00668 ** 
-# dynamicitystative                             0.10421    0.06170   1.689  0.09181 .  
-# predicateTypecommunicative                    0.16481    0.05409   3.047  0.00243 ** 
-# predicateTypeemotive                          0.47533    0.03614  13.152  < 2e-16 ***
-# predicateTypeevidential                       0.15101    0.05691   2.653  0.00821 ** 
+#                                              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                   0.14310    0.05251   2.725  0.00665 ** 
+# dynamicitystative                             0.09945    0.06122   1.625  0.10486    
+# predicateTypecommunicative                    0.16481    0.05405   3.049  0.00241 ** 
+# predicateTypeemotive                          0.48008    0.03537  13.574  < 2e-16 ***
+# predicateTypeevidential                       0.15276    0.05677   2.691  0.00736 ** 
 # dynamicitystative:predicateTypecommunicative       NA         NA      NA       NA    
 # dynamicitystative:predicateTypeemotive             NA         NA      NA       NA    
-# dynamicitystative:predicateTypeevidential    -0.10653    0.09903  -1.076  0.28255  
+# dynamicitystative:predicateTypeevidential    -0.06198    0.13070  -0.474  0.63554 
 
 #### ordinal models ----
 # remove "other" and "comPriv" predicates
@@ -1815,103 +2437,60 @@ clmm(as.factor(veridicality_num) ~ dynamicity + (1 | participant) + (1 | environ
 # data:    d.proj
 # 
 # link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -11833.45 23676.90 349(1749) 3.15e-03 4.0e+02
+# logit flexible  15662 -11826.64 23663.29 357(1789) 1.13e-03 4.0e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.6966   0.8346  
-# environment (Intercept) 0.4338   0.6587  
+# participant (Intercept) 0.6973   0.8350  
+# environment (Intercept) 0.4342   0.6589  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                   Estimate Std. Error z value Pr(>|z|)    
-# dynamicitystative  1.31164    0.03764   34.84   <2e-16 ***
+#                              Estimate Std. Error z value Pr(>|z|)    
+# dynamicitystative  1.32238    0.03778      35   <2e-16 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -2.8588     0.3855  -7.416
-# 0|1    0.6570     0.3843   1.710
+# -1|0  -2.8612     0.3856  -7.420
+# 0|1    0.6559     0.3844   1.706
 
 # with predicate type
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ dynamicity * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
-  summary()
-# design is column rank deficient so dropping 2 coef
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ dynamicity * predicateType + 
-#   (1 |  participant) + (1 | environment)
-# data:    d.proj
-# 
-# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -11338.67 22695.33 846(4234) 8.45e-03 5.7e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7765   0.8812  
-# environment (Intercept) 0.4844   0.6960  
-# Number of groups:  participant 290,  environment 3 
-# 
-# Coefficients:
-#                                          Estimate Std. Error z value Pr(>|z|)    
-# dynamicitystative                        -0.06604    0.15150  -0.436   0.6629    
-# predicateTypecognitive                   -2.59982    0.19049 -13.648   <2e-16 ***
-# predicateTypecommunicative               -1.94137    0.15857 -12.243   <2e-16 ***
-# predicateTypeevidential                  -2.01538    0.15053 -13.389   <2e-16 ***
-# dynamicitystative:predicateTypecognitive  0.43691    0.19653   2.223   0.0262 *  
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -4.9400     0.4366 -11.314
-# 0|1   -1.3058     0.4344  -3.006
-
-# with predicate type with emotive component distinction
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ dynamicity * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ dynamicity * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj) %>% 
   summary()
 # design is column rank deficient so dropping 3 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ dynamicity * predicateType2 + 
-#   (1 |  participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ dynamicity * fct_relevel(predicateType2,  
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11302.32 22624.65 1169(5850) 5.46e-03 5.6e+02
+# link  threshold nobs  logLik    AIC      niter       max.grad cond.H 
+# logit flexible  15662 -11300.72 22621.43 2584(12925) 2.64e-03 7.9e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7770   0.8815  
-# environment (Intercept) 0.4884   0.6989  
+# participant (Intercept) 0.7771   0.8815  
+# environment (Intercept) 0.4886   0.6990  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                           Estimate Std. Error z value Pr(>|z|)    
-# dynamicitystative                         -0.07058    0.15159  -0.466   0.6415    
-# predicateType2cognitive                   -2.60753    0.19064 -13.678   <2e-16 ***
-# predicateType2emoComm                     -1.51483    0.16637  -9.105   <2e-16 ***
-# predicateType2evidential                  -2.02081    0.15062 -13.417   <2e-16 ***
-# predicateType2nonEmoComm                  -2.05478    0.15926 -12.902   <2e-16 ***
-# dynamicitystative:predicateType2cognitive  0.44300    0.19669   2.252   0.0243 *  
+#                                                                   Estimate Std. Error z value Pr(>|z|)    
+# dynamicitystative                                                  0.04538    0.22778   0.199    0.842    
+# fct_relevel(predicateType2, "emotive")cognitive                   -2.49147    0.25572  -9.743  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                     -1.39887    0.23812  -5.875 4.24e-09 ***
+# fct_relevel(predicateType2, "emotive")evidential                  -1.89680    0.22734  -8.343  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                  -1.93891    0.23299  -8.322  < 2e-16 ***
+# dynamicitystative:fct_relevel(predicateType2, "emotive")cognitive  0.30347    0.25993   1.168    0.243    
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.9565     0.4382 -11.312
-# 0|1   -1.3089     0.4359  -3.002
+# -1|0  -4.8409     0.4701 -10.297
+# 0|1   -1.1928     0.4681  -2.548
 
 
 ## H3.2 change of state ----
@@ -1946,34 +2525,60 @@ d.proj = d.proj %>%
 
 ### by predicate type ----
 mean.proj = d.proj %>%
-  group_by(predicateType, changeOfState) %>%
+  group_by(predicateType2, changeOfState) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
-         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
 mean.proj
-nrow(mean.proj) # 8
+nrow(mean.proj) # 9
+
+# # how many predicates in which predicateType and CoS / no CoS?
+d.proj %>%
+  select(predicateType2, verb, changeOfState) %>%
+  unique() %>%
+  group_by(predicateType2, changeOfState) %>%
+  summarize(count=n())
+# predicateType2 changeOfState count
+#   <chr>          <chr>         <int>
+# 1 cognitive      no               51
+# 2 cognitive      yes               2
+# 3 comPriv        no                9
+# 4 emoComm        no               47
+# 5 emotive        no              143
+# 6 evidential     no               48
+# 7 evidential     yes              38
+# 8 nonEmoComm     no              189
+# 9 other          no               12
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) # 6
+nrow(mean.proj) # 7
 
 ##### plot ----
-ggplot(mean.proj, aes(x = predicateType, y = Mean.Proj, colour = changeOfState)) +
+ggplot(mean.proj, aes(x = predicateType2, y = Mean.Proj, colour = changeOfState)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(position = position_dodge(0.2)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
                 position = position_dodge(0.2)) +
   theme(legend.position = "top",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(y = "Mean projection rating",
        x = "Predicate type",
        colour = "Change-of-state predicate") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                              "emotive", "evidential", 
+                              "communicative without\nemotive component")) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = c("no" = "darkblue", "yes" = "gold3"))
-ggsave("../graphs/projection-by-predicateType-and-CoS.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType-and-CoS.pdf", height = 4, width = 10)
 
 ### by predicate ----
 # calculate by-predicate projection means 
@@ -2011,8 +2616,8 @@ mean.proj %>%
 # # A tibble: 2 × 2
 # predicateType `n()`
 #   <chr>         <int>
-# 1 cognitive         4 <<< !!!
-# 2 evidential       37
+# 1 cognitive         2 <<< !!!
+# 2 evidential       38
 
 # The small number of CoS predicates amongst the cognitives is the reason for the
 # different pattern.
@@ -2063,31 +2668,31 @@ lm(Mean.Proj ~ changeOfState, data = mean.proj) %>%
   summary()
 # Coefficients:
 #                  Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)       0.42120    0.01258  33.471   <2e-16 ***
-# changeOfStateyes -0.08904    0.04494  -1.981   0.0481 * 
+# (Intercept)       0.42129    0.01257  33.520   <2e-16 ***
+# changeOfStateyes -0.09250    0.04545  -2.035   0.0423 * 
 
 lm(Mean.Proj ~ changeOfState + predicateType, data = mean.proj) %>%  
   summary()
 # Coefficients:
 #                            Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.21288    0.02766   7.697 7.12e-14 ***
-# changeOfStateyes            0.07435    0.03916   1.899  0.05817 .  
-# predicateTypecommunicative  0.09503    0.03047   3.119  0.00191 ** 
-# predicateTypeemotive        0.50976    0.03202  15.920  < 2e-16 ***
-# predicateTypeevidential     0.04979    0.03705   1.344  0.17958  
+# (Intercept)                 0.21396    0.02702   7.918 1.47e-14 ***
+# changeOfStateyes            0.06168    0.04083   1.511  0.13152    
+# predicateTypecommunicative  0.09395    0.02989   3.143  0.00177 ** 
+# predicateTypeemotive        0.50868    0.03148  16.161  < 2e-16 ***
+# predicateTypeevidential     0.05595    0.03806   1.470  0.14211
 
 lm(Mean.Proj ~ changeOfState * predicateType, data = mean.proj) %>%  
   summary()
 # Coefficients: (2 not defined because of singularities)
 #                                             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                  0.18909    0.02837   6.664 6.83e-11 ***
-# changeOfStateyes                             0.37757    0.10132   3.727 0.000215 ***
-# predicateTypecommunicative                   0.11882    0.03107   3.824 0.000147 ***
-# predicateTypeemotive                         0.53355    0.03257  16.382  < 2e-16 ***
-# predicateTypeevidential                      0.09549    0.03933   2.428 0.015530 *  
+# (Intercept)                                  0.19144    0.02701   7.088 4.47e-12 ***
+# changeOfStateyes                             0.65856    0.13903   4.737 2.81e-06 ***
+# predicateTypecommunicative                   0.11647    0.02978   3.911 0.000104 ***
+# predicateTypeemotive                         0.53120    0.03132  16.963  < 2e-16 ***
+# predicateTypeevidential                      0.10241    0.03879   2.640 0.008530 ** 
 # changeOfStateyes:predicateTypecommunicative       NA         NA      NA       NA    
 # changeOfStateyes:predicateTypeemotive             NA         NA      NA       NA    
-# changeOfStateyes:predicateTypeevidential    -0.35535    0.10968  -3.240 0.001272 **  
+# changeOfStateyes:predicateTypeevidential    -0.65105    0.14520  -4.484 9.03e-06 *** 
 
 #### ordinal models ----
 # remove "other" and "comPriv" predicates
@@ -2104,103 +2709,60 @@ clmm(as.factor(veridicality_num) ~ changeOfState + (1 | participant) + (1 | envi
 # data:    d.proj
 # 
 # link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -12469.05 24948.11 249(1243) 1.54e-03 3.6e+02
+# logit flexible  15662 -12467.87 24945.74 277(1383) 9.09e-05 3.6e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.6208   0.7879  
-# environment (Intercept) 0.3816   0.6177  
+# participant (Intercept) 0.6215   0.7883  
+# environment (Intercept) 0.3817   0.6178  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
 #                  Estimate Std. Error z value Pr(>|z|)    
-# changeOfStateyes -0.36734    0.06149  -5.974 2.32e-09 ***
+# changeOfStateyes -0.38345    0.06216  -6.169 6.86e-10 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -3.1684     0.3618  -8.758
-# 0|1    0.1523     0.3603   0.423
+# -1|0  -3.1691     0.3618  -8.759
+# 0|1    0.1519     0.3603   0.422
 
 # with predicate type
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ changeOfState * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj) %>% 
-  summary()
-# design is column rank deficient so dropping 2 coef
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ changeOfState * predicateType + 
-#   (1 | participant) + (1 | environment)
-# data:    d.proj
-# 
-# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -11311.51 22641.02 852(4255) 4.56e-03 4.2e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7835   0.8852  
-# environment (Intercept) 0.4880   0.6986  
-# Number of groups:  participant 290,  environment 3 
-# 
-# Coefficients:
-#                                         Estimate Std. Error z value Pr(>|z|)    
-# changeOfStateyes                         0.06689    0.08387   0.798    0.425    
-# predicateTypecognitive                  -2.38912    0.07017 -34.047  < 2e-16 ***
-# predicateTypecommunicative              -1.87847    0.04694 -40.019  < 2e-16 ***
-# predicateTypeevidential                 -1.98605    0.06764 -29.363  < 2e-16 ***
-# changeOfStateyes:predicateTypecognitive  1.56224    0.22677   6.889 5.62e-12 ***
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -4.8850     0.4110 -11.887
-# 0|1   -1.2410     0.4087  -3.037
-
-# with predicate type with emotive component distinction
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ changeOfState * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ changeOfState * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj) %>% 
   summary()
 # design is column rank deficient so dropping 3 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ changeOfState * predicateType2 +  
-#   (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ changeOfState * fct_relevel(predicateType2,  
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter     max.grad cond.H 
-# logit flexible  15662 -11275.36 22570.73 970(4844) 3.68e-03 4.2e+02
+# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
+# logit flexible  15662 -11255.08 22530.16 1180(5894) 3.75e-03 4.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7837   0.8853  
-# environment (Intercept) 0.4920   0.7014  
+# participant (Intercept) 0.7859   0.8865  
+# environment (Intercept) 0.4943   0.7030  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                          Estimate Std. Error z value Pr(>|z|)    
-# changeOfStateyes                          0.06689    0.08395   0.797    0.426    
-# predicateType2cognitive                  -2.39112    0.07025 -34.036  < 2e-16 ***
-# predicateType2emoComm                    -1.44825    0.06905 -20.973  < 2e-16 ***
-# predicateType2evidential                 -1.98728    0.06769 -29.356  < 2e-16 ***
-# predicateType2nonEmoComm                 -1.98713    0.04879 -40.728  < 2e-16 ***
-# changeOfStateyes:predicateType2cognitive  1.55916    0.22691   6.871 6.36e-12 ***
+#                                                                    Estimate Std. Error z value Pr(>|z|)    
+# changeOfStateyes                                                  0.0005463  0.0845258   0.006    0.995    
+# fct_relevel(predicateType2, "emotive")cognitive                  -2.3805307  0.0683504 -34.828  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                    -1.4488496  0.0690772 -20.974  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")evidential                 -1.9441683  0.0691270 -28.125  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                 -1.9885229  0.0488169 -40.734  < 2e-16 ***
+# changeOfStateyes:fct_relevel(predicateType2, "emotive")cognitive  3.1627527  0.3961746   7.983 1.43e-15 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.8969     0.4126 -11.869
-# 0|1   -1.2394     0.4103  -3.021
+# -1|0  -4.9027     0.4135 -11.856
+# 0|1   -1.2395     0.4112  -3.015
 
 
 ## H3.3: activity ----
@@ -2237,34 +2799,64 @@ d.proj = d.proj %>%
 
 ### by predicate type ----
 mean.proj = d.proj %>%
-  group_by(predicateType, activity) %>%
+  group_by(predicateType2, activity) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
-         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
 mean.proj
-nrow(mean.proj) # 11
+nrow(mean.proj) # 13
+
+# how many predicates in which predicateType and activity / no activity?
+d.proj %>%
+  select(predicateType2, verb, activity) %>%
+  unique() %>%
+  group_by(predicateType2, activity) %>%
+  summarize(count=n())
+# predicateType2 activity count
+#   <chr>          <chr>    <int>
+# 1 cognitive      no          41
+# 2 cognitive      yes         12
+# 3 comPriv        no           7
+# 4 comPriv        yes          2
+# 5 emoComm        no           3
+# 6 emoComm        yes         44
+# 7 emotive        no         143
+# 8 evidential     no          74
+# 9 evidential     yes         12
+# 10 nonEmoComm     no          94
+# 11 nonEmoComm     yes         95
+# 12 other          no          10
+# 13 other          yes          2
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) # 7
+nrow(mean.proj) # 9
 
 #### plot ----
 ggplot(mean.proj, aes(x = predicateType, y = Mean.Proj, colour = activity)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(position = position_dodge(0.2)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
                 position = position_dodge(0.2)) +
   theme(legend.position = "top",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(y = "Mean projection rating",
        x = "Predicate type",
        colour = "Activity") +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                              "emotive", "evidential", 
+                              "communicative without\nemotive component")) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = c("no" = "slateblue", "yes" = "red3"))
-ggsave("../graphs/projection-by-predicateType-and-activity.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType-and-activity.pdf", height = 4, width = 10)
 
 ### by predicate ----
 # calculate by-predicate projection means 
@@ -2297,14 +2889,15 @@ nrow(mean.proj) # 523
 # how many activity predicates are in each predicate type category?
 mean.proj %>% 
   filter(activity == "yes") %>% 
-  group_by(predicateType) %>% 
+  group_by(predicateType2) %>% 
   summarise(n())
-# # A tibble: 3 × 2
-# predicateType `n()`
-#   <chr>         <int>
-# 1 cognitive        12
-# 2 communicative   139
-# 3 evidential       12
+# # A tibble: 4 × 2
+# predicateType2 `n()`
+#   <chr>          <int>
+# 1 cognitive         12
+# 2 emoComm           44
+# 3 evidential        12
+# 4 nonEmoComm        95
 
 #### plots ----
 # projection by predicate with activity predicates highlighted
@@ -2355,28 +2948,31 @@ lm(Mean.Proj ~ activity, data = mean.proj) %>%
 # (Intercept)  0.46198    0.01413  32.702  < 2e-16 ***
 # activityyes -0.15325    0.02531  -6.056 2.67e-09 ***
 
-lm(Mean.Proj ~ activity + predicateType, data = mean.proj) %>%  
+lm(Mean.Proj ~ activity + predicateType2, data = mean.proj) %>%  
   summary()
 # Coefficients:
-#                            Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                 0.21450    0.02807   7.642 1.04e-13 ***
-# activityyes                 0.01789    0.02248   0.796   0.4264    
-# predicateTypecommunicative  0.08287    0.03142   2.638   0.0086 ** 
-# predicateTypeemotive        0.50814    0.03240  15.684  < 2e-16 ***
-# predicateTypeevidential     0.07699    0.03472   2.218   0.0270 *   
+#                          Estimate Std. Error t value Pr(>|t|) 
+# (Intercept)               0.21961    0.02702   8.129 3.22e-15 ***
+# activityyes              -0.01468    0.02312  -0.635   0.5257    
+# predicateType2emoComm     0.21908    0.04200   5.216 2.64e-07 ***
+# predicateType2emotive     0.50303    0.03133  16.057  < 2e-16 ***
+# predicateType2evidential  0.07960    0.03375   2.358   0.0187 *  
+# predicateType2nonEmoComm  0.06657    0.03066   2.171   0.0304 *   
 
-lm(Mean.Proj ~ activity * predicateType, data = mean.proj) %>%  
+lm(Mean.Proj ~ activity * fct_relevel(predicateType2, "cognitive"), data = mean.proj) %>%  
   summary()
 # Coefficients: (1 not defined because of singularities)
-#                                         Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                             0.278220   0.030959   8.987  < 2e-16 ***
-# activityyes                            -0.252933   0.063823  -3.963 8.44e-05 ***
-# predicateTypecommunicative              0.001991   0.036658   0.054    0.957    
-# predicateTypeemotive                    0.444419   0.034799  12.771  < 2e-16 ***
-# predicateTypeevidential                 0.002467   0.038082   0.065    0.948    
-# activityyes:predicateTypecommunicative  0.299960   0.068758   4.363 1.55e-05 ***
-# activityyes:predicateTypeemotive              NA         NA      NA       NA    
-# activityyes:predicateTypeevidential     0.350024   0.087636   3.994 7.44e-05 *** 
+#                                       Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                           0.272190   0.029703   9.164  < 2e-16 ***
+# activityyes                          -0.246902   0.062424  -3.955 8.72e-05 ***
+# predicateType2emoComm                 0.205588   0.113754   1.807  0.07130 .  
+# predicateType2emotive                 0.450450   0.033566  13.420  < 2e-16 ***
+# predicateType2evidential              0.011905   0.037028   0.322  0.74796    
+# predicateType2nonEmoComm              0.001716   0.035596   0.048  0.96157    
+# activityyes:predicateType2emoComm     0.190467   0.129524   1.471  0.14204    
+# activityyes:predicateType2emotive           NA         NA      NA       NA    
+# activityyes:predicateType2evidential  0.340585   0.086023   3.959 8.58e-05 ***
+# activityyes:predicateType2nonEmoComm  0.256651   0.068281   3.759  0.00019 ***
 
 #### ordinal models ----
 # remove "other" and "comPriv" predicates
@@ -2412,88 +3008,47 @@ clmm(as.factor(veridicality_num) ~ activity + (1 | participant) + (1 | environme
 # 0|1  -0.007945   0.363860  -0.022
 
 # with predicate type
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ activity * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ activity * fct_relevel(predicateType2, "emotive") + 
+       (1 | participant) + (1 | environment), data = d.proj) %>% 
   summary()
 # design is column rank deficient so dropping 1 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ activity * predicateType + (1 |  participant) +
-#   (1 | environment)
+# formula: as.factor(veridicality_num) ~ activity * fct_relevel(predicateType2,  
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
 # link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11306.23 22632.47 1068(5323) 6.08e-03 6.1e+02
+# logit flexible  15662 -11274.84 22573.68 1556(7772) 4.39e-03 4.3e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7815   0.8840  
-# environment (Intercept) 0.4866   0.6976  
+# participant (Intercept) 0.7825   0.8846  
+# environment (Intercept) 0.4902   0.7001  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                        Estimate Std. Error z value Pr(>|z|)    
-# activityyes                             0.29233    0.12017   2.433    0.015 *  
-# predicateTypecognitive                 -2.03889    0.07377 -27.637  < 2e-16 ***
-# predicateTypecommunicative             -1.97864    0.05572 -35.512  < 2e-16 ***
-# predicateTypeevidential                -1.99960    0.05996 -33.350  < 2e-16 ***
-# activityyes:predicateTypecognitive     -1.27201    0.17731  -7.174  7.3e-13 ***
-# activityyes:predicateTypecommunicative -0.12142    0.13041  -0.931    0.352    
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#       Estimate Std. Error z value
-# -1|0  -4.8917     0.4104 -11.920
-# 0|1   -1.2398     0.4080  -3.039
-
-# with predicate type with emotive component distinction
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ activity * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
-  summary()
-# design is column rank deficient so dropping 1 coef
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ activity * predicateType2 + 
-#   (1 | participant) + (1 | environment)
-# data:    d.proj
-# 
-# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11275.35 22574.71 1178(5882) 7.02e-03 4.3e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7826   0.8846  
-# environment (Intercept) 0.4901   0.7001  
-# Number of groups:  participant 290,  environment 3 
-# 
-# Coefficients:
-#                                      Estimate Std. Error z value Pr(>|z|)    
-# activityyes                           0.02598    0.05607   0.463   0.6432    
-# predicateType2cognitive              -2.04032    0.07385 -27.629  < 2e-16 ***
-# predicateType2emoComm                -1.38758    0.23340  -5.945 2.76e-09 ***
-# predicateType2evidential             -1.99994    0.06000 -33.333  < 2e-16 ***
-# predicateType2nonEmoComm             -2.00045    0.05623 -35.576  < 2e-16 ***
-# activityyes:predicateType2cognitive  -1.00777    0.14178  -7.108 1.18e-12 ***
-# activityyes:predicateType2emoComm    -0.08907    0.24446  -0.364   0.7156    
-# activityyes:predicateType2evidential  0.26513    0.13259   2.000   0.0455 *  
+#                                                              Estimate Std. Error z value Pr(>|z|)    
+# activityyes                                                   0.02590    0.05607   0.462   0.6441    
+# fct_relevel(predicateType2, "emotive")cognitive              -2.06924    0.07262 -28.495  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                -1.38744    0.23340  -5.944 2.78e-09 ***
+# fct_relevel(predicateType2, "emotive")evidential             -1.98268    0.06042 -32.815  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm             -2.00045    0.05623 -35.576  < 2e-16 ***
+# activityyes:fct_relevel(predicateType2, "emotive")cognitive  -0.97880    0.14101  -6.941 3.88e-12 ***
+# activityyes:fct_relevel(predicateType2, "emotive")emoComm    -0.08912    0.24447  -0.365   0.7155    
+# activityyes:fct_relevel(predicateType2, "emotive")evidential  0.24774    0.13279   1.866   0.0621 .  
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -4.9019     0.4118 -11.904
-# 0|1   -1.2387     0.4095  -3.025
+# -1|0  -4.9019     0.4119 -11.902
+# 0|1   -1.2388     0.4095  -3.025
+
+
 
 ## H3.4 dynamic/activity/CoS comparison ----
+### H3.4.1 overall ----
 # create dataset for projection inferences
 d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) # 16291
@@ -2527,40 +3082,49 @@ d.proj = d.proj %>%
                                  polarity == "negative" & conditional == "True" ~ "q+cond+neg"))
 
 
-### by predicate type ----
+#### by predicate type ----
 mean.proj = d.proj %>%
-  group_by(predicateType, stateActivityCoS) %>%
+  group_by(predicateType2, stateActivityCoS) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
-         predicateType = fct_reorder(as.factor(predicateType),Mean.Proj))
+         predicateType = fct_reorder(as.factor(predicateType2), Mean.Proj))
 mean.proj
-nrow(mean.proj) # 16
+nrow(mean.proj) # 18
 
 # remove "other" and "comPriv" predicates
 mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
-nrow(mean.proj) # 10
+nrow(mean.proj) # 12
 
-#### plot ----
+##### plot ----
 ggplot(mean.proj, aes(x = predicateType, y = Mean.Proj, 
                       colour = fct_relevel(stateActivityCoS, 
                                            "activity", "change-of-state predicate",
                                            "state", "other"))) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(position = position_dodge(0.2)) +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
                 position = position_dodge(0.2)) +
     theme(legend.position = "top",
         axis.ticks.x = element_blank(),
-        axis.text.x = element_text(size = 10),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(y = "Mean projection rating",
        x = "Predicate type",
        colour = "Type of predicate") +
+  scale_x_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                              "emotive", "evidential", 
+                              "communicative without\nemotive component")) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = c("red3", "gold3", "aquamarine4", "grey"))
-ggsave("../graphs/projection-by-predicateType-and-stateActivityCoS.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-predicateType-and-stateActivityCoS.pdf", height = 4, width = 10)
 
-### by predicate ----
+#### by predicate ----
 # calculate by-predicate projection means 
 mean.proj = d.proj %>%
   group_by(verb_renamed) %>%
@@ -2588,7 +3152,21 @@ mean.proj = mean.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 nrow(mean.proj) # 523
 
-#### plots ----
+mean.proj %>%
+  select(predicateType2, verb_renamed, stateActivityCoS) %>%
+  group_by(predicateType2, stateActivityCoS) %>%
+  summarize(count=n()) %>% 
+  pivot_wider(names_from = stateActivityCoS, values_from = count)
+#   predicateType2 activity `change-of-state predicate` state other
+#   <chr>             <int>                       <int> <int> <int>
+# 1 cognitive            12                           2    39    NA
+# 2 emoComm              44                          NA    NA     3
+# 3 emotive              NA                          NA   148    NA
+# 4 evidential           12                          38     3    33
+# 5 nonEmoComm           95                          NA    NA    94
+
+
+##### plots ----
 ggplot() +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(data = mean.proj, 
@@ -2610,8 +3188,13 @@ ggplot() +
   geom_point(data = mean.proj, aes(x = verb_renamed, y = Mean.Proj, 
                                    colour = stateActivityCoS), show.legend = FALSE) +
   theme(legend.position = "top",
+        plot.margin = unit(c(5.5, 44, 5.5, 44), "pt"),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
   labs(y = "Mean projection rating", 
        x = "Predicate") +
@@ -2619,60 +3202,60 @@ ggplot() +
   scale_colour_manual(values = c("red3", "gold3", "aquamarine4", "grey"), 
                       breaks = c("activity", "change-of-state predicate", "state", "other")) +
   facet_wrap(~ fct_relevel(stateActivityCoS, "activity", "change-of-state predicate",
-                           "state", "other")) 
-ggsave("../graphs/projection-by-predicate-stateActivityCoS-faceted.pdf", height = 6, width = 6)
+                           "state", "other"), ncol = 4) 
+ggsave("../graphs/projection-by-predicate-stateActivityCoS-faceted.pdf", height = 4, width = 10)
 
 
-#### linear models ----
-lm(Mean.Proj ~ stateActivityCoS, data = mean.proj) %>%  
+##### linear models ----
+lm(Mean.Proj ~ fct_relevel(stateActivityCoS, "other"), data = mean.proj) %>%  
   summary()
 # Coefficients:
 #                                           Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                0.30873    0.01809  17.068   <2e-16 ***
-# stateActivityCoSchange-of-state predicate  0.01807    0.04160   0.434    0.664    
-# stateActivityCoSother                     -0.03372    0.02716  -1.242    0.215    
-# stateActivityCoSstate                      0.30660    0.02460  12.466   <2e-16 ***
+# (Intercept)                                0.30873    0.01805  17.106   <2e-16 ***
+# stateActivityCoSchange-of-state predicate  0.02006    0.04066   0.493    0.622    
+# stateActivityCoSother                     -0.03372    0.02710  -1.244    0.214    
+# stateActivityCoSstate                      0.30922    0.02460  12.570   <2e-16 ***
 
 lm(Mean.Proj ~ stateActivityCoS + predicateType, data = mean.proj) %>%  
   summary()
 # Coefficients:
 #                                           Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                0.16572    0.04581   3.618 0.000327 ***
-# stateActivityCoSchange-of-state predicate  0.05143    0.04440   1.158 0.247252    
-# stateActivityCoSother                     -0.03776    0.02372  -1.592 0.112001    
-# stateActivityCoSstate                      0.07026    0.04990   1.408 0.159713    
-# predicateTypecommunicative                 0.15771    0.04728   3.336 0.000912 ***
-# predicateTypeemotive                       0.48666    0.03450  14.105  < 2e-16 ***
-# predicateTypeevidential                    0.11574    0.04813   2.405 0.016527 * 
+# (Intercept)                                0.14651    0.04874   3.006 0.002775 ** 
+# stateActivityCoSchange-of-state predicate  0.04743    0.04406   1.076 0.282240    
+# stateActivityCoSother                     -0.04033    0.02378  -1.696 0.090574 .  
+# stateActivityCoSstate                      0.09239    0.05480   1.686 0.092427 .  
+# predicateTypecommunicative                 0.17797    0.05044   3.529 0.000455 ***
+# predicateTypeemotive                       0.48374    0.03440  14.061  < 2e-16 ***
+# predicateTypeevidential                    0.14195    0.05327   2.665 0.007944 ** 
 
 lm(Mean.Proj ~ stateActivityCoS * predicateType, data = mean.proj) %>%  
   summary()
 # Coefficients: (6 not defined because of singularities)
-# Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                                           0.02529    0.05493   0.460 0.645438    
-# stateActivityCoSchange-of-state predicate                             0.82471    0.14532   5.675 2.32e-08 ***
-# stateActivityCoSother                                                -0.11804    0.06414  -1.840 0.066293 .  
-# stateActivityCoSstate                                                 0.22203    0.06321   3.513 0.000483 ***
-# predicateTypecommunicative                                            0.30195    0.05725   5.274 1.97e-07 ***
-# predicateTypeemotive                                                  0.47533    0.03497  13.591  < 2e-16 ***
-# predicateTypeevidential                                               0.35249    0.07768   4.538 7.09e-06 ***
+#                                                                      Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                           0.02529    0.05488   0.461 0.645183    
+# stateActivityCoSchange-of-state predicate                             0.82471    0.14521   5.679 2.27e-08 ***
+# stateActivityCoSother                                                -0.11804    0.06409  -1.842 0.066084 .  
+# stateActivityCoSstate                                                 0.21727    0.06276   3.462 0.000581 ***
+# predicateTypecommunicative                                            0.30195    0.05720   5.278 1.93e-07 ***
+# predicateTypeemotive                                                  0.48008    0.03422  14.029  < 2e-16 ***
+# predicateTypeevidential                                               0.35249    0.07762   4.541 6.97e-06 ***
 # stateActivityCoSchange-of-state predicate:predicateTypecommunicative       NA         NA      NA       NA    
-# stateActivityCoSother:predicateTypecommunicative                      0.07101    0.06890   1.031 0.303200    
+# stateActivityCoSother:predicateTypecommunicative                      0.07101    0.06885   1.031 0.302826    
 # stateActivityCoSstate:predicateTypecommunicative                           NA         NA      NA       NA    
 # stateActivityCoSchange-of-state predicate:predicateTypeemotive             NA         NA      NA       NA    
 # stateActivityCoSother:predicateTypeemotive                                 NA         NA      NA       NA    
 # stateActivityCoSstate:predicateTypeemotive                                 NA         NA      NA       NA    
-# stateActivityCoSchange-of-state predicate:predicateTypeevidential    -0.90476    0.15856  -5.706 1.96e-08 ***
+# stateActivityCoSchange-of-state predicate:predicateTypeevidential    -0.90113    0.15827  -5.694 2.10e-08 ***
 # stateActivityCoSother:predicateTypeevidential                              NA         NA      NA       NA    
-# stateActivityCoSstate:predicateTypeevidential                        -0.30801    0.11038  -2.790 0.005460 ** 
+# stateActivityCoSstate:predicateTypeevidential                        -0.26172    0.13784  -1.899 0.058172 .
 
-#### ordinal models ----
+##### ordinal models ----
 # remove "other" and "comPriv" predicates
 d.proj = d.proj %>%
   filter(predicateType != "other" & predicateType != "comPriv")
 
-clmm(as.factor(veridicality_num) ~ stateActivityCoS + (1 | participant) + (1 | environment), 
-     data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ fct_relevel(stateActivityCoS, "activity") + (1 | participant) +
+       (1 | environment), data = d.proj) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
@@ -2681,87 +3264,41 @@ clmm(as.factor(veridicality_num) ~ stateActivityCoS + (1 | participant) + (1 | e
 # data:    d.proj
 # 
 # link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11829.72 23673.44 1817(9089) 5.76e-03 4.1e+02
+# logit flexible  15662 -11822.61 23659.22 1059(5299) 5.20e-03 4.1e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.6953   0.8338  
-# environment (Intercept) 0.4338   0.6587  
+# participant (Intercept) 0.6959   0.8342  
+# environment (Intercept) 0.4342   0.6589  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
 #                                           Estimate Std. Error z value Pr(>|z|)    
-# stateActivityCoSchange-of-state predicate  0.04006    0.06913   0.579    0.562    
-# stateActivityCoSother                     -0.10736    0.04497  -2.387    0.017 *  
-# stateActivityCoSstate                      1.27397    0.04324  29.461   <2e-16 ***
+# stateActivityCoSchange-of-state predicate  0.05124    0.06763   0.758   0.4487    
+# stateActivityCoSother                     -0.10748    0.04498  -2.390   0.0169 *  
+# stateActivityCoSstate                      1.28655    0.04340  29.642   <2e-16 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -2.8975     0.3861  -7.504
-# 0|1    0.6196     0.3848   1.610
+# -1|0  -2.8981     0.3862  -7.504
+# 0|1    0.6204     0.3850   1.612
+
 
 # with predicate type
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType + (1 | participant) + 
-       (1 | environment), data = d.proj) %>% 
-  summary()
-# design is column rank deficient so dropping 6 coef
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType +  
-#   (1 | participant) + (1 | environment)
-# data:    d.proj
-# 
-# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11263.34 22552.69 1705(8529) 5.18e-03 8.2e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.7897   0.8887  
-# environment (Intercept) 0.4917   0.7012  
-# Number of groups:  participant 290,  environment 3 
-# 
-# Coefficients:
-#                                                                  Estimate Std. Error z value Pr(>|z|)    
-# stateActivityCoSchange-of-state predicate                         -0.2607     0.1289  -2.023  0.04305 *  
-# stateActivityCoSother                                             -0.3385     0.1313  -2.578  0.00993 ** 
-# stateActivityCoSstate                                             -0.3257     0.1836  -1.774  0.07606 .  
-# predicateTypecognitive                                            -3.3513     0.2214 -15.140  < 2e-16 ***
-# predicateTypecommunicative                                        -2.1377     0.1907 -11.210  < 2e-16 ***
-# predicateTypeevidential                                           -2.0295     0.1509 -13.445  < 2e-16 ***
-# stateActivityCoSchange-of-state predicate:predicateTypecognitive   4.0798     0.4210   9.692  < 2e-16 ***
-# stateActivityCoSstate:predicateTypecognitive                       1.1840     0.2264   5.231 1.69e-07 ***
-# stateActivityCoSother:predicateTypecommunicative                   0.1685     0.1407   1.197  0.23120    
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -5.2325     0.4517 -11.583
-# 0|1   -1.5670     0.4493  -3.487
-
-# with predicate type with emotive component distinction
-# set emotives as reference level
-d.proj = d.proj %>% 
-  mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj) %>% 
+clmm(as.factor(veridicality_num) ~ stateActivityCoS * fct_relevel(predicateType2, "emotive")
+     + (1 | participant) + (1 | environment), data = d.proj) %>% 
   summary()
 # design is column rank deficient so dropping 8 coef
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + 
-#   (1 | participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ stateActivityCoS * fct_relevel(predicateType2,  
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj
 # 
-# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -11232.51 22495.02 1878(9395) 7.82e-03 7.1e+02
+# link  threshold nobs  logLik    AIC      niter       max.grad cond.H 
+# logit flexible  15662 -11230.91 22491.83 3588(17945) 3.81e-03 9.8e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
@@ -2770,25 +3307,245 @@ clmm(as.factor(veridicality_num) ~ stateActivityCoS * predicateType2 + (1 | part
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                                                   Estimate Std. Error z value Pr(>|z|)    
-# stateActivityCoSchange-of-state predicate                         -0.25927    0.12895  -2.011   0.0444 *  
-# stateActivityCoSother                                             -0.02492    0.05615  -0.444   0.6572    
-# stateActivityCoSstate                                             -0.32841    0.18369  -1.788   0.0738 .  
-# predicateType2cognitive                                           -3.35767    0.22153 -15.157  < 2e-16 ***
-# predicateType2emoComm                                             -1.78334    0.19673  -9.065  < 2e-16 ***
-# predicateType2evidential                                          -2.03365    0.15103 -13.465  < 2e-16 ***
-# predicateType2nonEmoComm                                          -2.30739    0.19224 -12.002  < 2e-16 ***
-# stateActivityCoSchange-of-state predicate:predicateType2cognitive  4.07932    0.42105   9.688  < 2e-16 ***
-# stateActivityCoSstate:predicateType2cognitive                      1.18881    0.22654   5.248 1.54e-07 ***
-# stateActivityCoSother:predicateType2emoComm                        0.08842    0.24469   0.361   0.7178    
-# stateActivityCoSother:predicateType2evidential                    -0.31195    0.14275  -2.185   0.0289 *  
+#                                                                                           Estimate Std. Error z value
+# stateActivityCoSchange-of-state predicate                                                 -0.24133    0.12808  -1.884
+# stateActivityCoSother                                                                     -0.02517    0.05615  -0.448
+# stateActivityCoSstate                                                                     -0.20050    0.25039  -0.801
+# fct_relevel(predicateType2, "emotive")cognitive                                           -3.22954    0.27958 -11.552
+# fct_relevel(predicateType2, "emotive")emoComm                                             -1.65548    0.26028  -6.360
+# fct_relevel(predicateType2, "emotive")evidential                                          -1.90561    0.22787  -8.363
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                          -2.17944    0.25686  -8.485
+# stateActivityCoSchange-of-state predicate:fct_relevel(predicateType2, "emotive")cognitive  4.06145    0.42084   9.651
+# stateActivityCoSstate:fct_relevel(predicateType2, "emotive")cognitive                      1.03630    0.28323   3.659
+# stateActivityCoSother:fct_relevel(predicateType2, "emotive")emoComm                        0.08913    0.24468   0.364
+# stateActivityCoSother:fct_relevel(predicateType2, "emotive")evidential                    -0.31249    0.14276  -2.189
+# Pr(>|z|)    
+# stateActivityCoSchange-of-state predicate                                                 0.059526 .  
+# stateActivityCoSother                                                                     0.654027    
+# stateActivityCoSstate                                                                     0.423270    
+# fct_relevel(predicateType2, "emotive")cognitive                                            < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm                                             2.01e-10 ***
+# fct_relevel(predicateType2, "emotive")evidential                                           < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm                                           < 2e-16 ***
+# stateActivityCoSchange-of-state predicate:fct_relevel(predicateType2, "emotive")cognitive  < 2e-16 ***
+# stateActivityCoSstate:fct_relevel(predicateType2, "emotive")cognitive                     0.000253 ***
+# stateActivityCoSother:fct_relevel(predicateType2, "emotive")emoComm                       0.715653    
+# stateActivityCoSother:fct_relevel(predicateType2, "emotive")evidential                    0.028602 *  
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -5.2454     0.4531  -11.58
-# 0|1   -1.5684     0.4506   -3.48
+# -1|0  -5.1180     0.4839  -10.57
+# 0|1   -1.4407     0.4818   -2.99
+
+
+### H3.4.2 evidentials only ----
+# create dataset for projection inferences
+d.proj = droplevels(subset(d, d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) # 16291
+
+# create predicateType, emotiveComponent, activity, environment columns
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"),     
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "emotive" ~ "emotive",
+                                    predicateType == "cognitive" ~ "cognitive",
+                                    predicateType == "evidential" ~ "evidential",
+                                    predicateType == "other" ~ "other"),
+         stateActivityCoS = case_when(stative_predicate == "yes" ~ "state",
+                                      change_of_state_predicate == "yes" ~ 
+                                        "change-of-state predicate",
+                                      activity_predicate == "yes" ~ "activity",
+                                      TRUE ~ "other"),
+         environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
+                                 polarity == "positive" & conditional == "True" ~ "q+cond",
+                                 polarity == "negative" & conditional == "True" ~ "q+cond+neg"),
+         evidenceType = case_when(perceptual_evidence == "yes" ~ "perceptual",
+                                    reportative_evidence == "yes" ~	"reportative",
+                                    inferential_evidence == "yes" ~ "inferential",
+                                    TRUE ~ NA))
+
+d.proj = droplevels(subset(d.proj, predicateType == "evidential"))
+nrow(d.proj) # 2635
+
+# how many predicates in which evidence type?
+d.proj %>%
+  select(evidenceType, verb_renamed) %>% 
+  unique() %>% 
+  group_by(evidenceType) %>% 
+  summarize(count=n())
+# # A tibble: 3 × 2
+# evidenceType count
+#   <chr>        <int>
+# 1 inferential     40
+# 2 perceptual      10
+# 3 reportative     36
+
+# how many predicates in which type of predicate?
+d.proj %>%
+  select(stateActivityCoS, verb_renamed) %>% 
+  unique() %>% 
+  group_by(stateActivityCoS) %>% 
+  summarize(count=n())
+# # A tibble: 4 × 2
+# stateActivityCoS          count
+# <chr>                     <int>
+# 1 activity                     12
+# 2 change-of-state predicate    37
+# 3 other                        33
+# 4 state                         3
+
+#### by evidence type ----
+mean.proj = d.proj %>%
+  group_by(evidenceType, stateActivityCoS) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         evidenceType = fct_reorder(as.factor(evidenceType), Mean.Proj))
+mean.proj
+nrow(mean.proj) # 9
+
+##### plot ----
+ggplot(mean.proj, aes(x = evidenceType, y = Mean.Proj, 
+                      colour = fct_relevel(stateActivityCoS, 
+                                           "activity", "change-of-state predicate",
+                                           "state", "other"))) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Evidence type",
+       colour = "Type of predicate") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("red3", "gold3", "aquamarine4", "grey"))
+ggsave("../graphs/projection-by-evidenceType-and-stateActivityCoS.pdf", height = 4, width = 10)
+
+# only evidence type
+mean.proj = d.proj %>%
+  group_by(evidenceType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         evidenceType = fct_reorder(as.factor(evidenceType), Mean.Proj))
+mean.proj
+nrow(mean.proj) # 3
+
+ggplot(mean.proj, aes(x = evidenceType, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Evidence type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) 
+ggsave("../graphs/projection-by-evidenceType.pdf", height = 4, width = 10)
+
+
+#### by predicate ----
+# calculate by-predicate projection means 
+mean.proj = d.proj %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+mean.proj
+nrow(mean.proj) # 86
+
+# add verb and evidence type to the means
+tmp = d.proj %>%
+  select(c(verb, verb_renamed, evidenceType, stateActivityCoS)) %>%
+  distinct(verb, verb_renamed, evidenceType, stateActivityCoS)
+nrow(tmp) # 86
+
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj) # 86
+
+mean.proj %>%
+  select(evidenceType, verb_renamed, stateActivityCoS) %>%
+  group_by(evidenceType, stateActivityCoS) %>%
+  summarize(count=n()) %>% 
+  pivot_wider(names_from = stateActivityCoS, values_from = count)
+# evidenceType activity `change-of-state predicate` other state
+#   <chr>           <int>                       <int> <int> <int>
+# 1 inferential         3                          35     2    NA
+# 2 perceptual          4                          NA     3     3
+# 3 reportative         5                           3    28    NA
+
+##### plots ----
+ggplot() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(data = mean.proj, 
+             aes(x = verb_renamed, y = Mean.Proj, colour = stateActivityCoS)) +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating", 
+       x = "Evidential predicate",
+       colour = "Type of predicate") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("red3", "gold3", "aquamarine4", "grey"),
+                      breaks = c("activity", "change-of-state predicate", "state", "other"))
+ggsave("../graphs/projection-by-evidential-stateActivityCoS.pdf", height = 4, width = 13)
+
+
+##### linear model ----
+lm(Mean.Proj ~ fct_relevel(stateActivityCoS, "other"), data = mean.proj) %>%  
+  summary()
+# Coefficients:
+#                                                                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                         0.37778    0.06869   5.500 4.21e-07 ***
+# fct_relevel(stateActivityCoS, "activity")change-of-state predicate -0.07642    0.07879  -0.970    0.335    
+# fct_relevel(stateActivityCoS, "activity")other                     -0.11804    0.08021  -1.472    0.145    
+# fct_relevel(stateActivityCoS, "activity")state                     -0.04444    0.15359  -0.289    0.773    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+## activity, CoS and other *** significant, state ** significant
+
+##### ordinal model ----
+clmm(as.factor(veridicality_num) ~ fct_relevel(stateActivityCoS, "activity") 
+     + (1 | participant) + (1 | environment), data = d.proj) %>% 
+  summary()
+# Coefficients:
+#                                                                    Estimate Std. Error z value Pr(>|z|)   
+# fct_relevel(stateActivityCoS, "activity")change-of-state predicate  -0.2529     0.1286  -1.966  0.04926 * 
+# fct_relevel(stateActivityCoS, "activity")other                      -0.3706     0.1329  -2.789  0.00529 **
+# fct_relevel(stateActivityCoS, "activity")state                      -0.1762     0.2493  -0.707  0.47966  
+
+# Interpretation?
 
 
 # H4: veridicality and projection ----
@@ -2869,7 +3626,7 @@ mean.proj.verid = mean.proj.verid %>%
 nrow(mean.proj.verid) # 523
 
 # Mean projection by mean veridicality
-### plots ----
+♠### plots ----
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.1) +
   geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.1) +
@@ -2889,12 +3646,16 @@ ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateTyp
   coord_fixed(ratio = 1)
 ggsave("../graphs/projection-by-veridicality-with-CIs.pdf", height = 6, width = 6)
 
-ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType)) +
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType2)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
   geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
-  geom_point(alpha = 0.5) +
+  geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE, show.legend = FALSE, linewidth = 0.5) +
-  theme(legend.position = "top",
+  theme(axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank()) +
   labs(x = "Mean veridicality rating", 
@@ -2902,9 +3663,44 @@ ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateTyp
        colour = "Predicate type") +
   scale_y_continuous(limits = c(-1, 1)) +
   scale_x_continuous(limits = c(-1, 1)) +
-  scale_colour_manual(values = cols) +
+  scale_colour_manual(values = cols2,
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component")) +
   coord_fixed(ratio = 1)
-ggsave("../graphs/projection-by-veridicality.pdf", height = 6, width = 6)
+ggsave("../graphs/projection-by-veridicality2.pdf", height = 4, width = 7)
+
+# faceted
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, show.legend = FALSE, linewidth = 0.5) +
+  theme(legend.position = "none",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.spacing = unit(18, "pt")) +
+  labs(x = "Mean veridicality rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_manual(values = cols2) +
+  coord_fixed(ratio = 1) + 
+  facet_wrap( ~ predicateType2, labeller = as_labeller(predicateType2_names), ncol = 5)
+ggsave("../graphs/projection-by-veridicality2-faceted.pdf", height = 3, width = 10.5)
+
 
 ### linear models ----
 lm(Mean.Proj ~ Mean.Verid, data = mean.proj.verid) %>% 
@@ -2918,27 +3714,27 @@ lm(Mean.Proj ~ Mean.Verid + predicateType2, data = mean.proj.verid) %>%
   summary()
 # Coefficients:
 #                          Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)               0.11604    0.02050   5.660 2.51e-08 ***
-# Mean.Verid                0.38407    0.01835  20.926  < 2e-16 ***
-# predicateType2emoComm     0.04015    0.02982   1.347   0.1787    
-# predicateType2emotive     0.29318    0.02518  11.642  < 2e-16 ***
-# predicateType2evidential -0.02098    0.02544  -0.825   0.4098    
-# predicateType2nonEmoComm -0.04679    0.02300  -2.034   0.0425 *  
+# (Intercept)               0.11581    0.02011   5.759 1.45e-08 ***
+# Mean.Verid                0.38433    0.01840  20.889  < 2e-16 ***
+# predicateType2emoComm     0.04019    0.02960   1.358   0.1751    
+# predicateType2emotive     0.29319    0.02494  11.757  < 2e-16 ***
+# predicateType2evidential -0.02129    0.02530  -0.841   0.4005    
+# predicateType2nonEmoComm -0.04670    0.02270  -2.057   0.0402 * 
 
 lm(Mean.Proj ~ Mean.Verid * predicateType2, data = mean.proj.verid) %>% 
   summary()
 # Coefficients:
-#                                       Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                          6.720e-02  2.306e-02   2.914  0.00373 ** 
-# Mean.Verid                           5.668e-01  4.651e-02  12.186  < 2e-16 ***
-# predicateType2emoComm                2.573e-02  6.282e-02   0.409  0.68236    
-# predicateType2emotive                3.768e-01  4.870e-02   7.738 5.39e-14 ***
-# predicateType2evidential            -6.697e-05  3.367e-02  -0.002  0.99841    
-# predicateType2nonEmoComm             4.884e-02  2.909e-02   1.679  0.09373 .  
-# Mean.Verid:predicateType2emoComm    -9.229e-02  9.111e-02  -1.013  0.31157    
-# Mean.Verid:predicateType2emotive    -2.254e-01  6.878e-02  -3.277  0.00112 ** 
-# Mean.Verid:predicateType2evidential -1.288e-01  5.994e-02  -2.148  0.03216 *  
-# Mean.Verid:predicateType2nonEmoComm -2.685e-01  5.363e-02  -5.006 7.67e-07 ***
+#                                      Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                          0.067958   0.022572   3.011  0.00273 ** 
+# Mean.Verid                           0.567387   0.046311  12.252  < 2e-16 ***
+# predicateType2emoComm                0.024967   0.062629   0.399  0.69032    
+# predicateType2emotive                0.376074   0.048455   7.761 4.59e-14 ***
+# predicateType2evidential            -0.002378   0.033785  -0.070  0.94391    
+# predicateType2nonEmoComm             0.048083   0.028695   1.676  0.09441 .  
+# Mean.Verid:predicateType2emoComm    -0.092912   0.090988  -1.021  0.30766    
+# Mean.Verid:predicateType2emotive    -0.225984   0.068630  -3.293  0.00106 ** 
+# Mean.Verid:predicateType2evidential -0.128161   0.060110  -2.132  0.03347 *  
+# Mean.Verid:predicateType2nonEmoComm -0.269076   0.053454  -5.034 6.67e-07 ***
 
 
 ### ordinal models ----
@@ -2981,86 +3777,44 @@ clmm(as.factor(veridicality_num) ~ Mean.Verid + (1 | participant) + (1 | environ
 # 0|1    1.5347     0.3877   3.959
 
 # with predicate type
-# set emotives as reference level
-d.proj.mean.verid = d.proj.mean.verid %>% 
-  mutate(predicateType = fct_relevel(predicateType, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType + (1 | participant) +
-       (1 | environment), data = d.proj.mean.verid) %>% 
+clmm(as.factor(veridicality_num) ~ Mean.Verid * fct_relevel(predicateType2, "nonEmoComm") + 
+       (1 | participant) + (1 | environment), data = d.proj.mean.verid) %>% 
   summary()
 # Cumulative Link Mixed Model fitted with the Laplace approximation
 # 
-# formula: as.factor(veridicality_num) ~ Mean.Verid * predicateType + 
-#   (1 |  participant) + (1 | environment)
+# formula: as.factor(veridicality_num) ~ Mean.Verid * fct_relevel(predicateType2,  
+#   "emotive") + (1 | participant) + (1 | environment)
 # data:    d.proj.mean.verid
 # 
 # link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -10830.87 21683.74 1834(9175) 9.11e-03 5.3e+02
-# 
-# Random effects:
-# Groups      Name        Variance Std.Dev.
-# participant (Intercept) 0.8388   0.9158  
-# environment (Intercept) 0.5184   0.7200  
-# Number of groups:  participant 290,  environment 3 
-# 
-# Coefficients:
-#                                       Estimate Std. Error z value Pr(>|z|)    
-# Mean.Verid                              1.9710     0.1593  12.372  < 2e-16 ***
-# predicateTypecognitive                 -1.4094     0.1465  -9.619  < 2e-16 ***
-# predicateTypecommunicative             -1.1555     0.1400  -8.253  < 2e-16 ***
-# predicateTypeevidential                -1.3837     0.1495  -9.256  < 2e-16 ***
-# Mean.Verid:predicateTypecognitive       0.4451     0.2116   2.104 0.035409 *  
-# Mean.Verid:predicateTypecommunicative  -0.5961     0.1759  -3.388 0.000703 ***
-# Mean.Verid:predicateTypeevidential     -0.1916     0.1951  -0.982 0.326084    
-# ---
-# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-# 
-# Threshold coefficients:
-#      Estimate Std. Error z value
-# -1|0  -3.5283     0.4409  -8.003
-# 0|1    0.3261     0.4390   0.743
-
-# with predicate type with emotive component distinction
-# set emotives as reference level
-d.proj.mean.verid = d.proj.mean.verid %>% 
-  mutate(predicateType2 = fct_relevel(predicateType2, "emotive"))
-
-clmm(as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + (1 | participant) +
-       (1 | environment), data = d.proj.mean.verid) %>% 
-  summary()
-# Cumulative Link Mixed Model fitted with the Laplace approximation
-# 
-# formula: as.factor(veridicality_num) ~ Mean.Verid * predicateType2 + 
-#   (1 |  participant) + (1 | environment)
-# data:    d.proj.mean.verid
-# 
-# link  threshold nobs  logLik    AIC      niter      max.grad cond.H 
-# logit flexible  15662 -10810.30 21646.60 1920(9605) 2.55e-03 5.2e+02
+# logit flexible  15662 -10810.07 21646.13 1528(7645) 1.18e-02 5.2e+02
 # 
 # Random effects:
 # Groups      Name        Variance Std.Dev.
 # participant (Intercept) 0.8387   0.9158  
-# environment (Intercept) 0.5219   0.7224  
+# environment (Intercept) 0.5218   0.7224  
 # Number of groups:  participant 290,  environment 3 
 # 
 # Coefficients:
-#                                     Estimate Std. Error z value Pr(>|z|)    
-# Mean.Verid                           1.96870    0.15937  12.353  < 2e-16 ***
-# predicateType2cognitive             -1.41271    0.14662  -9.635  < 2e-16 ***
-# predicateType2emoComm               -1.20920    0.21042  -5.747 9.11e-09 ***
-# predicateType2evidential            -1.38672    0.14957  -9.271  < 2e-16 ***
-# predicateType2nonEmoComm            -1.15359    0.14108  -8.177 2.91e-16 ***
-# Mean.Verid:predicateType2cognitive   0.44972    0.21169   2.124   0.0336 *  
-# Mean.Verid:predicateType2emoComm    -0.09059    0.27473  -0.330   0.7416    
-# Mean.Verid:predicateType2evidential -0.18650    0.19516  -0.956   0.3393    
-# Mean.Verid:predicateType2nonEmoComm -0.73468    0.17850  -4.116 3.86e-05 ***
+#                                                             Estimate Std. Error z value Pr(>|z|)    
+# Mean.Verid                                                   1.96865    0.15938  12.352  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")cognitive             -1.41422    0.14597  -9.689  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")emoComm               -1.20913    0.21043  -5.746 9.13e-09 ***
+# fct_relevel(predicateType2, "emotive")evidential            -1.38650    0.15062  -9.205  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm            -1.15368    0.14108  -8.177 2.90e-16 ***
+# Mean.Verid:fct_relevel(predicateType2, "emotive")cognitive   0.45539    0.21133   2.155   0.0312 *  
+# Mean.Verid:fct_relevel(predicateType2, "emotive")emoComm    -0.09073    0.27474  -0.330   0.7412    
+# Mean.Verid:fct_relevel(predicateType2, "emotive")evidential -0.18880    0.19632  -0.962   0.3362    
+# Mean.Verid:fct_relevel(predicateType2, "emotive")nonEmoComm -0.73462    0.17850  -4.115 3.86e-05 ***
 # ---
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 # 
 # Threshold coefficients:
 #      Estimate Std. Error z value
-# -1|0  -3.5351     0.4422  -7.995
-# 0|1    0.3248     0.4403   0.738
+# -1|0  -3.5352     0.4422  -7.995
+# 0|1    0.3249     0.4403   0.738
+
+
 
 ## H4.2 with "factives" ----
 # mean projection by mean veridicality with canonically projective predicates highlighted
@@ -3071,24 +3825,31 @@ ggplot() +
   geom_point(data = mean.proj.verid %>% 
                filter(canonicallyProjective == "yes"),
              aes(x = Mean.Verid, y = Mean.Proj, fill = "canonically projective predicate"), 
-             size = 3, colour = "deeppink") +
+             size = 3, colour = "red", alpha = 0.7) +
   geom_point(data = mean.proj.verid, 
-             aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType), alpha = 0.7) +
+             aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType2), alpha = 0.7) +
   geom_smooth(data = mean.proj.verid, 
-              aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType), 
-              method = "lm", se = FALSE, show.legend = FALSE, linewidth = 0.5) +
+              aes(x = Mean.Verid, y = Mean.Proj, colour = "grey10"), 
+              method = "lm", se = FALSE, show.legend = FALSE) +
   theme(panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        plot.caption = element_text(size = 9, hjust = 0)) +
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12)) +
   labs(x = "Mean veridicality rating", 
        y = "Mean projection rating",
        colour = "Predicate type",
        fill = element_blank()) +
   scale_y_continuous(limits = c(-1, 1)) +
   scale_x_continuous(limits = c(-1, 1)) +
-  scale_colour_manual(values = cols) +
+  scale_colour_manual(values = cols2,
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component")) +
   coord_fixed(ratio = 1)
-ggsave("../graphs/projection-by-veridicality-with-factives.pdf", height = 6, width = 9)
+ggsave("../graphs/projection-by-veridicality-with-factives2.pdf", height = 4, width = 7)
 
 ## H4.3 veridical non-projective predicates ----
 # What are the predicates with negative mean projection rating and positive mean veridicality rating?
@@ -3115,6 +3876,400 @@ ggsave("../graphs/projection-by-veridicality2.pdf", height = 6, width = 6)
 
 
 
+# H5: environment ----
+## by predicate type ----
+# create dataset for projection inferences
+d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
+nrow(d.proj) # 16291
+
+# create predicateType column
+d.proj = d.proj %>%
+  mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
+                                   communicative == "yes" ~ "communicative",   
+                                   emotive == "yes" ~ "emotive",
+                                   cognitive == "yes" ~ "cognitive",
+                                   evidential == "yes" ~ "evidential",
+                                   TRUE ~ "other"),
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         predicateType2 = case_when(predicateType == "comPriv" ~ "comPriv",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "emotive" ~ "emotive",
+                                    predicateType == "cognitive" ~ "cognitive",
+                                    predicateType == "evidential" ~ "evidential",
+                                    predicateType == "other" ~ "other"),
+         environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
+                                 polarity == "positive" & conditional == "True" ~ "q+cond",
+                                 polarity == "negative" & conditional == "True" ~ "q+cond+neg"))
+
+#### plot ----
+# calculate by predicate type means
+mean.proj = d.proj %>%
+  group_by(predicateType2, environment) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, Mean.Proj)
+mean.proj
+nrow(mean.proj) # 21
+
+mean.proj = mean.proj %>%
+  filter(predicateType2 != "other" & predicateType2 != "comPriv")
+nrow(mean.proj) # 15
+
+ggplot(mean.proj, aes(x = predicateType2, y = Mean.Proj, colour = environment)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Predicate type",
+       colour = "Environment") +
+  scale_x_discrete(labels = c("cognitive", "communicative with\nemotive component", 
+                              "emotive", "evidential", 
+                              "communicative without\nemotive component")) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("deeppink", "chocolate4", "turquoise"),
+                      labels = c("negation", "question + conditional", 
+                                 "question + conditional + negation"))
+ggsave("../graphs/projection-by-predicateType-and-environment.pdf", height = 4, width = 10)
+
+ggplot(mean.proj, aes(x = environment, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Environment",
+       colour = "Predicate type") +
+  scale_x_discrete(labels = c("negation", "question +\nconditional", "question +\nconditional +\nnegation")) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = cols2,
+                      labels = c("cognitive", "communicative with\nemotive component", 
+                                 "emotive", "evidential", 
+                                 "communicative without\nemotive component"))
+ggsave("../graphs/projection-by-environment-and-predicateType.pdf", height = 4, width = 10)
+
+## by-predicate ----
+# calculate by-predicate projection means 
+mean.proj = d.proj %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+mean.proj
+nrow(mean.proj) # 544
+levels(mean.proj$verb_renamed)
+
+# add predicateType and verb to the means
+tmp = d.proj %>%
+  select(c(verb, verb_renamed, predicateType, predicateType2, environment)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2, environment)
+nrow(tmp) # 544
+
+mean.proj = left_join(mean.proj, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj) # 544
+
+# remove "other" and "comPriv" predicates
+mean.proj = mean.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj) # 1569
+
+# how many predicates in which environment?
+mean.proj %>%
+  select(environment, verb_renamed) %>% 
+  unique() %>% 
+  group_by(environment) %>% 
+  summarize(count=n())
+#   environment count
+#   <chr>       <int>
+# 1 neg           523
+# 2 q+cond        523
+# 3 q+cond+neg    523
+
+
+#### linear model ----
+lm(Mean.Proj ~ fct_relevel(environment, "neg"), data = mean.proj) %>% 
+  summary()
+# Coefficients:
+#                                             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                4.142e-01  1.211e-02   34.19   <2e-16 ***
+# fct_relevel(environment, "neg")q+cond      1.120e-17  1.713e-02    0.00        1    
+# fct_relevel(environment, "neg")q+cond+neg -1.030e-17  1.713e-02    0.00        1    
+
+# (Intercept)                                  4.142e-01  1.211e-02   34.19   <2e-16 ***
+# fct_relevel(environment, "q+cond")neg        9.212e-17  1.713e-02    0.00        1    
+# fct_relevel(environment, "q+cond")q+cond+neg 5.492e-17  1.713e-02    0.00        1   
+
+# (Intercept)                                  4.142e-01  1.211e-02   34.19   <2e-16 ***
+# fct_relevel(environment, "q+cond+neg")neg    8.311e-17  1.713e-02    0.00        1    
+# fct_relevel(environment, "q+cond+neg")q+cond 3.690e-17  1.713e-02    0.00        1  
+
+lm(Mean.Proj ~ fct_relevel(environment, "neg") * fct_relevel(predicateType2, "nonEmoComm"),
+   data = mean.proj) %>% 
+  summary()
+# emotives: all environment *** significant
+# cognitives: all environments *** significant
+# evidential: all environments *** significant
+# emoComm: all environments *** significant
+# nonEmoComm: all environments *** significant
+
+# Interpretation?
+
+
+#### plots ----
+##### neg environment ----
+d.proj.neg <- d.proj %>% 
+  filter(environment == "neg")
+nrow(d.proj.neg) # 5411
+
+# calculate by-predicate projection means 
+mean.proj.neg = d.proj.neg %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj.neg) # 544
+
+# add predicateType and verb to the means
+tmp = d.proj.neg %>%
+  select(c(verb, verb_renamed, predicateType, predicateType2)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2)
+nrow(tmp) # 544
+
+mean.proj.neg = left_join(mean.proj.neg, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj.neg) # 544
+
+# remove "other" and "comPriv" predicates
+mean.proj.neg = mean.proj.neg %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj.neg) # 523
+
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+a <- ggplot(mean.proj.neg, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(alpha = 0.6) +
+  theme(plot.margin = unit(c(38 , 5.5, 5.5, 5.5), "pt"),
+        legend.position = c(0.48, 1.25),
+        legend.direction = "horizontal",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 13),
+        legend.spacing.x = unit(0.75, "cm"),
+        plot.title = element_text(hjust = .01),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.border = element_rect(colour = "deeppink", linewidth = 2)) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       title = "Negation") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) +
+  facet_wrap( ~ predicateType2, ncol = 5)
+
+##### q+cond environment ----
+d.proj.qcond <- d.proj %>% 
+  filter(environment == "q+cond")
+nrow(d.proj.qcond) # 5440
+
+# calculate by-predicate projection means 
+mean.proj.qcond = d.proj.qcond %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj.qcond) # 544
+
+# add predicateType and verb to the means
+tmp = d.proj.qcond %>%
+  select(c(verb, verb_renamed, predicateType, predicateType2)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2)
+nrow(tmp) # 544
+
+mean.proj.qcond = left_join(mean.proj.qcond, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj.qcond) # 544
+
+# remove "other" and "comPriv" predicates
+mean.proj.qcond = mean.proj.qcond %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj.qcond) # 523
+
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+b <- ggplot(mean.proj.qcond, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(alpha = 0.6) +
+  theme(legend.position = "none",
+        legend.title = element_blank(),
+        plot.title = element_text(hjust = .01),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.border = element_rect(colour = "chocolate4", linewidth = 2)) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       title = "Question + conditional") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) +
+  facet_wrap( ~ predicateType2, ncol = 5)
+
+##### q+cond+neg environment ----
+d.proj.qcondneg <- d.proj %>% 
+  filter(environment == "q+cond+neg")
+nrow(d.proj.qcondneg) # 5440
+
+# calculate by-predicate projection means 
+mean.proj.qcondneg = d.proj.qcondneg %>%
+  group_by(verb_renamed) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed),Mean.Proj))
+nrow(mean.proj.qcondneg) # 544
+
+# add predicateType and verb to the means
+tmp = d.proj.qcondneg %>%
+  select(c(verb, verb_renamed, predicateType, predicateType2)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2)
+nrow(tmp) # 544
+
+mean.proj.qcondneg = left_join(mean.proj.qcondneg, tmp, by = c("verb_renamed")) %>%
+  distinct() %>%
+  mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
+nrow(mean.proj.qcondneg) # 544
+
+# remove "other" and "comPriv" predicates
+mean.proj.qcondneg = mean.proj.qcondneg %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+nrow(mean.proj.qcondneg) # 523
+
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotive component", 
+                           "emotive" = "emotive", 
+                           "evidential" = "evidential", 
+                           "nonEmoComm" = "communicative without\nemotive component")
+
+c <- ggplot(mean.proj.qcondneg, aes(x = verb_renamed, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(alpha = 0.6) +
+  theme(legend.position = "none",
+        legend.title = element_blank(),
+        plot.title = element_text(hjust = .01),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_blank(),
+        strip.background = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.border = element_rect(colour = "turquoise", linewidth = 2)) +
+  labs(x = "Predicate",
+       y = "Mean projection rating", 
+       title = "Question + conditional + negation") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) +
+  facet_wrap( ~ predicateType2, 
+              labeller = as_labeller(predicateType2_names), ncol = 5)
+
+##### combined plot ----
+a / b / c + plot_layout(axis_titles = "collect")
+ggsave("../graphs/projection-by-predicateType-and-environment-faceted.pdf", 
+       height = 10, width = 10)
+
+## ordinal models ----
+d.proj = d.proj %>%
+  filter(predicateType != "other" & predicateType != "comPriv")
+
+clmm(as.factor(veridicality_num) ~ fct_relevel(environment, "q+cond") + (1 | participant), 
+     data = d.proj) %>% 
+  summary()
+
+# Coefficients:
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# fct_relevel(environment, "neg")q+cond      0.83178    0.06940  11.985   <2e-16 ***
+# fct_relevel(environment, "neg")q+cond+neg -0.67112    0.06832  -9.824   <2e-16 ***
+
+# fct_relevel(environment, "q+cond")neg        -0.83179    0.06942  -11.98   <2e-16 ***
+# fct_relevel(environment, "q+cond")q+cond+neg -1.50291    0.04274  -35.16   <2e-16 ***
+
+# fct_relevel(environment, "q+cond+neg")neg     0.67111    0.06834    9.82   <2e-16 ***
+# fct_relevel(environment, "q+cond+neg")q+cond  1.50291    0.04274   35.17   <2e-16 ***
+
+clmm(as.factor(veridicality_num) ~ fct_relevel(environment, "q+cond") * 
+       fct_relevel(predicateType2, "cognitive") + (1 | participant), data = d.proj) %>% 
+  summary()
+
+# most interactions are *** significant.
+
+# emotives:
+#                                                  z value Pr(>|z|)    
+# fct_relevel(environment, "neg")q+cond              3.034 0.002413 ** 
+# fct_relevel(environment, "neg")q+cond+neg         -9.124  < 2e-16 ***
+
+# fct_relevel(environment, "q+cond")neg             -3.034 0.002410 ** 
+# fct_relevel(environment, "q+cond")q+cond+neg     -14.211  < 2e-16 ***
+
+# fct_relevel(environment, "q+cond+neg")neg          9.127  < 2e-16 ***
+# fct_relevel(environment, "q+cond+neg")q+cond      14.212  < 2e-16 ***
+
+# cognitives:
+
+# fct_relevel(environment, "neg")q+cond                     0.25600    
+# fct_relevel(environment, "neg")q+cond+neg                 0.00105 **  
+
+# fct_relevel(environment, "q+cond")neg              1.134  0.25688    
+# fct_relevel(environment, "q+cond")q+cond+neg      -2.332  0.01968 * 
+
+# fct_relevel(environment, "q+cond+neg")neg          3.277  0.00105 ** 
+# fct_relevel(environment, "q+cond+neg")q+cond       2.338  0.01940 *
 
 
 

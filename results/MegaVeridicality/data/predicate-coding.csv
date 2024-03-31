@@ -63,9 +63,9 @@ bug,passive,be bugged,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 cackle,active,cackle,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
 calculate,active,calculate,,,,,,yes,,,,,,yes,,,yes,,,,,yes,yes,,
 care,active,care,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
-categorize,active,categorize,,,,,,,,,,,,yes,,,,,,,,yes,yes,,
-celebrate,active,celebrate,yes,,,,yes,,,,,,,,,,,,,,,yes,,yes,
-certify,active,certify,yes,,,,,,,,,,,,,,,,,,,yes,,,
+categorize,active,categorize,,,,,,yes,,,,,,yes,,,yes,,,,,yes,yes,,
+celebrate,active,celebrate,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
+certify,active,certify,yes,,,yes,,,,,,,,,,,,,,,,yes,,,
 challenge,active,challenge,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 challenge,passive,be challenged,,,,,,,,,,,,,,,,yes,,,,yes,,yes,
 chant,active,chant,yes,yes,,,,,,,,,,,,,,,,,,yes,,yes,
@@ -96,7 +96,7 @@ confess,active,confess,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 confide,active,confide,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 confirm,active,confirm,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 congratulate,passive,be congratulated,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
-conjecture,active,conjecture,,,,,,yes,,,,,,yes,,,yes,,,,yes,,,,
+conjecture,active,conjecture,,,,,,yes,,yes,,,,,,,,,,,yes,,,,
 consent,active,consent,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 console,passive,be consoled,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 consult,passive,be consulted,,,,,,yes,,,,,,yes,,yes,,,yes,,,yes,,yes,
@@ -106,9 +106,9 @@ contend,active,contend,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 content,passive,be content,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 contest,active,contest,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 convey,active,convey,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
-convince,passive,be convinced,,,,,,yes,,yes,yes,,,yes,,yes,,,,,yes,yes,yes,,
+convince,passive,be convinced,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 corroborate,active,corroborate,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
-cringe,active,cringe,yes,,,,yes,,,,,,,,,,,,,,,yes,,,
+cringe,active,cringe,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,,
 crush,passive,be crushed,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 cry,active,cry,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
 curse,active,curse,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
@@ -190,7 +190,7 @@ enthuse,passive,be enthused,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 envision,active,envision,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 envy,active,envy,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 establish,active,establish,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
-estimate,active,estimate,,,,,,yes,,,,,,yes,,,yes,,,,yes,,,,
+estimate,active,estimate,,,,,,yes,,,,,,yes,,,yes,,,,,yes,yes,,
 evaluate,active,evaluate,,,,,,yes,,,,,,yes,,,yes,,,,,yes,yes,,
 exasperate,passive,be exasperated,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 excite,passive,be excited,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
@@ -256,7 +256,7 @@ grumble,active,grumble,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
 grunt,active,grunt,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
 guarantee,active,guarantee,yes,,,yes,,,,,,,,,,,,,,,,yes,,,
 guarantee,passive,be guaranteed,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
-guess,active,guess,yes,,yes,,,yes,,,,,,yes,,,yes,,,,yes,yes,,,
+guess,active,guess,yes,,yes,,,yes,,yes,,,,yes,,,yes,,,,yes,yes,,,
 gush,active,gush,yes,yes,,,,,,,,,,,,,,,,,,yes,,yes,
 hallucinate,active,hallucinate,,,,,,yes,,yes,,,yes,,,,,,,,,yes,,yes,
 hate,active,hate,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
@@ -405,7 +405,7 @@ reassure,passive,be reassured,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
 recall,active,recall,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 recap,active,recap,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 reckon,active,reckon,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
-recognize,active,recognize,,,,,,yes,,,yes,,,yes,,,yes,,,,yes,yes,yes,,yes
+recognize,active,recognize,,,,,,yes,,,,,,yes,,,yes,,,,,yes,yes,,yes
 recollect,active,recollect,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 reconsider,active,reconsider,,,,,,yes,,,,,,yes,,,yes,,,,,yes,,yes,
 record,active,record,yes,yes,,,,,,,,,,,,,,,,,,yes,,yes,
@@ -417,9 +417,9 @@ relate,active,relate,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 relieve,passive,be relieved,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 relish,active,relish,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 remark,active,remark,yes,yes,,,,,,,,,,,,,,,,,,yes,,,
-remember,active,remember,,,,,,yes,,yes,yes,,,,,,,,,,yes,yes,yes,,yes
+remember,active,remember,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,yes
 remind,passive,be reminded,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
-reminisce,active,reminisce,yes,,,,yes,,,,,,,,,,,,,,,yes,,yes,
+reminisce,active,reminisce,yes,yes,,,yes,,,,,,,,,,,,,,,yes,,yes,
 repeat,active,repeat,yes,yes,,,,,,,,,,,,,,,,,,yes,,,
 reply,active,reply,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 report,active,report,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
@@ -486,7 +486,7 @@ submit,active,submit,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 suggest,active,suggest,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 summarize,active,summarize,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
 suppose,active,suppose,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
-surmise,active,surmise,,,,,,yes,,,,,,yes,,,yes,,,,yes,,,,
+surmise,active,surmise,,,,,,yes,,yes,,,,,,,,,,,yes,,,,
 surprise,passive,be surprised,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 suspect,active,suspect,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 swear,active,swear,yes,,,yes,,,,,,,,,,,,,,,,yes,,yes,
@@ -496,7 +496,7 @@ tell,passive,be told,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
 terrify,passive,be terrified,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 test,active,test,yes,,,yes,,,,,,,,,,,,,,,,yes,,yes,
 testify,active,testify,yes,,yes,,,,,,,,,,,,,,,,,yes,,yes,
-theorize,active,theorize,yes,,,yes,,yes,,,,,,yes,,,yes,,,,yes,yes,,yes,
+theorize,active,theorize,yes,,,yes,,yes,,,,,,yes,,,yes,,,,,yes,,yes,
 think,active,think,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 thrill,passive,be thrilled,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
 torture,passive,be tortured,,,,,,yes,yes,,,,,,,,,,,,yes,,,,yes
@@ -507,7 +507,7 @@ trust,active,trust,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 tweet,active,tweet,yes,yes,,,,,,,,,,,,,,,,,,yes,,yes,
 tweet,passive,be tweeted,,,,,,yes,,,,,,yes,,yes,,,,,,yes,,,
 type,active,type,yes,yes,,,,,,,,,,,,,,,,,,yes,,yes,
-uncover,active,uncover,yes,,,,,yes,,,,,,,,,yes,,,,,yes,,,yes
+uncover,active,uncover,yes,,,yes,,yes,,,,,,,,,yes,,,,,yes,,,yes
 underestimate,active,underestimate,,,,,,yes,,yes,yes,,,,,,,,,,yes,,,,
 underline,active,underline,yes,,yes,,,,,,,,,,,,,,,,,yes,,,
 underscore,active,underscore,yes,,yes,,,,,,,,,,,,,,,,,yes,,,

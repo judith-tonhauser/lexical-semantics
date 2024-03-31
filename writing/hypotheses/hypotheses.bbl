@@ -1,11 +1,37 @@
 \newcommand{\noopsort}[1]{}\newcommand{\SortNoop}[1]{} \newcommand{\noop}[1]{}
-\begin{thebibliography}{1}
+\begin{thebibliography}{5}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[Anand and Hacquard(2014)]{anand-hacquard2014}
+Anand, Pranav and Valentine Hacquard. 2014.
+\newblock Factivity, belief and discourse.
+\newblock In L.~Crni\v{c} and U.~Sauerland, eds., {\em The Art and Craft of
+  Semantics: A Festschrift for {I}rene {H}eim\/}, pages 69--90. MIT Working
+  Papers in Linguistics.
+
+\bibitem[Hofmann et~al.(2023)Hofmann, de~Marneffe, and
+  Tonhauser]{hofmann-etal23}
+Hofmann, Lisa, Marie-Catherine de~Marneffe, and Judith Tonhauser. 2023.
+\newblock Projection variability of clausal complements across different
+  operators.
+\newblock In {\em Sinn und Bedeutung 28\/}.
 
 \bibitem[Kiparsky and Kiparsky(1970)]{kiparsky-kiparsky70}
 Kiparsky, Paul and Carol Kiparsky. 1970.
 \newblock Fact.
 \newblock In M.~Bierwisch and K.~Heidolph, eds., {\em Progress in
   Linguistics\/}, pages 143--173. The Hague: Mouton.
+
+\bibitem[Warriner et~al.(2013)Warriner, Kuperman, and
+  Brysbaert]{warriner-etal2013}
+Warriner, {Amy Beth}, Victor Kuperman, and Marc Brysbaert. 2013.
+\newblock Norms of valuence, arousal, and dominance for 13,915 {E}nglish
+  lemmas.
+\newblock {\em Behavioral Research\/} 45:1191--1207.
+
+\bibitem[White and Rawlins(2018)]{white-rawlins-nels2018}
+White, Aaron~S. and Kyle Rawlins. 2018.
+\newblock The role of veridicality and factivity in clause selection.
+\newblock In {\em 48th Meeting of the North East Linguistic Society\/}, page~??
 
 \end{thebibliography}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10.12) (preloaded format=pdflatex 2023.10.21)  20 NOV 2023 13:05
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10.12) (preloaded format=pdflatex 2023.10.21)  31 MAR 2024 17:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1199,56 +1199,56 @@ File: l3backend-pdftex.def 2023-10-10 L3 backend support: PDF output (pdfTeX)
 ) (hypotheses.aux)
 \openout1 = `hypotheses.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 112.
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 106.
 LaTeX Font Info:    Trying to load font information for OML+txmi on input line 
-112.
+106.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\omltxmi.fd
 File: omltxmi.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 106.
 LaTeX Font Info:    Trying to load font information for OMS+txsy on input line 
-112.
+106.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\omstxsy.fd
 File: omstxsy.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 106.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 106.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 106.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 106.
 LaTeX Font Info:    Trying to load font information for OMX+txex on input line 
-112.
+106.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\omxtxex.fd
 File: omxtxex.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 112.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 106.
 LaTeX Font Info:    Trying to load font information for U+txexa on input line 1
-12.
+06.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\utxexa.fd
 File: utxexa.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 112.
-LaTeX Font Info:    Trying to load font information for T3+cmr on input line 11
-2.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 106.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 106.
+LaTeX Font Info:    ... okay on input line 106.
+LaTeX Font Info:    Checking defaults for T3/cmr/m/n on input line 106.
+LaTeX Font Info:    Trying to load font information for T3+cmr on input line 10
+6.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/tipa\t3cmr.fd
 File: t3cmr.fd 2001/12/31 TIPA font definitions
 )
-LaTeX Font Info:    ... okay on input line 112.
+LaTeX Font Info:    ... okay on input line 106.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1310,7 +1310,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
-Package hyperref Info: Link coloring ON on input line 112.
+Package hyperref Info: Link coloring ON on input line 106.
  (hypotheses.out) (hypotheses.out)
 \@outlinefile=\write5
 \openout5 = `hypotheses.out'.
@@ -1319,80 +1319,284 @@ Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: rotating package is loaded.
 Package caption Info: End \AtBeginDocument code.
 LaTeX Font Info:    Trying to load font information for U+txmia on input line 1
-12.
+06.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\utxmia.fd
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 112
+LaTeX Font Info:    Trying to load font information for U+msa on input line 106
 .
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 112
+LaTeX Font Info:    Trying to load font information for U+msb on input line 106
 .
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for U+txsyc on input line 1
-12.
+06.
 
 (C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\utxsyc.fd
 File: utxsyc.fd 2000/12/15 v3.1
 )
-Package xypdf Info: Line width: 0.61319pt on input line 112.
+Package xypdf Info: Line width: 0.61319pt on input line 106.
 LaTeX Font Info:    Font shape `OT1/txr/b/n' in size <14.4> not available
-(Font)              Font shape `OT1/txr/bx/n' tried instead on input line 128.
-LaTeX Font Info:    Font shape `OT1/txr/b/n' in size <12> not available
-(Font)              Font shape `OT1/txr/bx/n' tried instead on input line 130.
-LaTeX Font Info:    Trying to load font information for TS1+txr on input line 1
-36.
+(Font)              Font shape `OT1/txr/bx/n' tried instead on input line 110.
+LaTeX Font Info:    Trying to load font information for OMS+txr on input line 1
+17.
 
-(C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\ts1txr.fd
-File: ts1txr.fd 2000/12/15 v3.1
+(C:\Users\kilia\AppData\Local\Programs\MiKTeX\tex/latex/txfonts\omstxr.fd
+File: omstxr.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Font shape `OT1/txr/b/n' in size <10.95> not available
-(Font)              Font shape `OT1/txr/bx/n' tried instead on input line 140.
+LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 117.
+LaTeX Font Info:    Font shape `OT1/txr/b/n' in size <12> not available
+(Font)              Font shape `OT1/txr/bx/n' tried instead on input line 133.
 
 [1
 
 {C:/Users/kilia/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/kili
-a/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}] [2]
-(hypotheses.bbl) [3] (hypotheses.aux)
+a/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf, id=88, 
+722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf Gra
+phic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType.pdf  used on input line 148.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+ [2 <../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf, id=101
+, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf Gr
+aphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType2.pdf  used on input line 163.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+<../../results/MegaVeridicality/graphs/projection-by-predicate-faceted2.pdf, id
+=103, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicate-faceted2.pd
+f Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicate-faceted2.pdf
+>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicate-faceted2.pdf  used on input line 172.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+ [3 <../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf> <.
+./../results/MegaVeridicality/graphs/projection-by-predicate-faceted2.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-commType.pdf
+, id=125, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-commTyp
+e.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-commType
+.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-commType.pdf  used on input line 186.
+(pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
+<../../results/MegaVeridicality/graphs/projection-by-communicative-predicate.pd
+f, id=127, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-communicative-predica
+te.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-communicative-predicat
+e.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-co
+mmunicative-predicate.pdf  used on input line 195.
+(pdftex.def)             Requested size: 422.77664pt x 169.1089pt.
+ [4 <../../results/MegaVeridicality/graphs/projection-by-predicateType-commType
+.pdf> <../../results/MegaVeridicality/graphs/projection-by-communicative-predic
+ate.pdf>]
+<../../results/MegaVeridicality/graphs/valence-arousal-by-predicateType2.pdf, i
+d=153, 722.7pt x 433.62pt>
+File: ../../results/MegaVeridicality/graphs/valence-arousal-by-predicateType2.p
+df Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/valence-arousal-by-predicateType2.pd
+f>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/valence-arousal-
+by-predicateType2.pdf  used on input line 213.
+(pdftex.def)             Requested size: 328.82707pt x 197.29741pt.
+ [5 <../../results/MegaVeridicality/graphs/valence-arousal-by-predicateType2.pd
+f>]
+<../../results/MegaVeridicality/graphs/valence-by-arousal.pdf, id=167, 867.24pt
+ x 578.16pt>
+File: ../../results/MegaVeridicality/graphs/valence-by-arousal.pdf Graphic file
+ (type pdf)
+<use ../../results/MegaVeridicality/graphs/valence-by-arousal.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/valence-by-arous
+al.pdf  used on input line 239.
+(pdftex.def)             Requested size: 305.33789pt x 203.55882pt.
+<../../results/MegaVeridicality/graphs/projection-by-valence-with-direction.pdf
+, id=169, 433.62pt x 252.945pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-valence-with-directio
+n.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-valence-with-direction
+.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-va
+lence-with-direction.pdf  used on input line 248.
+(pdftex.def)             Requested size: 305.33789pt x 178.12169pt.
+ [6 <../../results/MegaVeridicality/graphs/valence-by-arousal.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-valence-and-direction-of-v
+alence-faceted2.pdf, id=186, 722.7pt x 433.62pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-valence-and-direction
+-of-valence-faceted2.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-valence-and-direction-
+of-valence-faceted2.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-va
+lence-and-direction-of-valence-faceted2.pdf  used on input line 257.
+(pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
+ [7 <../../results/MegaVeridicality/graphs/projection-by-valence-with-direction
+.pdf> <../../results/MegaVeridicality/graphs/projection-by-valence-and-directio
+n-of-valence-faceted2.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-arousal-with-direction.pdf
+, id=215, 433.62pt x 252.945pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-arousal-with-directio
+n.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-arousal-with-direction
+.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-ar
+ousal-with-direction.pdf  used on input line 266.
+(pdftex.def)             Requested size: 305.33789pt x 178.12169pt.
+<../../results/MegaVeridicality/graphs/projection-by-arousal-and-direction-of-v
+alence-faceted2.pdf, id=217, 722.7pt x 433.62pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-arousal-and-direction
+-of-valence-faceted2.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-arousal-and-direction-
+of-valence-faceted2.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-ar
+ousal-and-direction-of-valence-faceted2.pdf  used on input line 275.
+(pdftex.def)             Requested size: 375.80544pt x 225.48369pt.
+ [8 <../../results/MegaVeridicality/graphs/projection-by-arousal-with-direction
+.pdf> <../../results/MegaVeridicality/graphs/projection-by-arousal-and-directio
+n-of-valence-faceted2.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-Dynamici
+ty.pdf, id=244, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-Dyn
+amicity.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-Dyna
+micity.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-Dynamicity.pdf  used on input line 290.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+
+Overfull \hbox (17.31104pt too wide) in paragraph at lines 295--296
+\OT1/txr/m/n/10.95 tude holder from a state of un-aware-ness/uncertainty/undeci
+dedness to a state of aware-ness/certainty/decidedness.
+ []
+
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-CoS.pdf,
+ id=246, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-CoS
+.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-CoS.
+pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-CoS.pdf  used on input line 301.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+[9 <../../results/MegaVeridicality/graphs/projection-by-predicateType-and-Dynam
+icity.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-activity
+.pdf, id=259, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-act
+ivity.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-acti
+vity.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-activity.pdf  used on input line 311.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-stateAct
+ivityCoS.pdf, id=261, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-sta
+teActivityCoS.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-stat
+eActivityCoS.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-stateActivityCoS.pdf  used on input line 320.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+ [10 <../../results/MegaVeridicality/graphs/projection-by-predicateType-and-CoS
+.pdf> <../../results/MegaVeridicality/graphs/projection-by-predicateType-and-ac
+tivity.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicate-stateActivityCoS
+-faceted.pdf, id=280, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicate-stateActivi
+tyCoS-faceted.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicate-stateActivit
+yCoS-faceted.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicate-stateActivityCoS-faceted.pdf  used on input line 346.
+(pdftex.def)             Requested size: 375.80544pt x 150.32245pt.
+ [11 <../../results/MegaVeridicality/graphs/projection-by-predicateType-and-sta
+teActivityCoS.pdf> <../../results/MegaVeridicality/graphs/projection-by-predica
+te-stateActivityCoS-faceted.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-veridicality2-faceted.pdf,
+ id=306, 758.835pt x 216.81pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-veridicality2-faceted
+.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-veridicality2-faceted.
+pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-ve
+ridicality2-faceted.pdf  used on input line 359.
+(pdftex.def)             Requested size: 422.77664pt x 120.79411pt.
+<../../results/MegaVeridicality/graphs/projection-by-veridicality-with-factives
+2.pdf, id=308, 505.89pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-veridicality-with-fac
+tives2.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-veridicality-with-fact
+ives2.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-ve
+ridicality-with-factives2.pdf  used on input line 368.
+(pdftex.def)             Requested size: 281.85587pt x 161.06325pt.
+ [12 <../../results/MegaVeridicality/graphs/projection-by-veridicality2-faceted
+.pdf> <../../results/MegaVeridicality/graphs/projection-by-veridicality-with-fa
+ctives2.pdf>]
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-environm
+ent.pdf, id=341, 722.7pt x 289.08pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-env
+ironment.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-envi
+ronment.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-environment.pdf  used on input line 383.
+(pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
+<../../results/MegaVeridicality/graphs/projection-by-predicateType-and-environm
+ent-faceted.pdf, id=343, 722.7pt x 722.7pt>
+File: ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-env
+ironment-faceted.pdf Graphic file (type pdf)
+<use ../../results/MegaVeridicality/graphs/projection-by-predicateType-and-envi
+ronment-faceted.pdf>
+Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
+edicateType-and-environment-faceted.pdf  used on input line 392.
+(pdftex.def)             Requested size: 422.77664pt x 422.77228pt.
+ [13 <../../results/MegaVeridicality/graphs/projection-by-predicateType-and-env
+ironment.pdf>] (hypotheses.bbl [14 <../../results/MegaVeridicality/graphs/proje
+ction-by-predicateType-and-environment-faceted.pdf>]) [15] (hypotheses.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-10-10>
  ***********
-
-
-Package rerunfilecheck Warning: File `hypotheses.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `hypotheses.out':
-(rerunfilecheck)             Before: 4F2318B3AEA25973E11C4E385BBAB3F4;2104
-(rerunfilecheck)             After:  FFCF37BCF624C9C0E029FBBE404B9C98;2099.
+Package rerunfilecheck Info: File `hypotheses.out' has not changed.
+(rerunfilecheck)             Checksum: 96F78AEA64F8076AFA4B61EE4DB7708E;3182.
  ) 
 Here is how much of TeX's memory you used:
- 29824 strings out of 474824
- 523177 string characters out of 5750976
- 1934043 words of memory out of 5000000
- 51170 multiletter control sequences out of 15000+600000
- 585206 words of font info for 104 fonts, out of 8000000 for 9000
+ 30100 strings out of 474824
+ 540066 string characters out of 5750976
+ 1935043 words of memory out of 5000000
+ 51407 multiletter control sequences out of 15000+600000
+ 582606 words of font info for 99 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 102i,6n,107p,3244b,649s stack positions out of 10000i,1000n,20000p,200000b,200000s
-<C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/rtcx
-r.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/
-rtxb.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfon
-ts/rtxr.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmb8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmr8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmri8a.pfb>
-Output written on hypotheses.pdf (3 pages, 63726 bytes).
+ 102i,8n,107p,3244b,553s stack positions out of 10000i,1000n,20000p,200000b,200000s
+<C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/rtxi
+.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/r
+txr.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfont
+s/txsy.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/
+utmb8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/
+utmr8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/
+utmri8a.pfb>
+Output written on hypotheses.pdf (15 pages, 617549 bytes).
 PDF statistics:
- 94 PDF objects out of 1000 (max. 8388607)
- 18 named destinations out of 1000 (max. 500000)
- 69 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 418 PDF objects out of 1000 (max. 8388607)
+ 61 named destinations out of 1000 (max. 500000)
+ 201 words of extra memory for PDF output out of 10000 (max. 10000000)
 
