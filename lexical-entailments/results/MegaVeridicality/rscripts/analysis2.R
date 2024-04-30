@@ -368,8 +368,8 @@ slice_min(subset(mean.proj.comm, commType == "state changing"), Mean.Proj, n = 1
 # CoS evidentials ----
 # only CoS evidentials
 mean.proj.cosevi = mean.proj %>%
-  filter(predicateType == "evidential" & changeOfState == "yes")
-nrow(mean.proj.cosevi) # 38
+  filter(predicateType == "evidential" & changeOfState == "yes" | verb_renamed == "know")
+nrow(mean.proj.cosevi) # 39
 
 ggplot(mean.proj.cosevi, aes(x = verb_renamed, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
@@ -380,7 +380,7 @@ ggplot(mean.proj.cosevi, aes(x = verb_renamed, y = Mean.Proj)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1))
 ggsave("../graphs/projection-by-cos-evidential.pdf", height = 4, width = 13)
 
-slice_max(mean.proj.cosevi, Mean.Proj, n = 10) %>% 
+slice_max(filter(mean.proj.cosevi, verb_renamed != "know"), Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
 #   verb_renamed   Mean.Proj
 #   <fct>              <dbl>
@@ -396,7 +396,7 @@ slice_max(mean.proj.cosevi, Mean.Proj, n = 10) %>%
 # 10 detect             0.4  
 # 11 learn              0.4  
 
-slice_min(mean.proj.cosevi, Mean.Proj, n = 10) %>% 
+slice_min(filter(mean.proj.cosevi, verb_renamed != "know"), Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
 #   verb_renamed Mean.Proj
 #   <fct>            <dbl>
@@ -414,13 +414,13 @@ slice_min(mean.proj.cosevi, Mean.Proj, n = 10) %>%
 # 12 resolve         0.167 
 # 13 select          0.167 
 
-# only specific predicates (those discussed by Korotkova & Anand (2024) and similar ones)
+# only specific predicates (those discussed by Korotkova & Anand (2024) and similar ones + know)
 a <- mean.proj %>% 
   filter(verb_renamed %in% c("assess", "conclude", "deduce", "detect", "determine", 
                              "discover", "evaluate", "figure out", "find out", 
                              "gather", "identify", "infer", "learn", "notice", 
                              "piece together", "realize", "reason out", "reason", 
-                             "recognize"))
+                             "recognize", "know"))
 
 # load predicate attribute data
 b <-  read.csv("../data/predicates2.csv")
@@ -429,7 +429,7 @@ nrow(b) # 19
 # combine dataframes
 mean.proj.cosevi2 <-  left_join(a, b, by = c("verb_renamed")) %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj.cosevi2) # 19
+nrow(mean.proj.cosevi2) # 20
 levels(mean.proj.cosevi2$verb_renamed)
 
 # define x-axis label colours, highlighting the predicates in Korotkova & Anand (2024)
@@ -441,13 +441,34 @@ KA <- mean.proj.cosevi2 %>%
   as.vector()
 # [1] "discover"   "figure out" "find out"   "learn"      "notice"     "realize"
 
+immi <- mean.proj.cosevi2 %>% 
+  filter(imminency_reading == "yes") %>% 
+  select(verb_renamed) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+# [1] "detect"         "discover"       "figure out"     "find out"       "identify"       "learn"         
+# [7] "notice"         "piece together" "realize"        "recognize"     
+
 cols = data.frame(predicate = levels(mean.proj.cosevi2$verb_renamed))
-cols$whose = as.factor(ifelse(cols$predicate %in% KA, "KA", "X"))
-cols$colours =  ifelse(cols$whose == "KA", "deeppink", "black")
+cols$category = as.factor(ifelse(cols$predicate %in% KA, "KA", 
+                              ifelse(cols$predicate == "know", "KNOW", 
+                                     "X")))
+cols$imminency = as.factor(ifelse(cols$predicate %in% immi, "immi", "non-immi"))
+cols$colours =  ifelse(cols$category == "KA", "deeppink", 
+                       ifelse(cols$category == "KNOW", "grey60",
+                              "black"))
+cols$faces =  ifelse(cols$immi == "immi", "bold", "plain")
 cols
 
 label_colours <- cols %>% 
   select(colours) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+
+label_faces <- cols %>% 
+  select(faces) %>% 
   droplevels() %>% 
   unlist() %>% 
   as.vector()
@@ -465,10 +486,11 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
         legend.text = element_text(size = 12),
         axis.title = element_text(size = 14),
         axis.title.x = element_text(vjust = -1),
-        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, colour = label_colours),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours, face = label_faces),
         plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
         plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
-  labs(x = "Evidential change-of-state predicate",
+  labs(x = "Predicate",
        y = "Mean projection rating", 
        colour = "Predicate property",
        caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).") + 
@@ -491,13 +513,14 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
         legend.text = element_text(size = 12),
         axis.title = element_text(size = 14),
         axis.title.x = element_text(vjust = -1),
-        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, colour = label_colours),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours, face = label_faces),
         plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
         plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
-  labs(x = "Evidential change-of-state predicate",
+  labs(x = "Predicate",
        y = "Mean projection rating", 
        colour = "Predicate property",
-       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).") + 
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = c("green3","blue")) 
 ggsave("../graphs/projection-by-cos-evidential-volition.pdf", height = 5, width = 13)
@@ -519,13 +542,14 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
         legend.text = element_text(size = 12),
         axis.title = element_text(size = 14),
         axis.title.x = element_text(vjust = -1),
-        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, colour = label_colours),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours, face = label_faces),
         plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
         plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
-  labs(x = "Evidential change-of-state predicate",
+  labs(x = "Predicate",
        y = "Mean projection rating", 
        colour = "Predicate property",
-       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).") + 
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = c("gold3","purple")) 
 ggsave("../graphs/projection-by-cos-evidential-abductive-evidence.pdf", height = 5, width = 13)
@@ -559,13 +583,14 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
         legend.text = element_text(size = 11),
         axis.title = element_text(size = 14),
         axis.title.x = element_text(vjust = -1),
-        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, colour = label_colours),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours, face = label_faces),
         plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
         plot.margin = unit(c(5.5, 11, 22, 5.5), "pt")) +
-  labs(x = "Evidential change-of-state predicate",
+  labs(x = "Predicate",
        y = "Mean projection rating", 
        colour = "Compatible evidence types",
-       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).") + 
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = c("gold3","purple", "red", "blue", "green2"))
 ggsave("../graphs/projection-by-cos-evidential-types-of-evidence.pdf", height = 5, width = 13)
