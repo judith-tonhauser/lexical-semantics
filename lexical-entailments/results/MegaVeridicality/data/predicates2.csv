@@ -1,20 +1,20 @@
-﻿projection_rank,verb_renamed,K_A_original,not_colloquial,imminency_reading,beginning_to,volition_how,volition_that,evidence_compatibility_perceptual,evidence_compatibility_abduction_effect_to_cause,evidence_compatibility_abduction_effect_to_cause_longer_chain,evidence_compatibility_hearsay,evidence_compatibility_anti_abduction_general_knowledge,evidence_compatibility_anti_abduction_eliminative_reasoning
-1,realize,yes,no,yes,,no,no,yes,yes,yes,yes,,yes
-2,notice,yes,no,yes,,no,no,yes,no,no,no,,no
-3,recognize,no,no,yes,,no,no,no,no,no,yes,,no
-4,figure out,yes,no,yes,,yes,no,no,no,yes,no,,yes
-5,find out,yes,no,yes,,yes,no,yes,yes,yes,yes,,no
-6,piece together,no,no,yes,,yes,no,no,no,yes,no,,yes
-7,learn,yes,no,yes,,yes,no,yes,yes,yes/no,yes,,no
-8,detect,no,yes,yes,,no,no,yes,no,no,no,,no
-9,deduce,no,no,no,,yes,no,no,yes/no,yes,no,,yes
-10,identify,no,yes,yes,,yes,no,yes,no,no,no,,yes
-11,gather,no,no,no,,no,no,no,no,yes,yes,,yes
-12,reason out,no,no,no,,yes,no,no,no,yes,no,,yes
-13,discover,yes,no,yes,,yes,yes,yes,yes,yes,yes,,no
-14,reason,no,no,no,,no,no,no,no,yes,no,,yes
-15,evaluate,no,no,no,,yes,no,no,no,no,no,,yes
-16,assess,no,no,no,,yes,no,no,no,no,no,,yes
-17,determine,no,no,no,,yes,no,no,yes,yes,no,,no
-18,infer,no,no,no,,yes,no,no,no,yes,no,,yes
-19,conclude,no,no,no,,no,no,no,no,yes,no,,yes
+﻿projection_rank,verb,K_A_original,not_colloquial,imminency_reading,beginning_to,volition_how,volition_that,evidence_compatibility_perceptual,evidence_compatibility_abduction_effect_to_cause,evidence_compatibility_abduction_effect_to_cause_longer_chain,evidence_compatibility_hearsay,evidence_compatibility_anti_abduction_general_knowledge,evidence_compatibility_anti_abduction_eliminative_reasoning
+1,realize,yes,no,yes,,no,no,yes,yes,yes,yes,yes,yes
+2,notice,yes,no,yes,,no,no,yes,no,no,no,no,no
+3,recognize,no,no,yes,,no,no,no,no,no,yes,no,no
+4,figure out,yes,no,yes,,yes,no,no,no,yes,no,yes,yes
+5,find out,yes,no,yes,,yes,no,yes,yes,yes,yes,no,no
+6,piece together,no,no,yes,,yes,no,no,no,yes,no,yes,yes
+7,learn,yes,no,yes,,yes,no,yes,yes,yes/no,yes,no,no
+8,detect,no,yes,yes,,no,no,yes,no,no,no,no,no
+9,deduce,no,no,no,,yes,no,no,yes/no,yes,no,yes,yes
+10,identify,no,yes,yes,,yes,no,yes,no,no,no,no,yes
+11,gather,no,no,no,,no,no,no,no,yes,yes,yes,no
+12,reason out,no,no,no,,yes,no,no,no,yes,no,yes,yes
+13,discover,yes,no,yes,,yes,yes,yes,yes,yes,yes,no,no
+14,reason,no,no,no,,no,no,no,no,yes,no,yes,yes
+15,evaluate,no,no,no,,yes,no,no,no,no,no,yes,yes
+16,assess,no,no,no,,yes,no,no,no,no,no,yes,yes
+17,determine,no,no,no,,yes,no,no,yes,yes,no,yes,yes
+18,infer,no,no,no,,yes,no,no,no,yes,no,yes,yes
+19,conclude,no,no,no,,no,no,no,no,yes,no,yes,yes

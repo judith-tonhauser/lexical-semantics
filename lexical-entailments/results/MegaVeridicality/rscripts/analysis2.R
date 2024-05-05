@@ -29,19 +29,6 @@ names(y)
 d = left_join(d, y, by = c("verb", "voice"))
 nrow(d) # 21692
 
-# specify colours for predicate types
-cols =  c(cognitive = "coral",
-          communicative = "deepskyblue2",
-          emotive = "darkgreen",
-          evidential = "purple")
-
-cols2 =  c(cognitive = "coral",
-           nonEmoComm = "deepskyblue2",
-           emoComm = "green3",
-           emotive = "darkgreen",
-           evidential = "purple")
-
-
 # create dataset for projection inferences
 d.proj = droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
 nrow(d.proj) # 16291
@@ -367,6 +354,7 @@ slice_min(subset(mean.proj.comm, commType == "state changing"), Mean.Proj, n = 1
 
 # CoS evidentials ----
 # only CoS evidentials
+## MegaVeridicality dataset ----
 mean.proj.cosevi = mean.proj %>%
   filter(predicateType == "evidential" & changeOfState == "yes" | verb_renamed == "know")
 nrow(mean.proj.cosevi) # 39
@@ -420,11 +408,15 @@ a <- mean.proj %>%
                              "discover", "evaluate", "figure out", "find out", 
                              "gather", "identify", "infer", "learn", "notice", 
                              "piece together", "realize", "reason out", "reason", 
-                             "recognize", "know"))
+                             "recognize", "know")) %>% 
+  droplevels()
 
 # load predicate attribute data
 b <-  read.csv("../data/predicates2.csv")
 nrow(b) # 19
+
+# add "verb_renamed" column
+b <- b %>% mutate(verb_renamed = verb)
 
 # combine dataframes
 mean.proj.cosevi2 <-  left_join(a, b, by = c("verb_renamed")) %>%
@@ -450,16 +442,15 @@ immi <- mean.proj.cosevi2 %>%
 # [1] "detect"         "discover"       "figure out"     "find out"       "identify"       "learn"         
 # [7] "notice"         "piece together" "realize"        "recognize"     
 
-cols = data.frame(predicate = levels(mean.proj.cosevi2$verb_renamed))
-cols$category = as.factor(ifelse(cols$predicate %in% KA, "KA", 
-                              ifelse(cols$predicate == "know", "KNOW", 
-                                     "X")))
-cols$imminency = as.factor(ifelse(cols$predicate %in% immi, "immi", "non-immi"))
-cols$colours =  ifelse(cols$category == "KA", "deeppink", 
-                       ifelse(cols$category == "KNOW", "grey60",
-                              "black"))
-cols$faces =  ifelse(cols$immi == "immi", "bold", "plain")
-cols
+cols <-  data.frame(predicate = levels(mean.proj.cosevi2$verb_renamed)) %>% 
+  mutate(category = as.factor(ifelse(predicate %in% KA, "KA", 
+                                     ifelse(predicate == "know", "KNOW", 
+                                            "X"))),
+         imminency = as.factor(ifelse(predicate %in% immi, "immi", "non-immi")),
+         colours =  ifelse(category == "KA", "deeppink", 
+                           ifelse(category == "KNOW", "grey60",
+                                  "black")),
+         faces =  ifelse(imminency == "immi", "bold", "plain"))
 
 label_colours <- cols %>% 
   select(colours) %>% 
@@ -575,8 +566,12 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
              shape = 1, size = 6.5, stroke = 1.5, 
              aes(colour = "hearsay evidence")) +
   geom_point(data = mean.proj.cosevi2 %>% 
-               filter(evidence_compatibility_anti_abduction_eliminative_reasoning == "yes"), 
+               filter(evidence_compatibility_anti_abduction_general_knowledge == "yes"), 
              shape = 1, size = 8, stroke = 1.5, 
+             aes(colour = "anti-abductive reasoning\nbased on general knowledge")) +
+  geom_point(data = mean.proj.cosevi2 %>% 
+               filter(evidence_compatibility_anti_abduction_eliminative_reasoning == "yes"), 
+             shape = 1, size = 9.5, stroke = 1.5, 
              aes(colour = "anti-abductive\neliminative reasoning")) +
   theme(legend.position = "top",
         legend.title = element_text(size = 13),
@@ -592,5 +587,154 @@ ggplot(mean.proj.cosevi2, aes(x = verb_renamed, y = Mean.Proj)) +
        colour = "Compatible evidence types",
        caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
-  scale_colour_manual(values = c("gold3","purple", "red", "blue", "green2"))
+  scale_colour_manual(values = c("gold","purple", "blue","red",  "darkorange2", "green2")) 
+#  guides(colour = guide_legend(nrow = 2, byrow = TRUE, ncol = 4))
 ggsave("../graphs/projection-by-cos-evidential-types-of-evidence.pdf", height = 5, width = 13)
+
+
+## VerbVeridicality dataset ----
+z <-  read.csv("../data/verb-veridicality.csv")
+nrow(z) # 1498
+
+# separate projection ratings (negative environment ratings) into separate columns. 
+z <- z %>% separate(turker_neg_ratings, c("rating1", "rating2", "rating3"), 
+                    sep = ",")
+
+# select only items with that-complements for the 20 predicates specified above.
+z <- z %>% 
+  subset(z$task == "that") %>% 
+  filter(verb %in% a$verb_renamed) %>%
+  pivot_longer(
+    cols = c("rating1", "rating2", "rating3"), 
+    names_to = "rating_number", 
+    values_to = "rating")
+nrow(z) # 393
+
+# "rating.rescaled" for easier comparison with MV dataset whose ratings we have
+# recoded to numerical values ranging from -1 to 1.
+z <- z %>% mutate(rating = as.numeric(as.character(z$rating)),
+                  rating.rescaled = rating/2)
+
+# calculate by-predicate projection means for original and rescaled ratings.
+mean.proj.vv = z %>%
+  group_by(verb) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating),
+            Mean.Proj.rescaled = mean(rating.rescaled), 
+            CILow.rescaled = ci.low(rating.rescaled), 
+            CIHigh.rescaled = ci.high(rating.rescaled)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         YMin.Proj.rescaled = Mean.Proj.rescaled - CILow.rescaled, 
+         YMax.Proj.rescaled = Mean.Proj.rescaled + CIHigh.rescaled,
+         verb = fct_reorder(as.factor(verb), Mean.Proj))
+
+# combine dataframes
+mean.proj.vv2 <-  left_join(mean.proj.vv, b, by = c("verb")) %>% 
+  mutate(verb = fct_reorder(as.factor(verb), Mean.Proj))
+nrow(mean.proj.vv2) # 8
+
+# define x-axis label colours, highlighting the predicates in Korotkova & Anand (2024)
+# and those predicates with an imminency reading.
+KA2 <- mean.proj.vv2 %>% 
+  filter(K_A_original == "yes") %>% 
+  select(verb) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+# [1] "discover" "learn"    "notice"   "realize" 
+
+immi2 <- mean.proj.vv2 %>% 
+  filter(imminency_reading == "yes") %>% 
+  select(verb_renamed) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+# [1] "discover"  "learn"     "notice"    "realize"   "recognize"    
+
+cols2 <-  data.frame(predicate = levels(mean.proj.vv2$verb)) %>% 
+  mutate(category = as.factor(ifelse(predicate %in% KA, "KA", 
+                                     ifelse(predicate == "know", "KNOW", 
+                                            "X"))),
+         imminency = as.factor(ifelse(predicate %in% immi, "immi", "non-immi")),
+         colours =  ifelse(category == "KA", "deeppink", 
+                           ifelse(category == "KNOW", "grey60",
+                                  "black")),
+         faces =  ifelse(imminency == "immi", "bold", "plain"))
+
+label_colours2 <- cols2 %>% 
+  select(colours) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+
+label_faces2 <- cols2 %>% 
+  select(faces) %>% 
+  droplevels() %>% 
+  unlist() %>% 
+  as.vector()
+
+# imminency reading
+ggplot(mean.proj.vv2, aes(x = verb, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  # geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  geom_point() +
+  geom_point(data = mean.proj.vv2 %>% filter(imminency_reading == "yes"), 
+             shape = 1, size = 2, stroke = 1.5,
+             aes(colour = "imminency reading")) +
+  theme(legend.position = "top",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours2, face = label_faces2),
+        plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
+        plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
+  labs(x = "Predicate",
+       y = "Mean projection rating", 
+       colour = "Predicate property",
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).") + 
+  scale_y_continuous(limits = c(-2, 2), breaks = c(-2, -1, 0, 1, 2), minor_breaks = FALSE) +
+  scale_colour_manual(values = c("green3"))
+ggsave("../graphs/projection-by-cos-evidential-imminency-vv.pdf", height = 5, width = 13)
+
+## MegaVeridicality + VerbVeridicality  ----
+ggplot() +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(data = mean.proj.cosevi2, 
+             aes(x = verb_renamed, y = Mean.Proj, 
+                 colour = "MegaVeridicality (White & Rawlins 2018)"), 
+             position = position_nudge(x = -0.07)) +
+  geom_errorbar(data = mean.proj.cosevi2, 
+                aes(x = verb_renamed, y = Mean.Proj, 
+                    ymin = YMin.Proj, ymax = YMax.Proj, 
+                    colour = "MegaVeridicality (White & Rawlins 2018)"), 
+                width = 0, position = position_nudge(x = -0.07)) +
+  geom_point(data = mean.proj.vv2, 
+             aes(x = verb, y = Mean.Proj.rescaled, 
+                 colour = "VerbVeridicality (Ross & Pavlick 2019)"), 
+             position = position_nudge(x = 0.07)) +
+  geom_errorbar(data =  mean.proj.vv2, 
+                aes(x = verb, y = Mean.Proj, 
+                    ymin = YMin.Proj.rescaled, ymax = YMax.Proj.rescaled, 
+                    colour = "VerbVeridicality (Ross & Pavlick 2019)"), 
+                width = 0, position = position_nudge(x = 0.07)) +
+  theme(legend.position = "top",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
+                                   colour = label_colours, face = label_faces),
+        plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
+        plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
+  labs(x = "Predicate",
+       y = "Mean projection rating", 
+       colour = "Dataset",
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("deepskyblue","chocolate"))
+ggsave("../graphs/projection-by-cos-evidential-mv-vv.pdf", height = 5, width = 13)
+
