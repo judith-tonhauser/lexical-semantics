@@ -728,13 +728,18 @@ ggplot() +
         axis.title.x = element_text(vjust = -1),
         axis.text.x = element_text(angle = 45, size = 12, hjust = 1, 
                                    colour = label_colours, face = label_faces),
-        plot.caption = element_text(hjust = 0, vjust = -6, size = 11),
+        plot.caption = element_text(hjust = 0, vjust = -8, size = 11),
         plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
   labs(x = "Predicate",
        y = "Mean projection rating", 
        colour = "Dataset",
-       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024).\nPredicates in bold are those with an imminency reading.") + 
+       caption = "Predicates highlighted in pink are those discussed by Korotkova & Anand (2024); predicates in bold are those with an imminency reading. 
+       \nRating scales:
+       White and Rawlins's (2018) participants answered the question 'Did that thing happen?' (CC: 'a particular thing happened') by choosing 'no', 'maybe or maybe not' or 'yes'. 
+       These ratings were recoded as -1, 0 and 1, respectively.
+       Ross and Pavlick's (2019) participants provided ratings on a 5-point Likert scale ranging from -2 (the CC is 'definitely not true') to 2 ('definitely true'). 
+       These ratings were rescaled to range from -1 to 1.") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(values = c("deepskyblue","chocolate"))
-ggsave("../graphs/projection-by-cos-evidential-mv-vv.pdf", height = 5, width = 13)
+ggsave("../graphs/projection-by-cos-evidential-mv-vv.pdf", height = 7, width = 13)
 
