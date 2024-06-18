@@ -1,0 +1,174 @@
+\documentclass[11pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[colorlinks = true,
+		linkcolor=black,
+		citecolor=black,
+	        urlcolor  = black]{hyperref}
+%\usepackage[dvips]{graphics}
+%\usepackage[table]{xcolor}
+%\usepackage{amssymb}
+\usepackage{float}
+%\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{multicol}
+\usepackage{txfonts}
+\usepackage{amsfonts}
+\usepackage{natbib}
+
+\usepackage{multirow}
+
+\usepackage{gb4e}
+\usepackage[all]{xy}
+\usepackage{rotating}
+\usepackage{tipa}
+\usepackage{multirow}
+\usepackage{authblk}
+\usepackage{url}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{adjustbox}
+\usepackage{array}
+
+\usepackage{dcolumn} % for printing model output tables directly from R
+
+
+%\usepackage{color}
+%\DeclareOuterCiteDelims{cite}{\textcolor{green}{\bibopenbracket}}{\textcolor{red}{\bibclosebracket}}
+
+\definecolor{Pink}{RGB}{255,50,170}
+\newcommand{\jd}[1]{\textcolor{Pink}{[jd: #1]}}  
+
+\newcommand{\jt}[1]{\textbf{\color{purple}JT: #1}}
+
+\newcommand{\tableref}[1]{Tab.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+
+\def\bad{{\leavevmode\llap{*}}}
+\def\marginal{{\leavevmode\llap{?}}}
+\def\verymarginal{{\leavevmode\llap{??}}}
+\def\swmarginal{{\leavevmode\llap{4}}}
+\def\infelic{{\leavevmode\llap{\#}}}
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+%\definecolor{gray}{rgb}{0.36, 0.54, 0.66}
+
+\newcommand{\dashrule}[1][black]{%
+  \color{#1}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}\xleaders\hbox{\rule{4pt}{0pt}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}}\hfill\kern0pt%
+}
+
+\setlength{\parindent}{.3in}
+\setlength{\parskip}{0ex}
+
+\newcommand{\yi}{\'{\symbol{16}}}
+\newcommand{\nasi}{\~{\symbol{16}}}
+\newcommand{\hina}{h\nasi na}
+\newcommand{\ina}{\nasi na}
+
+\newcommand{\foc}{$_{\mbox{\small F}}$}
+
+\hyphenation{par-ti-ci-pa-tion}
+
+%\setlength{\bibhang}{0.5in}
+%\setlength{\bibsep}{0mm}
+%\bibpunct[:]{(}{)}{,}{a}{}{,}
+
+\newcommand{\6}{\mbox{$[\hspace*{-.6mm}[$}} 
+\newcommand{\9}{\mbox{$]\hspace*{-.6mm}]$}}
+\newcommand{\sem}[2]{\6#1\9$^{#2}$}
+\renewcommand{\ni}{\~{\i}}
+
+\newcommand{\citepos}[1]{\citeauthor{#1}'s \citeyear{#1}}
+\newcommand{\citeposs}[1]{\citeauthor{#1}'s}
+\newcommand{\citetpos}[1]{\citeauthor{#1}'s \citeyear{#1}}
+
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{90}{0em}}}% no optional argument here, please!
+
+\title{Thoughts}
+
+\author{JT}
+
+%\author[$\bullet$]{Judith Degen}
+%\author[$\circ$]{Judith Tonhauser}
+%
+%\affil[$\bullet$]{Stanford University}
+%\affil[$\circ$]{University of Stuttgart}
+%
+%\renewcommand\Authands{ and }
+
+\begin{document}
+
+\maketitle
+
+\begin{itemize}[leftmargin=12pt]
+
+\item The lexical semantics of verbs modulates the syntactic distribution of the verbs and the meanings of the sentences. For attitude predicates, like {\em think} and {\em know}, the lexical semantics has been assumed to be a predictor of the kinds of arguments that these predicates can co-occur with (e.g., veridicality, factivity, neg-raising, grammatical aspect).
+
+\item This project assumes that the lexical semantics of attitude predicates also modulates the extent to which the content of the clausal complement is taken to project, that is, to be a commitment of the speaker. This is also uncontroversial: ever since \citealt{kiparsky-kiparsky70}, it has been assumed that predicates differ (either semantically or syntactically) and these differences (`factivity') modulate whether the CC is presupposed. More recent research has shown that more fine-grained distinctions are needed.
+
+\item Some early results:
+
+\begin{itemize}
+
+\item Across attitude predicates: The stronger the veridicality inference of a predicate, the stronger its projection inference. Lexical entailments matter!
+
+\item By and large, the CCs of emotive predicates are more projective than those of cognitive, communicative, or evidential predicates. Lexical meaning matters!
+
+\item Lexical semantics: Among all the predicates, the CC of stative ones project more than the CC of eventive ones. Lexical meaning matters!
+
+\end{itemize}
+
+\item What we don't know about yet, however, is i) what the lexical representations of the predicate need to look like to predict projection and projection variation, and ii) how the lexical representations interact with compositional semantics and discourse pragmatics to produce projection and projection variation.
+
+\item So, let's start by assuming that the lexical entry of a predicate codes its lexical entailments, and that these lexical entailments interact with compositional semantics and discourse pragmatics to produce projection and projection variation.
+
+\item Scontras \& Tonhauser: RSA-model that predicts projection for the CC of {\em know} (which is entailed) but not the CC of {\em think} (which is not entailed), modulated by the QUD and the interpreters' prior beliefs.
+
+\item Which types of lexical entailments might matter?
+
+\begin{itemize}
+
+\item {\bf Veridicality and counterfactuality} (e.g., {\em pretend, imagine, dream, fake})
+
+\item {\bf Temporality:} If a predicate is only past-oriented ({\em remember}) vs.\ whether a predicate also allows for future-orientedness ({\em imagine})
+
+\item {\bf Experience:} Does the predicate require that the AH had a personal experience of an eventuality (experiential use) or only a non-personal acquaintance with a fact (propositional use)? Liefke. Diagnostics to identify experiential use: ?how complement?, insertion of ?vividly? in main clause (Stephenson), replace predicate with ?has seen?, compatible with progressive aspect (Ozdiliz thesis)
+
+Evidentiality
+
+\item {\bf Mirativity} (e.g., {\em notice, realize})
+
+\item {\bf Aspect:} 
+
+\begin{itemize}
+
+\item Grohne 2016, White \& Rawlins 2018, \"Ozyildiz 2021, White 2021: dynamic think combines with interrogatives, but stative think resists them ==> aspect matters for clause-selection
+
+\item Zuchewicz 2020: perfectivity matters for factivity; Grohne 2017: telicity matters for exhaustivity, Bervoets 2014, 2020 Xian 2020, Jeretic \& \"O 2022: stativity matters for neg-raising
+
+\end{itemize}
+
+\end{itemize}
+
+\item What is the relevant mechanism? Backgroundedness: the various lexical entailments of a predicate differ in how backgrounded they are, which in turn determines projection. This is different from the mechanism in \citealt{heim83}, where presupposition was coded and was the mechanism.
+
+\end{itemize}
+
+\bibliographystyle{../cslipubs-natbib}
+\bibliography{../bibliography}
+
+
+\end{document}

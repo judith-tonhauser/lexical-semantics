@@ -1,0 +1,16 @@
+\newcommand{\noopsort}[1]{}\newcommand{\SortNoop}[1]{} \newcommand{\noop}[1]{}
+\begin{thebibliography}{2}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[Heim(1983)]{heim83}
+Heim, Irene. 1983.
+\newblock On the projection problem for presuppositions.
+\newblock {\em West Coast Conference on Formal Linguistics\/} 2:114--125.
+
+\bibitem[Kiparsky and Kiparsky(1970)]{kiparsky-kiparsky70}
+Kiparsky, Paul and Carol Kiparsky. 1970.
+\newblock Fact.
+\newblock In M.~Bierwisch and K.~Heidolph, eds., {\em Progress in
+  Linguistics\/}, pages 143--173. The Hague: Mouton.
+
+\end{thebibliography}
