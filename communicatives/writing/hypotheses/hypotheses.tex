@@ -1,0 +1,139 @@
+\documentclass[11pt,fleqn]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{tikz}
+\usepackage{mathtools}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage[colorlinks = true,
+		linkcolor=black,
+		citecolor=black,
+	        urlcolor  = black]{hyperref}
+%\usepackage[dvips]{graphics}
+%\usepackage[table]{xcolor}
+%\usepackage{amssymb}
+\usepackage{float}
+%\usepackage{subfig}
+\usepackage{booktabs}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{multicol}
+\usepackage{txfonts}
+\usepackage{amsfonts}
+\usepackage{natbib}
+
+\usepackage{multirow}
+
+\usepackage{gb4e}
+\usepackage[all]{xy}
+\usepackage{rotating}
+\usepackage{tipa}
+\usepackage{multirow}
+\usepackage{authblk}
+\usepackage{url}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{adjustbox}
+\usepackage{array}
+
+\usepackage{dcolumn} % for printing model output tables directly from R
+
+\usepackage{graphics}
+\graphicspath{{../../results/MegaVeridicality/graphs/}}
+
+%\usepackage{color}
+%\DeclareOuterCiteDelims{cite}{\textcolor{green}{\bibopenbracket}}{\textcolor{red}{\bibclosebracket}}
+
+\definecolor{Pink}{RGB}{255,50,170}
+\newcommand{\jd}[1]{\textcolor{Pink}{[jd: #1]}}  
+
+\newcommand{\jt}[1]{\textbf{\color{purple}JT: #1}}
+
+\newcommand{\tableref}[1]{Tab.~\ref{#1}}
+\newcommand{\figref}[1]{Fig.~\ref{#1}}
+
+\def\bad{{\leavevmode\llap{*}}}
+\def\marginal{{\leavevmode\llap{?}}}
+\def\verymarginal{{\leavevmode\llap{??}}}
+\def\swmarginal{{\leavevmode\llap{4}}}
+\def\infelic{{\leavevmode\llap{\#}}}
+
+\definecolor{airforceblue}{rgb}{0.36, 0.54, 0.66}
+%\definecolor{gray}{rgb}{0.36, 0.54, 0.66}
+
+\newcommand{\dashrule}[1][black]{%
+  \color{#1}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}\xleaders\hbox{\rule{4pt}{0pt}\rule[\dimexpr.5ex-.2pt]{4pt}{.4pt}}\hfill\kern0pt%
+}
+
+\setlength{\parindent}{.3in}
+\setlength{\parskip}{0ex}
+
+\newcommand{\yi}{\'{\symbol{16}}}
+\newcommand{\nasi}{\~{\symbol{16}}}
+\newcommand{\hina}{h\nasi na}
+\newcommand{\ina}{\nasi na}
+
+\newcommand{\foc}{$_{\mbox{\small F}}$}
+
+\hyphenation{par-ti-ci-pa-tion}
+
+%\setlength{\bibhang}{0.5in}
+%\setlength{\bibsep}{0mm}
+%\bibpunct[:]{(}{)}{,}{a}{}{,}
+
+\newcommand{\6}{\mbox{$[\hspace*{-.6mm}[$}} 
+\newcommand{\9}{\mbox{$]\hspace*{-.6mm}]$}}
+\newcommand{\sem}[2]{\6#1\9$^{#2}$}
+\renewcommand{\ni}{\~{\i}}
+
+\newcommand{\citepos}[1]{\citeauthor{#1}'s (\citeyear{#1})}
+\newcommand{\citeposs}[1]{\citeauthor{#1}'s}
+\newcommand{\citetpos}[1]{\citeauthor{#1}'s \citeyear{#1}}
+
+\newcolumntype{R}[2]{%
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}%
+    l%
+    <{\egroup}%
+}
+\newcommand*\rot{\multicolumn{1}{R{90}{0em}}}% no optional argument here, please!
+
+\title{Hypotheses}
+
+\author{YK and JT}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+
+\section{Applying \citepos{korotkova-anand-dgfs2024} criteria}
+\subsection{``Abduction: reasoning from effect to cause"}
+``Abduction: reasoning from effect to cause"
+To test whether the predicates can be used in this way, we constructed additional examples. The first two merely serve as alternatives to \citepos{korotkova-anand-dgfs2024} example (10) and are a little clearer with some predicates.
+
+\begin{exe}		
+	\ex Jane is sitting in a windowless room, talking to her mother on the phone, when another person walks in dripping wet. Jane says, ``Mum, I discovered / \# figured out / found out / learnt / \# noticed /  \# pieced together / realized / \# reasoned out / ... that it's raining."
+	\ex Someone has been stealing John's lunch for weeks. One day, he sees his colleague Sally eat his sandwich. He tells his boss, ``I discovered / \# figured out / found out / learnt / \# noticed /  \# pieced together / realized / \# reasoned out / ... that Sally is the thief who has stolen all my sandwiches!"
+\end{exe}
+
+According to \cite{korotkova-anand-dgfs2024}, \emph{figure out} should be felicitous in the abductive reasoning context. We disagree with this judgement in the examples above as well as their example (10). Our intuition is that \emph{figure out} and similar predicates, like \emph{piece together} and \emph{reason out}, require an accumulation of several pieces of evidence. We construct a more complex example to test this. 
+
+\begin{exe}
+	\ex One day, Alex finds a parcel in the stairwell of her building that obviously contains baby equipment. It is addressed to her neighbour Jack, who Alex believes is single. When Alex gets her mail, she finds a letter that has accidentally ended up in her letterbox. It is addressed to Jack and some woman. Alex sticks the letter in the right letterbox and goes for a walk. As she walks down the street, she sees Jack on the other side of the street with a woman she doesn't know. In the evening, Alex goes to the gym. There she meets the woman again, who introduces herself. Her name is the one Alex read on the misdelivered letter earlier that day. When she gets back home after her workout, Alex tells her spouse, ``Today I discovered / figured out / found out / ? learnt / \# noticed / pieced together / realized / reasoned out / ... that Jack is having a baby!"
+\end{exe}
+
+Our examples show that whilst the predicates can be distinguished in terms of their compatibility with abductive reasoning, as \cite{korotkova-anand-dgfs2024} argue, a more fine-grained distinction might be required.
+
+\section{Conclusion}
+
+
+
+\bibliographystyle{../cslipubs-natbib}
+\bibliography{../bibliography}
+
+
+\end{document}

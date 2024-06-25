@@ -1,0 +1,11 @@
+\newcommand{\noopsort}[1]{}\newcommand{\SortNoop}[1]{} \newcommand{\noop}[1]{}
+\begin{thebibliography}{1}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[Korotkova and Anand(2024)]{korotkova-anand-dgfs2024}
+Korotkova, Natasha and Parnav Anand. 2024.
+\newblock Today {I} learned: English `coming-to-know' predicates.
+\newblock Presentation at the Annual Meeting of the {\em Deutsche Gesellschaft
+  f\"ur Sprachwissenschaft}, Bochum, March 2024.
+
+\end{thebibliography}

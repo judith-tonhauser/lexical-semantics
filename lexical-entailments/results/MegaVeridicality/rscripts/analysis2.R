@@ -764,7 +764,7 @@ nrow(z) # 1498
 z <- z %>% 
   mutate(turker_neg_ratings2 = turker_neg_ratings, .after = turker_pos_ratings) %>% 
   separate(turker_neg_ratings, c("rating1", "rating2", "rating3"), 
-                    sep = ",")
+           sep = ",")
 
 # select only items with that-complements
 z <- z %>% 
@@ -811,7 +811,7 @@ z2 <- z %>%
 
 z2 %>% distinct(verb) %>% count() # 72
 
-# vvonlypreds <- c("felt", "hold", "recommend", "saw", "speculate") 
+vvonlypreds <- c("felt", "hold", "recommend", "saw", "speculate") 
 
 # Creating .csv file for predicate coding for VV dataset, transferring the 
 # classifications for the 67 predicates that occur in both datasets from 
@@ -832,14 +832,14 @@ z2 %>% distinct(verb) %>% count() # 72
 
 
 # load predicate coding
-z3 = read.csv("../data/predicate-coding-vv.csv")
+z3 <- read.csv("../data/predicate-coding-vv.csv")
 nrow(z3) # 72
 
-dvv = left_join(z2, z3, by = c("verb"))
+dvv <- left_join(z2, z3, by = c("verb"))
 nrow(dvv) # 2403
 
 # create predicateType, emotiveComponent, change-of-state, environment columns
-d.proj.vv = dvv %>%
+d.proj.vv <- dvv %>%
   mutate(predicateType = case_when(communicative == "yes" & private == "yes" ~ "comPriv",
                                    communicative == "yes" ~ "communicative",   
                                    emotive == "yes" ~ "emotive",
@@ -876,7 +876,7 @@ d.proj.vv = dvv %>%
                                         say_by_means_form == "yes" ~ "form"))
 
 # calculate by-predicate projection means for original and rescaled ratings.
-mean.proj.vv = dvv %>%
+mean.proj.vv <- dvv %>%
   group_by(verb) %>% 
   summarize(Mean.Proj = mean(rating), 
             CILow = ci.low(rating), 
@@ -891,22 +891,22 @@ mean.proj.vv = dvv %>%
          verb = fct_reorder(as.factor(verb), Mean.Proj))
 
 # add predicateType etc. to the means
-tmp2 = d.proj.vv %>%
+tmp3 <- d.proj.vv %>%
   select(c(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
            commType, changeOfState, volition, sayVerb, sayVerbType, modeVerbType, 
            sayByMeansVerbType)) %>%
   distinct(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
            commType, changeOfState, volition, sayVerb, sayVerbType, modeVerbType, 
            sayByMeansVerbType)
-nrow(tmp2) # 72
+nrow(tmp3) # 72
 
-mean.proj.vv <- left_join(mean.proj.vv, tmp2, by = c("verb")) %>%
+mean.proj.vv <- left_join(mean.proj.vv, tmp3, by = c("verb")) %>%
   filter(! predicateType %in% c("comPriv", "other")) %>% 
   distinct() %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
 nrow(mean.proj.vv) # 68
 
-## say verbs ----
+### say verbs ----
 # distribution of communication predicates
 d.proj.vv %>% 
   filter(predicateType == "communicative" | sayVerb == "yes") %>% 
@@ -920,11 +920,30 @@ d.proj.vv %>%
 # 3 yes     comPriv           2
 # 4 yes     communicative    22
 # There are 37 communication predicates in the VV dataset. One of them ('think') 
-# is say-verbs but not a communicatives. Two are predicates can be interpreted
-# both as communicative and private predicates. These four predicates are excluded
-# from analysis, i.e., only the 34 communicative predicates are included.
+# is a say-verb but not a communicative. Two are predicates that can be interpreted
+# both as communicative and private predicates. These three predicates are excluded
+# from analysis.
 
-### types of communicatives ----
+vvonly.acc.comms <- d.proj.vv %>% 
+  filter(verb_renamed %in% vvonlypreds & predicateType == "communicative") %>% 
+  distinct(verb_renamed)
+# verb_renamed
+# <chr>       
+# 1 recommend   
+
+d.proj.vv %>% 
+  filter(predicateType == "communicative" & ! verb_renamed %in% acc.comms) %>% 
+  distinct(verb_renamed)
+#   verb_renamed
+#   <chr>       
+# 1 recommend   
+
+# All communicative predicates in the VV dataset that also occur in the MV dataset
+# have a mean acceptability rating of greater than 4 in the MV dataset. Therefore,
+# non of the 34 communicatives are excluded from analysis. 
+
+
+#### types of communicatives ----
 d.proj.vv %>% 
   filter(predicateType == "communicative") %>% 
   group_by(sayVerb) %>% 
@@ -963,7 +982,7 @@ ggplot(mean.proj.vv.commsay, aes(x = sayVerb, y = Mean.Proj)) +
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, -0.5, 0, 0.5, 1))
 ggsave("../graphs/projection-by-communication-type-vv.pdf", height = 4, width = 10)
 
-### types of say verbs ----
+#### types of say verbs ----
 d.proj.vv %>% 
   filter(sayVerb == "yes" & predicateType == "communicative") %>%  
   group_by(sayVerbType) %>% 
@@ -1031,7 +1050,7 @@ ggplot(mean.proj.saytype.vv2, aes(x = sayVerb, y = Mean.Proj, colour = sayVerbTy
   scale_colour_manual(values = c("purple","deeppink", "orange3", "grey50"))
 ggsave("../graphs/projection-by-sayverb-type-vv2.pdf", height = 4, width = 10)
 
-### types of mode verbs ----
+#### types of mode verbs ----
 d.proj.vv %>% 
   filter(sayVerbType == "mode verb") %>%  
   group_by(modeVerbType) %>% 
@@ -1070,7 +1089,7 @@ ggplot(mean.proj.modetype.vv, aes(x = sayVerbType, y = Mean.Proj, colour = modeV
   scale_colour_manual(values = c("green3","blue", "grey50"))
 ggsave("../graphs/projection-by-modeverb-type-vv.pdf", height = 4, width = 10)
 
-### types of say-by-means verbs ----
+#### types of say-by-means verbs ----
 d.proj.vv %>% 
   filter(modeVerbType == "say-by-means") %>%  
   group_by(sayByMeansVerbType) %>% 
@@ -1082,7 +1101,7 @@ d.proj.vv %>%
 
 # No plot for only one predicate. :) - no "overall" plot, either.
 
-## by-predicateType ----
+### by-predicateType ----
 d.proj.vv %>%
   filter(predicateType2 != "comPriv" & predicateType2 != "other") %>% 
   group_by(predicateType2) %>%
@@ -1102,11 +1121,16 @@ d.proj.vv %>%
 #   verb_renamed
 #   <chr>       
 # 1 complain  
-# With only one communicative with an emotive component, the VV dataset is of 
-# limited use for investigating this property.
 
-### plots ----
+# With only one communicative with an emotive component, the VV dataset is of 
+# limited use for investigating the 'emotive component' property.
+
+# With only three projectino ratings per item, the dataset is overall ill-suited 
+# for a more fine-grained investigation of communication predicates, 
+
+#### plots ----
 # calculate by-predicateType means
+
 mean.proj.type.vv = d.proj.vv %>%
   group_by(predicateType) %>%
   summarize(Mean.Proj = mean(rating), 
@@ -1160,7 +1184,7 @@ nrow(mean.proj.type2.vv) # 7
 mean.proj.type2.vv %>%
   filter(predicateType2 != "other" & predicateType2 != "comPriv") %>% 
   ggplot(aes(x = factor(predicateType2, c("cognitive", "evidential", "nonEmoComm", 
-                                              "emoComm", "emotive")), 
+                                          "emoComm", "emotive")), 
              y = Mean.Proj.rescaled, colour = predicateType2)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
@@ -1182,8 +1206,8 @@ mean.proj.type2.vv %>%
   scale_colour_manual(values = cols2)
 ggsave("../graphs/projection-by-predicateType2-vv.pdf", height = 4, width = 10)
 
-## by predicate ----
-### plots ----
+### by predicate ----
+#### plots ----
 mean.proj.vv %>% 
   ggplot(aes(x = verb_renamed, y = Mean.Proj.rescaled, colour = predicateType)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
@@ -1236,13 +1260,6 @@ mean.proj.vv %>%
   facet_wrap(~ predicateType, ncol = 4)
 ggsave("../graphs/projection-by-predicate-faceted-vv.pdf", height = 4, width = 9)
 
-# predicate type 2
-predicateType2_names <- c( "cognitive" = "cognitive", 
-                           "emoComm" = "communicative with\nemotive component", 
-                           "emotive" = "emotive", 
-                           "evidential" = "evidential", 
-                           "nonEmoComm" = "communicative without\nemotive component")
-
 # with labels
 mean.proj.vv %>% 
   ggplot(aes(x = verb_renamed, y = Mean.Proj.rescaled, colour = predicateType2)) +
@@ -1290,7 +1307,7 @@ mean.proj.vv %>%
               labeller = as_labeller(predicateType2_names), ncol = 5)
 ggsave("../graphs/projection-by-predicate-faceted-vv2.pdf", height = 4, width = 10)
 
-### models ----
+#### models ----
 lm(Mean.Proj.rescaled ~ fct_relevel(predicateType, "communicative"), data = mean.proj.vv) %>% 
   summary()
 # Coefficients:
@@ -1313,8 +1330,8 @@ lm(Mean.Proj.rescaled ~ fct_relevel(predicateType2, "emoComm"), data = mean.proj
 # fct_relevel(predicateType2, "emoComm")evidential -0.08069    0.25818  -0.313    0.756
 # fct_relevel(predicateType2, "emoComm")nonEmoComm -0.18375    0.25374  -0.724    0.472
 
-# None of the predicate types with the 'emotive component' distinction are correlated
-# with projection ratings.
+# None of the five predicate types with the 'emotive component' distinction are 
+# correlated with projection ratings.
 
 ## VAD ratings ----
 
