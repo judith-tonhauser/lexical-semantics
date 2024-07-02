@@ -370,11 +370,11 @@ left_join(count, count2, by = "predicateType2") %>%
   mutate(low.acc.percentage = low.acc.count * 100 / total.count)
 #   predicateType2 total.count low.acc.count low.acc.percentage
 #   <chr>                <int>         <int>              <dbl>
-# 1 cognitive               53             1               1.89
+# 1 cognitive               54             1               1.85
 # 2 emoComm                 47             9              19.1 
 # 3 emotive                148             4               2.70
 # 4 evidential              86             8               9.30
-# 5 nonEmoComm             189            11               5.82
+# 5 nonEmoComm             188            11               5.85
 
 # Due to their low acceptability ratings, the 33 predicates (incl. 20 communicatives)
 # listed above are excluded from analysis.
@@ -452,11 +452,11 @@ mean.proj.acc %>%
   count()
 #   predicateType2     n
 #   <chr>          <int>
-# 1 cognitive         52
+# 1 cognitive         53
 # 2 emoComm           38
 # 3 emotive          144
 # 4 evidential        78
-# 5 nonEmoComm       178
+# 5 nonEmoComm       177
 
 ## B.2 by predicate ----
 ### with communicatives ----
@@ -571,7 +571,7 @@ mean.proj.comm %>%
 #   commType                count
 #   <chr>                   <int>
 # 1 discourse participation   109
-# 2 pure                       85
+# 2 pure                       84
 # 3 state changing             22
 
 #### plots ----
@@ -661,7 +661,7 @@ mean.proj.comm %>%
 #   commType                count
 #   <chr>                   <int>
 # 1 discourse participation   109
-# 2 pure                       85
+# 2 pure                       84
 # 3 state changing             22
 
 ## C.2 our subcategories ----
@@ -936,7 +936,7 @@ d.proj.acc %>%
 #   predicateType sayVerb     n
 #   <chr>         <chr>   <int>
 # 1 cognitive     yes         2
-# 2 communicative no        105
+# 2 communicative no        104
 # 3 communicative yes       111
 
 d.proj.acc %>% 
@@ -959,9 +959,9 @@ d.proj.comm %>%
   count()
 #   sayVerb     n
 #   <chr>   <int>
-# 1 no        105
+# 1 no        104
 # 2 yes       111
-# Of the 216 communicatives included in this investigation, 111 are say-predicates.
+# Of the 215 communicatives included in this investigation, 111 are say-predicates.
 
 #### plot ----
 mean.proj.commsay <- d.proj.comm %>%
@@ -1202,22 +1202,24 @@ clmm(as.factor(veridicality_num) ~ fct_relevel(sayByMeansVerbType, "sound") +
 mean.proj.comm %>% 
   group_by(predicateType2, commType, sayVerbType, modeVerbType) %>% 
   count()
-#   predicateType2 commType                sayVerbType             n
-#   <chr>          <chr>                   <chr>               <int>
-# 1 emoComm        discourse participation mode verb               4
-# 2 emoComm        discourse participation NA                      3
-# 3 emoComm        pure                    mode verb              23
-# 4 emoComm        pure                    NA                      7
-# 5 emoComm        state changing          NA                      1
-# 6 nonEmoComm     discourse participation discourse role verb    46
-# 7 nonEmoComm     discourse participation mode verb               1
-# 8 nonEmoComm     discourse participation NA                     55
-# 9 nonEmoComm     pure                    discourse role verb     5
-# 10 nonEmoComm     pure                    mode verb              26
-# 11 nonEmoComm     pure                    say                     1
-# 12 nonEmoComm     pure                    NA                     23
-# 13 nonEmoComm     state changing          discourse role verb     5
-# 14 nonEmoComm     state changing          NA                     16
+# predicateType2 commType                sayVerbType         modeVerbType          n
+# <chr>          <chr>                   <chr>               <chr>             <int>
+# 1 emoComm        discourse participation mode verb           say-with-attitude     4
+# 2 emoComm        discourse participation NA                  NA                    3
+# 3 emoComm        pure                    mode verb           say-by-means         16
+# 4 emoComm        pure                    mode verb           say-with-attitude     7
+# 5 emoComm        pure                    NA                  NA                    7
+# 6 emoComm        state changing          NA                  NA                    1
+# 7 nonEmoComm     discourse participation discourse role verb NA                   46
+# 8 nonEmoComm     discourse participation mode verb           say-with-attitude     1
+# 9 nonEmoComm     discourse participation NA                  NA                   55
+# 10 nonEmoComm     pure                    discourse role verb NA                    5
+# 11 nonEmoComm     pure                    mode verb           say-by-means         25
+# 12 nonEmoComm     pure                    mode verb           say-with-attitude     1
+# 13 nonEmoComm     pure                    say                 NA                    1
+# 14 nonEmoComm     pure                    NA                  NA                   22
+# 15 nonEmoComm     state changing          discourse role verb NA                    5
+# 16 nonEmoComm     state changing          NA                  NA                   16
 
 #### plot ----
 mean.proj.overall <- d.proj.comm %>%
@@ -1308,8 +1310,8 @@ mean.proj.vad %>%
   count()
 #   predicateType     n
 #   <chr>         <int>
-# 1 cognitive        46
-# 2 communicative   189
+# 1 cognitive        47
+# 2 communicative   188
 # 3 emotive          98
 # 4 evidential       69
 
@@ -1319,11 +1321,11 @@ mean.proj.vad %>%
   count()  
 #   predicateType2     n
 #   <chr>          <int>
-# 1 cognitive         46
+# 1 cognitive         47
 # 2 emoComm           33
 # 3 emotive           98
 # 4 evidential        69
-# 5 nonEmoComm       156
+# 5 nonEmoComm       155
 
 ### X.01 rescale V + A + D ratings ----
 # Valence and dominance have extremes (unhappy - happy, controlled - controlling)
@@ -1486,11 +1488,11 @@ lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emotive"), new.scale) %>%
   summary()
 # Coefficients:
 #                                                  Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                       0.44199    0.01716  25.754  < 2e-16 ***
-# fct_relevel(predicateType2, "emotive")cognitive  -0.12335    0.03036  -4.062 5.86e-05 ***
-# fct_relevel(predicateType2, "emotive")emoComm    -0.08343    0.03419  -2.440   0.0151 *  
-# fct_relevel(predicateType2, "emotive")evidential -0.22471    0.02670  -8.416 7.13e-16 ***
-# fct_relevel(predicateType2, "emotive")nonEmoComm -0.23975    0.02190 -10.948  < 2e-16 ***
+# (Intercept)                                       0.44199    0.01719  25.708  < 2e-16 ***
+# fct_relevel(predicateType2, "emotive")cognitive  -0.12843    0.03020  -4.253 2.63e-05 ***
+# fct_relevel(predicateType2, "emotive")emoComm    -0.08343    0.03425  -2.436   0.0153 *  
+# fct_relevel(predicateType2, "emotive")evidential -0.22471    0.02675  -8.401 7.94e-16 ***
+# fct_relevel(predicateType2, "emotive")nonEmoComm -0.23896    0.02196 -10.879  < 2e-16 ***
 
 ##### X.1.2.2 with direction of valence ----
 ###### plot ----
@@ -1740,7 +1742,7 @@ lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "cognitive") * V.Mean.Sum2.directio
 ##### X.3.2.3 with 'direction' of dominance ----
 ###### plot ----
 # calculate dominance by predicateType2 means and direction of valence
-mean.dominance3 = new.scale %>%
+mean.dominance3 <- new.scale %>%
   group_by(predicateType2, D.Mean.Sum2.direction) %>%
   summarize(Mean.Dominance = mean(D.Mean.Sum2), CILow = ci.low(D.Mean.Sum2), 
             CIHigh = ci.high(D.Mean.Sum2)) %>%
@@ -1794,11 +1796,11 @@ new.scale %>%
   count()
 #   predicateType2     n
 #   <chr>          <int>
-# 1 cognitive         36
+# 1 cognitive         37
 # 2 emoComm           19
 # 3 emotive           44
 # 4 evidential        57
-# 5 nonEmoComm       113
+# 5 nonEmoComm       112
 
 new.scale %>% 
   filter(D.Mean.Sum2.direction == "negative") %>% 
@@ -2381,8 +2383,8 @@ chisq.test(contingency_table) %>%
 new.scale %>% 
   count(predicateType2, D.Mean.Sum2.direction)
 #    predicateType2 D.Mean.Sum2.direction   n
-# 1       cognitive              negative  10 22% of cognitives
-# 2       cognitive              positive  36
+# 1       cognitive              negative  10 21% of cognitives
+# 2       cognitive              positive  37
 # 3         emoComm              negative  14 42% of emoComms
 # 4         emoComm              positive  19
 # 5         emotive              negative  54 55% of emotives
@@ -2390,7 +2392,7 @@ new.scale %>%
 # 7      evidential              negative  12 17% of evidentials
 # 8      evidential              positive  57
 # 9      nonEmoComm              negative  43 28% of nonEmoComms
-# 10     nonEmoComm              positive 113
+# 10     nonEmoComm              positive 112
 
 new.scale %>% 
   count(predicateType2, V.Mean.Sum2.direction)
@@ -3574,9 +3576,9 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 *
 # nonEmoComm	    positive  n.s.  n.s.
 
 
-# Y Volition ----
-## Y.1 all predicates ----
-### Y.1.1 by predicate ----
+# V Volition ----
+## V.1 all predicates ----
+### VY.1.1 by predicate ----
 #### plots ----
 ggplot(mean.proj.acc, aes(x = verb_renamed, y = Mean.Proj, colour = volition)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
@@ -3617,7 +3619,7 @@ lm(Mean.Proj ~ fct_relevel(volition, "volitional"), data = mean.proj.acc) %>%
 # (Intercept)                                        0.28830    0.01852  15.569   <2e-16 ***
 # fct_relevel(volition, "volitional")non-volitional  0.22172    0.02391   9.275   <2e-16 ***
 
-### Y.1.2 by predicate type ----
+### V.1.2 by predicate type ----
 #### plot ----
 mean.proj.vol = d.proj.acc %>%
   group_by(predicateType2, volition) %>%
@@ -3660,18 +3662,18 @@ d.proj.acc %>%
 #   predicateType2 volition       count
 #   <chr>          <chr>          <int>
 # 1 cognitive      non-volitional    43
-# 2 cognitive      volitional         9
+# 2 cognitive      volitional        10
 # 3 emoComm        non-volitional    19
 # 4 emoComm        volitional        19
 # 5 emotive        non-volitional   144
 # 6 evidential     non-volitional    75
 # 7 evidential     volitional         3
 # 8 nonEmoComm     non-volitional    13
-# 9 nonEmoComm     volitional       165
+# 9 nonEmoComm     volitional       164
 
 # All emotives are non-volitional. Almost all evidentials are non-volitional.
 
-## Y.2 only communicatives ----
+## V.2 only communicatives ----
 ### by predicate ----
 #### plot ----
 ggplot(mean.proj.comm, aes(x = verb_renamed, y = Mean.Proj, colour = volition)) +
@@ -3706,15 +3708,17 @@ mean.proj.comm %>%
 # 1 emoComm        non-volitional    19
 # 2 emoComm        volitional        19
 # 3 nonEmoComm     non-volitional    13
-# 4 nonEmoComm     volitional       165
+# 4 nonEmoComm     volitional       164
 
-# Z ----
+# W ----
 mean.proj.comm %>% 
   filter(sayByMeansVerbType == "form") %>% 
   select(verb_renamed) %>% 
   print(n = Inf)
 
-# focus-sensitive interpretation
+# two possible interpretation: CC was not said vs was not said in a certain way /
+# with a certain attitude etc.
+
 # emoComms: 38/38
 # commType discourse participation: mixed, more single interpretation
 # commType pure: mixed, more focus-sensitive interpretation
@@ -3722,3 +3726,451 @@ mean.proj.comm %>%
 # say verbs discourse role: mainly single interpretation (exceptions: apologize, insist...)  
 # mode verbs say-with-attitude: 13/13
 # say-by-means verbs sound: 5/5, manner: 22/22, form: 0/14
+
+
+# Z projection by communicatives ----
+## with think and know ----
+### plot ----
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know", "believe")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "believe"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "believe")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "dodgerblue4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "believe"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.2,
+                   colour = "orange2") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "believe", "know"),
+                      values = c("deepskyblue2", "dodgerblue4", "deeppink", "orange2", "darkgreen"))
+ggsave("../graphs/projection-by-communicative.pdf", height = 4, width = 13)
+
+## with highly projective predicates ---- 
+# communicative predicates that project as much or more strongly than 'know'
+mean.proj.acc %>% filter(predicateType == "communicative" & 
+                           Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj) %>% 
+  arrange(desc(Mean.Proj)) %>% 
+  select(verb_renamed, Mean.Proj, commType, sayVerbType)
+# verb_renamed Mean.Proj commType                sayVerbType        
+#   <fct>            <dbl> <chr>                   <chr>              
+# 1 cry              0.833 pure                    mode verb          
+# 2 flip out         0.833 pure                    NA                 
+# 3 cringe           0.8   pure                    NA                 
+# 4 celebrate        0.733 pure                    NA                 
+# 5 fess up          0.733 discourse participation NA                 
+# 6 apologize        0.724 discourse participation discourse role verb
+# 7 whine            0.7   pure                    mode verb          
+# 8 approve          0.667 discourse participation NA                 
+# 9 disclose         0.667 discourse participation NA                 
+# 10 grimace          0.667 pure                    NA                 
+# 11 pout             0.667 pure                    NA                 
+# 12 bitch            0.633 discourse participation mode verb          
+# 13 document         0.633 pure                    mode verb          
+# 14 weep             0.633 pure                    mode verb   
+
+### plot ----
+# with labels for highly projective predicates
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "dodgerblue4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                              Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "dodgerblue4", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-highest.pdf", height = 4, width = 13)
+
+
+## with extreme predicates ----
+# calculate difference in mean projection rating between the predicate with the 
+# highest rating and 'know':
+slice_max(mean.proj.comm, Mean.Proj, with_ties = FALSE)$Mean.Proj - 
+  subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj
+# 0.2
+
+# communicative predicates whose projection rating ranges between that of 'think'
+# and think + 0.2:
+aaa <- mean.proj.acc %>% filter(predicateType == "communicative" & 
+                           Mean.Proj <= subset(mean.proj.acc, verb_renamed == "think")$Mean.Proj + 0.2 & 
+                           Mean.Proj >= subset(mean.proj.acc, verb_renamed == "think")$Mean.Proj) %>% 
+  arrange(Mean.Proj) %>% 
+  select(verb_renamed, Mean.Proj, commType, sayVerbType) %>% 
+  print(n = Inf)
+aaa %>% write.csv("../data/barely-projective-communicatives.csv")
+# verb_renamed Mean.Proj commType                sayVerbType        
+# <fct>            <dbl> <chr>                   <chr>              
+#   1 charge         -0.0333 discourse participation NA                 
+# 2 allege          0      discourse participation discourse role verb
+# 3 demand          0.0333 discourse participation discourse role verb
+# 4 fake            0.0333 state changing          NA                 
+# 5 retract         0.0333 discourse participation NA                 
+# 6 contend         0.0667 discourse participation discourse role verb
+# 7 decree          0.0667 discourse participation discourse role verb
+# 8 fax             0.0667 pure                    mode verb          
+# 9 hint            0.0667 discourse participation NA                 
+# 10 imply           0.0667 discourse participation NA                 
+# 11 jest            0.0667 pure                    mode verb          
+# 12 propose         0.0667 discourse participation discourse role verb
+# 13 reject          0.0667 discourse participation NA                 
+# 14 forecast        0.0690 pure                    NA                 
+# 15 bet             0.1    discourse participation NA                 
+# 16 dispel          0.1    discourse participation NA                 
+# 17 generalize      0.1    state changing          NA                 
+# 18 holler          0.1    pure                    mode verb          
+# 19 joke            0.1    pure                    mode verb          
+# 20 posit           0.1    discourse participation discourse role verb
+# 21 promise         0.1    state changing          discourse role verb
+# 22 type            0.1    pure                    mode verb          
+# 23 wager           0.1    discourse participation NA                 
+# 24 depict          0.133  pure                    NA                 
+# 25 implore         0.133  state changing          NA                 
+# 26 narrate         0.133  pure                    NA                 
+# 27 proclaim        0.133  discourse participation discourse role verb
+# 28 prophesy        0.133  pure                    NA                 
+# 29 quarrel         0.133  discourse participation NA                 
+# 30 recap           0.133  discourse participation discourse role verb
+# 31 request         0.133  discourse participation NA                 
+# 32 rule            0.133  discourse participation discourse role verb
+# 33 demonstrate     0.138  state changing          NA                 
+# 34 challenge       0.167  discourse participation NA                 
+# 35 corroborate     0.167  discourse participation NA                 
+# 36 debate          0.167  discourse participation NA                 
+# 37 establish       0.167  discourse participation discourse role verb
+# 38 express         0.167  pure                    NA                 
+# 39 indict          0.167  discourse participation NA                 
+# 40 insinuate       0.167  discourse participation NA                 
+# 41 insist          0.167  state changing          discourse role verb
+# 42 lie             0.167  state changing          discourse role verb
+# 43 mark            0.167  pure                    discourse role verb
+# 44 post            0.167  pure                    mode verb          
+# 45 reassert        0.167  discourse participation discourse role verb
+# 46 submit          0.167  discourse participation NA                 
+# 47 tease           0.167  discourse participation mode verb  
+
+# communicative predicates with similar projection ratings as 'know': 
+# (know - 0.2) to max [= know + 0.2] 
+bbb <- mean.proj.acc %>% filter(predicateType == "communicative" & 
+                           Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2) %>% 
+  arrange(desc(Mean.Proj)) %>% 
+  select(verb_renamed, Mean.Proj, commType, sayVerbType) %>% 
+  print(n = Inf)
+bbb %>% write.csv("../data/highly-projective-communicatives.csv")
+# verb_renamed Mean.Proj commType                sayVerbType        
+# <fct>            <dbl> <chr>                   <chr>              
+# 1 cry              0.833 pure                    mode verb          
+# 2 flip out         0.833 pure                    NA                 
+# 3 cringe           0.8   pure                    NA                 
+# 4 celebrate        0.733 pure                    NA                 
+# 5 fess up          0.733 discourse participation NA                 
+# 6 apologize        0.724 discourse participation discourse role verb
+# 7 whine            0.7   pure                    mode verb          
+# 8 approve          0.667 discourse participation NA                 
+# 9 disclose         0.667 discourse participation NA                 
+# 10 grimace          0.667 pure                    NA                 
+# 11 pout             0.667 pure                    NA                 
+# 12 bitch            0.633 discourse participation mode verb          
+# 13 document         0.633 pure                    mode verb          
+# 14 weep             0.633 pure                    mode verb          
+# 15 complain         0.6   discourse participation mode verb          
+# 16 conceal          0.6   state changing          NA                 
+# 17 explain          0.6   discourse participation discourse role verb
+# 18 stress           0.6   discourse participation NA                 
+# 19 publicize        0.586 pure                    NA                 
+# 20 flaunt           0.567 discourse participation NA                 
+# 21 fuss             0.567 discourse participation NA                 
+# 22 leak             0.567 discourse participation NA                 
+# 23 point out        0.567 discourse participation discourse role verb
+# 24 reveal           0.567 discourse participation NA                 
+# 25 share            0.567 discourse participation NA                 
+# 26 warn             0.552 state changing          NA                 
+# 27 announce         0.533 discourse participation discourse role verb
+# 28 cheer            0.533 pure                    mode verb          
+# 29 expose           0.533 state changing          NA                 
+# 30 log              0.533 pure                    mode verb          
+# 31 reiterate        0.533 discourse participation discourse role verb
+# 32 snitch           0.533 discourse participation NA                 
+# 33 divulge          0.5   discourse participation NA                 
+# 34 emphasize        0.5   pure                    NA                 
+# 35 gab              0.5   pure                    NA                 
+# 36 grumble          0.5   pure                    mode verb          
+# 37 address          0.467 discourse participation NA                 
+# 38 gasp             0.467 pure                    mode verb          
+# 39 gush             0.467 pure                    mode verb          
+# 40 moan             0.467 pure                    mode verb          
+# 41 shriek           0.467 pure                    mode verb          
+# 42 sob              0.467 pure                    mode verb          
+# 43 whimper          0.467 pure                    mode verb          
+# 44 admit            0.433 discourse participation discourse role verb
+# 45 broadcast        0.433 pure                    mode verb          
+# 46 detail           0.433 discourse participation NA                 
+# 47 murmur           0.433 pure                    mode verb          
+# 48 spout            0.433 pure                    NA                 
+# 49 stammer          0.433 pure                    mode verb          
+# 50 voice            0.433 pure                    NA    
+
+### plots ----
+# with labels for extreme predicates
+# 0 to (think + 0.2) and know to (know + 0.2)
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj <= subset(mean.proj.acc, verb_renamed == "think")$Mean.Proj + 0.2 & 
+                                               Mean.Proj >= 0), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "dodgerblue4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                     Mean.Proj <= subset(mean.proj.acc, verb_renamed == "think")$Mean.Proj + 0.2 & 
+                                                     Mean.Proj >= 0),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "hotpink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                     Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes.pdf", height = 4, width = 13)
+
+
+# with labels for 13/14 extreme predicates on both ends
+# There are 14 predicates that project as much or more strongly than 'know'
+# The 13 least projective predicates from 0 have a mean projection rating of up 
+# to 0.0690. Predicates 14 to 22 have a rating of 0.1. Therefore, on the lower 
+# end of the projection scale only 13 predicates are included.
+
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                         Mean.Proj >= 0), Mean.Proj, n = 13), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "dodgerblue4") +
+  geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                                Mean.Proj >= 0), Mean.Proj, n = 13),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 2, nudge_y = -0.5,
+                   colour = "hotpink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                     Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-14.pdf", height = 4, width = 13)
+
+# some more predicates - how many?
+mean.proj.acc %>% 
+  filter(predicateType == "communicative" & 
+           Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.1) %>% 
+  nrow() # 32
+# The first 32 predicates from 0 include those with a mean projection rating of 
+# up to 0.133. The 33rd predicate has a rating of 0.167. 32 is therefore a good 
+# number of predicates to consider on both ends.
+
+# with labels for 32 extreme predicates on both ends
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                          Mean.Proj >= 0), Mean.Proj, n = 32), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.1), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "dodgerblue4") +
+  geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                                Mean.Proj >= 0), Mean.Proj, n = 32),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 2, nudge_y = -0.7,
+                   colour = "hotpink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                     Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.1),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.7,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-32.pdf", height = 4, width = 13)

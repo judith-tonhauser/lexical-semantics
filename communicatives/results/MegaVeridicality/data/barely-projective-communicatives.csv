@@ -1,0 +1,49 @@
+"","verb_renamed","Mean.Proj","commType","sayVerbType"
+"1","charge",-0.0333333333333333,"discourse participation",NA
+"2","allege",0,"discourse participation","discourse role verb"
+"3","demand",0.0333333333333333,"discourse participation","discourse role verb"
+"4","fake",0.0333333333333333,"state changing",NA
+"5","retract",0.0333333333333333,"discourse participation",NA
+"6","contend",0.0666666666666667,"discourse participation","discourse role verb"
+"7","decree",0.0666666666666667,"discourse participation","discourse role verb"
+"8","fax",0.0666666666666667,"pure","mode verb"
+"9","hint",0.0666666666666667,"discourse participation",NA
+"10","imply",0.0666666666666667,"discourse participation",NA
+"11","jest",0.0666666666666667,"pure","mode verb"
+"12","propose",0.0666666666666667,"discourse participation","discourse role verb"
+"13","reject",0.0666666666666667,"discourse participation",NA
+"14","forecast",0.0689655172413793,"pure",NA
+"15","bet",0.1,"discourse participation",NA
+"16","dispel",0.1,"discourse participation",NA
+"17","generalize",0.1,"state changing",NA
+"18","holler",0.1,"pure","mode verb"
+"19","joke",0.1,"pure","mode verb"
+"20","posit",0.1,"discourse participation","discourse role verb"
+"21","promise",0.1,"state changing","discourse role verb"
+"22","type",0.1,"pure","mode verb"
+"23","wager",0.1,"discourse participation",NA
+"24","depict",0.133333333333333,"pure",NA
+"25","implore",0.133333333333333,"state changing",NA
+"26","narrate",0.133333333333333,"pure",NA
+"27","proclaim",0.133333333333333,"discourse participation","discourse role verb"
+"28","prophesy",0.133333333333333,"pure",NA
+"29","quarrel",0.133333333333333,"discourse participation",NA
+"30","recap",0.133333333333333,"discourse participation","discourse role verb"
+"31","request",0.133333333333333,"discourse participation",NA
+"32","rule",0.133333333333333,"discourse participation","discourse role verb"
+"33","will",0.133333333333333,"pure",NA
+"34","demonstrate",0.137931034482759,"state changing",NA
+"35","challenge",0.166666666666667,"discourse participation",NA
+"36","corroborate",0.166666666666667,"discourse participation",NA
+"37","debate",0.166666666666667,"discourse participation",NA
+"38","establish",0.166666666666667,"discourse participation","discourse role verb"
+"39","express",0.166666666666667,"pure",NA
+"40","indict",0.166666666666667,"discourse participation",NA
+"41","insinuate",0.166666666666667,"discourse participation",NA
+"42","insist",0.166666666666667,"state changing","discourse role verb"
+"43","lie",0.166666666666667,"state changing","discourse role verb"
+"44","mark",0.166666666666667,"pure","discourse role verb"
+"45","post",0.166666666666667,"pure","mode verb"
+"46","reassert",0.166666666666667,"discourse participation","discourse role verb"
+"47","submit",0.166666666666667,"discourse participation",NA
+"48","tease",0.166666666666667,"discourse participation","mode verb"
