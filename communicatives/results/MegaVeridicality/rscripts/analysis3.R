@@ -36,10 +36,10 @@ cols <- c(cognitive = "coral",
           evidential = "purple")
 
 cols2 <- c(cognitive = "coral",
-           nonEmoComm = "deepskyblue2",
            emoComm = "green3",
            emotive = "darkgreen",
-           evidential = "purple")
+           evidential = "purple",
+           nonEmoComm = "deepskyblue2")
 
 predicateType2_names <- c( "cognitive" = "cognitive", 
                            "emoComm" = "communicative with\nemotive component", 
@@ -75,6 +75,8 @@ d.proj <- d.proj %>%
          commType = case_when(pure_comm == "yes" ~ "pure",
                               discourse_participation_comm == "yes" ~ "discourse participation",
                               state_changing_comm == "yes" ~ "state changing"),
+         emoCommType = case_when(emo_comm_manner == "yes" ~ "manner",
+                              emo_comm_attitude == "yes" ~ "attitude"),
          changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
                                    TRUE ~ "no"),
          environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
@@ -115,11 +117,11 @@ nrow(mean.proj.all) # 544
 # add predicateType etc. to the means
 tmp <- d.proj %>%
   select(c(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, changeOfState, volition, sayVerb, sayVerbType, modeVerbType, 
-           sayByMeansVerbType)) %>%
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)) %>%
   distinct(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, changeOfState, volition, sayVerb, sayVerbType, modeVerbType, 
-           sayByMeansVerbType)
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)
 nrow(tmp) # 544
 
 mean.proj.all <- left_join(mean.proj.all, tmp, by = c("verb_renamed")) %>%
@@ -127,36 +129,36 @@ mean.proj.all <- left_join(mean.proj.all, tmp, by = c("verb_renamed")) %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
 nrow(mean.proj.all) # 544
 
-# mean.proj.all %>%
-#   group_by(predicateType2) %>% 
-#   distinct(verb_renamed) %>% 
-#   count()
-#   predicateType2     n
-#   <chr>          <int>
+mean.proj.all %>%
+  group_by(predicateType2) %>%
+  distinct(verb_renamed) %>%
+  count()
+# predicateType2     n
+# <chr>          <int>
 # 1 cognitive         53
-# 2 comPriv            9
-# 3 emoComm           47
-# 4 emotive          148
-# 5 evidential        86
-# 6 nonEmoComm       189
-# 7 other             12
+# 2 comPriv           11
+# 3 emoComm           34
+# 4 emotive          149
+# 5 evidential        87
+# 6 nonEmoComm       185
+# 7 other             26
 
 # exclude "comPriv" and "other" predicates from analysis.
 mean.proj <- mean.proj.all %>% 
   filter(! predicateType %in% c("comPriv", "other"))
-nrow(mean.proj) # 523  
-# 
-# mean.proj %>%
-#   group_by(predicateType2) %>% 
-#   distinct(verb_renamed) %>% 
-#   count()
-#   predicateType2     n
-#   <chr>          <int>
+nrow(mean.proj) # 508  
+ 
+mean.proj %>%
+  group_by(predicateType2) %>%
+  distinct(verb_renamed) %>%
+  count()
+# predicateType2     n
+# <chr>          <int>
 # 1 cognitive         53
-# 2 emoComm           47
-# 3 emotive          148
-# 4 evidential        86
-# 5 nonEmoComm       189
+# 2 emoComm           34
+# 3 emotive          149
+# 4 evidential        87
+# 5 nonEmoComm       185
 
 # Subsets for all predicates / communicative predicates with mean acceptability
 # ratings greater than 4. See "Acceptability" below for the reasons for and the
@@ -169,7 +171,7 @@ acc.preds <- mean.proj %>%
   droplevels() %>% 
   unlist() %>% 
   as.vector()
-length(acc.preds) # 490
+length(acc.preds) # 479
 
 # acceptable communicatives
 acc.comms <- mean.proj %>%
@@ -178,25 +180,25 @@ acc.comms <- mean.proj %>%
   droplevels() %>% 
   unlist() %>% 
   as.vector()
-length(acc.comms) # 216
+length(acc.comms) # 203
 
 # by-predicate projection means for "acceptable" predicates
 mean.proj.acc <- mean.proj %>% 
   filter(Mean.Acc > 4)
-nrow(mean.proj.acc) # 490
+nrow(mean.proj.acc) # 479
 
 # by-predicate projection means for "acceptable" communicatives
 mean.proj.comm <- mean.proj.acc %>%
   filter(predicateType == "communicative")
-nrow(mean.proj.comm) # 216 (= 236 - 20)
+nrow(mean.proj.comm) # 203
 
 d.proj.acc <- d.proj %>% 
   filter(verb_renamed %in% acc.preds)
-nrow(d.proj.acc) # 14676
+nrow(d.proj.acc) # 14347
 
 d.proj.comm <- d.proj.acc %>% 
   filter(predicateType == "communicative")
-nrow(d.proj.comm) # 6471
+nrow(d.proj.comm) # 6082
 
 
 # A Acceptability ----
@@ -233,13 +235,13 @@ d.proj %>%
   summarise(count = n())
 #   acceptability count
 #           <int> <int>
-# 1             1   486
-# 2             2   958
-# 3             3  1468
-# 4             4  1595
-# 5             5  2819
-# 6             6  3100
-# 7             7  5236
+# 1             1   447
+# 2             2   896
+# 3             3  1420
+# 4             4  1543
+# 5             5  2739
+# 6             6  3013
+# 7             7  5125
 
 # distribution of ratings within each acceptability subgroup
 o <- d.proj %>% 
@@ -250,28 +252,28 @@ o <- d.proj %>%
   mutate(percentage =  n * 100 / sum(n)) %>% 
   print(n = Inf)
 #   acceptability veridicality     n percentage
-#           <int> <chr>        <int>      <dbl>
-# 1             1 maybe          339      69.8 
-# 2             1 no              59      12.1 
-# 3             1 yes             88      18.1 
-# 4             2 maybe          663      69.2 
-# 5             2 no              80       8.35
-# 6             2 yes            215      22.4 
-# 7             3 maybe          967      65.9 
-# 8             3 no             129       8.79
-# 9             3 yes            372      25.3 
-# 10             4 maybe          992      62.2 
-# 11             4 no             102       6.39
-# 12             4 yes            501      31.4 
-# 13             5 maybe         1440      51.1 
-# 14             5 no             174       6.17
-# 15             5 yes           1205      42.7 
-# 16             6 maybe         1270      41.0 
-# 17             6 no             145       4.68
-# 18             6 yes           1685      54.4 
-# 19             7 maybe         1717      32.8 
-# 20             7 no             205       3.92
-# 21             7 yes           3314      63.3 
+#          <int> <chr>        <int>      <dbl>
+# 1             1 maybe          309      69.1 
+# 2             1 no              56      12.5 
+# 3             1 yes             82      18.3 
+# 4             2 maybe          621      69.3 
+# 5             2 no              77       8.59
+# 6             2 yes            198      22.1 
+# 7             3 maybe          942      66.2 
+# 8             3 no             129       9.06
+# 9             3 yes            353      24.8 
+# 10             4 maybe          959      62.2 
+# 11             4 no             100       6.48
+# 12             4 yes            484      31.4 
+# 13             5 maybe         1404      51.1 
+# 14             5 no             173       6.30
+# 15             5 yes           1168      42.6 
+# 16             6 maybe         1241      41.1 
+# 17             6 no             143       4.73
+# 18             6 yes           1638      54.2 
+# 19             7 maybe         1691      32.9 
+# 20             7 no             205       3.99
+# 21             7 yes           3240      63.1 
 
 ### plots ----
 ggplot(o, aes(x = acceptability, y = percentage, colour = veridicality)) +
@@ -320,41 +322,37 @@ mean.proj %>%
   arrange(Mean.Acc) %>% 
   reframe(verb_renamed, Mean.Acc, Mean.Proj, predicateType2) %>% 
   print(n = Inf)
-#   verb_renamed  Mean.Acc Mean.Proj predicateType2
-#   <fct>            <dbl>     <dbl> <chr>         
+# verb_renamed  Mean.Acc Mean.Proj predicateType2
+# <fct>            <dbl>     <dbl> <chr>         
 # 1 be bet            2.55    0.0345 evidential    
-# 2 grin              2.83    0.333  emoComm       
-# 3 come out          2.97    0.367  nonEmoComm    
-# 4 okay              3.03    0.333  nonEmoComm    
-# 5 negotiate         3.1     0.2    nonEmoComm    
-# 6 elect             3.33    0.167  evidential    
-# 7 curse             3.37    0.267  emoComm       
-# 8 bark              3.38    0.276  emoComm       
-# 9 be tweeted        3.4     0.167  evidential    
-# 10 measure           3.5     0.167  evidential    
-# 11 snap              3.57    0.333  emoComm       
-# 12 stutter           3.57    0.3    nonEmoComm    
-# 13 be cheered        3.6     0.733  emotive       
-# 14 growl             3.62    0.483  emoComm       
-# 15 hush up           3.67    0.467  nonEmoComm    
-# 16 manufacture       3.67    0.0333 nonEmoComm    
-# 17 simulate          3.67    0.167  nonEmoComm    
-# 18 giggle            3.7     0.3    emoComm       
-# 19 hoot              3.7     0.4    emoComm       
-# 20 volunteer         3.7     0.267  nonEmoComm    
-# 21 be faxed          3.77    0.267  evidential    
-# 22 diagnose          3.8     0.233  evidential    
-# 23 be stimulated     3.83    0.724  emotive       
-# 24 be nonplussed     3.83    0.433  emotive       
-# 25 beam              3.83    0.3    emoComm       
-# 26 cackle            3.83    0.433  emoComm       
-# 27 categorize        3.83    0.367  evidential    
-# 28 pity              3.83    0.667  emotive       
-# 29 test              3.87    0.0667 nonEmoComm    
-# 30 vote              3.9     0.2    nonEmoComm    
-# 31 be educated       3.93    0.433  evidential    
-# 32 presuppose        4      -0.1    cognitive     
-# 33 update            4       0.367  nonEmoComm  
+# 2 okay              3.03    0.333  nonEmoComm    
+# 3 negotiate         3.1     0.2    nonEmoComm    
+# 4 elect             3.33    0.167  evidential    
+# 5 curse             3.37    0.267  emoComm       
+# 6 bark              3.38    0.276  nonEmoComm    
+# 7 be tweeted        3.4     0.167  evidential    
+# 8 measure           3.5     0.167  evidential    
+# 9 snap              3.57    0.333  emoComm       
+# 10 stutter           3.57    0.3    nonEmoComm    
+# 11 be cheered        3.6     0.733  emotive       
+# 12 growl             3.62    0.483  emoComm       
+# 13 manufacture       3.67    0.0333 nonEmoComm    
+# 14 simulate          3.67    0.167  nonEmoComm    
+# 15 giggle            3.7     0.3    emoComm       
+# 16 hoot              3.7     0.4    emoComm       
+# 17 volunteer         3.7     0.267  nonEmoComm    
+# 18 be faxed          3.77    0.267  evidential    
+# 19 diagnose          3.8     0.233  evidential    
+# 20 be stimulated     3.83    0.724  emotive       
+# 21 be nonplussed     3.83    0.433  emotive       
+# 22 cackle            3.83    0.433  emoComm       
+# 23 categorize        3.83    0.367  evidential    
+# 24 pity              3.83    0.667  emotive       
+# 25 test              3.87    0.0667 nonEmoComm    
+# 26 vote              3.9     0.2    nonEmoComm    
+# 27 be educated       3.93    0.433  evidential    
+# 28 presuppose        4      -0.1    cognitive     
+# 29 update            4       0.367  nonEmoComm  
 
 # What proportion of predicates within each type has a mean acceptability rating 
 # of less than or equal to 4?
@@ -370,13 +368,13 @@ left_join(count, count2, by = "predicateType2") %>%
   mutate(low.acc.percentage = low.acc.count * 100 / total.count)
 #   predicateType2 total.count low.acc.count low.acc.percentage
 #   <chr>                <int>         <int>              <dbl>
-# 1 cognitive               54             1               1.85
-# 2 emoComm                 47             9              19.1 
-# 3 emotive                148             4               2.70
-# 4 evidential              86             8               9.30
-# 5 nonEmoComm             188            11               5.85
+# 1 cognitive               53             1               1.89
+# 2 emoComm                 33             6              17.6 
+# 3 emotive                149             4               2.68
+# 4 evidential              87             8               9.20
+# 5 nonEmoComm             185            10               5.41
 
-# Due to their low acceptability ratings, the 33 predicates (incl. 20 communicatives)
+# Due to their low acceptability ratings, the 29 predicates (incl. 16 communicatives)
 # listed above are excluded from analysis.
 
 
@@ -451,12 +449,11 @@ mean.proj.acc %>%
   distinct(verb_renamed) %>% 
   count()
 #   predicateType2     n
-#   <chr>          <int>
-# 1 cognitive         53
-# 2 emoComm           38
-# 3 emotive          144
-# 4 evidential        78
-# 5 nonEmoComm       177
+# 1 cognitive         52
+# 2 emoComm           28
+# 3 emotive          145
+# 4 evidential        79
+# 5 nonEmoComm       175
 
 ## B.2 by predicate ----
 ### with communicatives ----
@@ -570,9 +567,9 @@ mean.proj.comm %>%
   summarize(count=n())
 #   commType                count
 #   <chr>                   <int>
-# 1 discourse participation   109
-# 2 pure                       84
-# 3 state changing             22
+# 1 discourse participation   105
+# 2 pure                       79
+# 3 state changing             19
 
 #### plots ----
 ggplot(mean.proj.comm, aes(x = verb_renamed, y = Mean.Proj, colour = commType)) +
@@ -622,19 +619,18 @@ ggplot(mean.proj.comm, aes(x = verb_renamed, y = Mean.Proj)) +
 
 slice_max(mean.proj.comm, Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
-#   verb_renamed Mean.Proj
-#   <fct>            <dbl>
 # 1 cry              0.833
-# 2 flip out         0.833
-# 3 cringe           0.8  
-# 4 celebrate        0.733
-# 5 fess up          0.733
-# 6 apologize        0.724
-# 7 whine            0.7  
-# 8 approve          0.667
-# 9 disclose         0.667
-# 10 grimace         0.667
-# 11 pout            0.667
+# 2 fess up          0.733
+# 3 apologize        0.724
+# 4 whine            0.7  
+# 5 disclose         0.667
+# 6 pout             0.667
+# 7 bitch            0.633
+# 8 document         0.633
+# 9 weep             0.633
+# 10 complain         0.6  
+# 11 explain          0.6  
+# 12 stress           0.6 
 
 slice_min(mean.proj.comm, Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
@@ -660,9 +656,9 @@ mean.proj.comm %>%
   summarize(count=n())
 #   commType                count
 #   <chr>                   <int>
-# 1 discourse participation   109
-# 2 pure                       84
-# 3 state changing             22
+# 1 discourse participation   104
+# 2 pure                       79
+# 3 state changing             19
 
 ## C.2 our subcategories ----
 ### C.2.1 "pure" communicatives ----
@@ -695,23 +691,20 @@ ggplot(mean.proj.comm, aes(x = verb_renamed, y = Mean.Proj)) +
 #### highest/lowest projection ratings ---- 
 slice_max(subset(mean.proj.comm, commType == "pure"), Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
-#   verb_renamed Mean.Proj
-#   <fct>            <dbl>
 # 1 cry              0.833
-# 2 flip out         0.833
-# 3 cringe           0.8  
-# 4 celebrate        0.733
-# 5 whine            0.7  
-# 6 grimace          0.667
-# 7 pout             0.667
-# 8 document         0.633
-# 9 weep             0.633
-# 10 publicize       0.586
+# 2 whine            0.7  
+# 3 pout             0.667
+# 4 document         0.633
+# 5 weep             0.633
+# 6 publicize        0.586
+# 7 cheer            0.533
+# 8 log              0.533
+# 9 emphasize        0.5  
+# 10 gab              0.5  
+# 11 grumble          0.5  
 
 slice_min(subset(mean.proj.comm, commType == "pure"), Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
-#   verb_renamed Mean.Proj
-#   <fct>            <dbl>
 # 1 fax             0.0667
 # 2 jest            0.0667
 # 3 forecast        0.0690
@@ -721,7 +714,9 @@ slice_min(subset(mean.proj.comm, commType == "pure"), Mean.Proj, n = 10) %>%
 # 7 depict          0.133 
 # 8 narrate         0.133 
 # 9 prophesy        0.133 
-# 10 will           0.133 
+# 10 express         0.167 
+# 11 mark            0.167 
+# 12 post            0.167 
 
 ### C.2.2 "discourse participation" communicatives ----
 #### plot ----
@@ -758,18 +753,17 @@ slice_max(subset(mean.proj.comm, commType == "discourse participation"),
 #   <fct>            <dbl>
 # 1 fess up          0.733
 # 2 apologize        0.724
-# 3 approve          0.667
-# 4 disclose         0.667
-# 5 bitch            0.633
-# 6 complain         0.6  
-# 7 explain          0.6  
-# 8 stress           0.6  
-# 9 flaunt           0.567
-# 10 fuss            0.567
-# 11 leak            0.567
-# 12 point out       0.567
-# 13 reveal          0.567
-# 14 share           0.567
+# 3 disclose         0.667
+# 4 bitch            0.633
+# 5 complain         0.6  
+# 6 explain          0.6  
+# 7 stress           0.6  
+# 8 flaunt           0.567
+# 9 fuss             0.567
+# 10 leak             0.567
+# 11 point out        0.567
+# 12 reveal           0.567
+# 13 share            0.567
 
 slice_min(subset(mean.proj.comm, commType == "discourse participation"), 
           Mean.Proj, n = 10) %>% 
@@ -797,10 +791,10 @@ mean.proj.comm %>%
 #   predicateType2 commType                sayVerbType             n
 #   <chr>          <chr>                   <chr>               <int>
 # 1 emoComm        discourse participation mode verb               4 - A
-# 2 emoComm        discourse participation NA                      3
+# 2 emoComm        discourse participation NA                      2
 # 3 nonEmoComm     discourse participation discourse role verb    46
 # 4 nonEmoComm     discourse participation mode verb               1 - B
-# 5 nonEmoComm     discourse participation NA                     55
+# 5 nonEmoComm     discourse participation NA                     51
 # 6 nonEmoComm     pure                    discourse role verb     5 - C
 # 7 nonEmoComm     state changing          discourse role verb     5 - D
 
@@ -900,16 +894,16 @@ slice_max(subset(mean.proj.comm, commType == "state changing"), Mean.Proj, n = 1
   select(verb_renamed, Mean.Proj)
 #   verb_renamed Mean.Proj
 #   <fct>            <dbl>
-# 1 conceal          0.6  
-# 2 warn             0.552
-# 3 expose           0.533
-# 4 advise           0.367
-# 5 certify          0.367
-# 6 showcase         0.333
-# 7 advertise        0.3  
-# 8 guarantee        0.267
-# 9 swear            0.233
-# 10 vow              0.233
+# 1 warn             0.552
+# 2 expose           0.533
+# 3 advise           0.367
+# 4 certify          0.367
+# 5 showcase         0.333
+# 6 advertise        0.3  
+# 7 guarantee        0.267
+# 8 swear            0.233
+# 9 vow              0.233
+# 10 prove            0.207
 
 slice_min(subset(mean.proj.comm, commType == "state changing"), Mean.Proj, n = 10) %>% 
   select(verb_renamed, Mean.Proj)
@@ -919,12 +913,12 @@ slice_min(subset(mean.proj.comm, commType == "state changing"), Mean.Proj, n = 1
 # 2 fabricate      -0.2   
 # 3 feign          -0.133 
 # 4 fake            0.0333
-# 5 generalize      0.1   
-# 6 promise         0.1   
-# 7 implore         0.133 
-# 8 demonstrate     0.138 
-# 9 insist          0.167 
-# 10 lie             0.167 
+# 5 promise         0.1   
+# 6 demonstrate     0.138 
+# 7 insist          0.167 
+# 8 lie             0.167 
+# 9 warrant         0.2   
+# 10 prove          0.207 
 
 ## C.3 say verbs (Grimshaw 2015) ----
 # distribution of communication predicates
@@ -936,7 +930,7 @@ d.proj.acc %>%
 #   predicateType sayVerb     n
 #   <chr>         <chr>   <int>
 # 1 cognitive     yes         2
-# 2 communicative no        104
+# 2 communicative no         92
 # 3 communicative yes       111
 
 d.proj.acc %>% 
@@ -947,7 +941,7 @@ d.proj.acc %>%
 # 2         pray
 # These predicates "report internal linguistic formulation only" (Grimshaw 2015: 84).
 
-# The MV dataset contains 216 communication predicates with mean acceptability 
+# The MV dataset contains 203 communication predicates with mean acceptability 
 # ratings greater than 4. It further contains two say-verbs that are not communicatives.
 # These are not included in the present analysis.
 
@@ -959,9 +953,9 @@ d.proj.comm %>%
   count()
 #   sayVerb     n
 #   <chr>   <int>
-# 1 no        104
+# 1 no         92
 # 2 yes       111
-# Of the 215 communicatives included in this investigation, 111 are say-predicates.
+# Of the 203 communicatives included in this investigation, 111 are say-predicates.
 
 #### plot ----
 mean.proj.commsay <- d.proj.comm %>%
@@ -1061,8 +1055,9 @@ ggplot(mean.proj.saytype2, aes(x = sayVerb, y = Mean.Proj, colour = sayVerbType)
   scale_colour_manual(values = c("purple","deeppink", "orange3", "grey50"))
 ggsave("../graphs/projection-by-sayverb-type2.pdf", height = 4, width = 10)
 
+
 #### linear model ----
-lm(Mean.Proj ~ fct_relevel(sayVerbType, "say"), data = mean.proj.comm) %>% 
+lm(Mean.Proj ~ fct_relevel(sayVerbType, "mode verb"), data = mean.proj.comm) %>% 
   summary()
 # sayVerbType           significance
 # discourse role verb   ***
@@ -1072,7 +1067,7 @@ lm(Mean.Proj ~ fct_relevel(sayVerbType, "say"), data = mean.proj.comm) %>%
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 #### ordinal model ----
-clmm(as.factor(veridicality_num) ~ fct_relevel(sayVerbType, "say") + 
+clmm(as.factor(veridicality_num) ~ fct_relevel(sayVerbType, "mode verb") + 
        (1 | participant) + (1 | environment), data = d.proj.comm) %>% 
   summary()
 # Coefficients:
@@ -1205,21 +1200,20 @@ mean.proj.comm %>%
 # predicateType2 commType                sayVerbType         modeVerbType          n
 # <chr>          <chr>                   <chr>               <chr>             <int>
 # 1 emoComm        discourse participation mode verb           say-with-attitude     4
-# 2 emoComm        discourse participation NA                  NA                    3
+# 2 emoComm        discourse participation NA                  NA                    2
 # 3 emoComm        pure                    mode verb           say-by-means         16
-# 4 emoComm        pure                    mode verb           say-with-attitude     7
-# 5 emoComm        pure                    NA                  NA                    7
-# 6 emoComm        state changing          NA                  NA                    1
-# 7 nonEmoComm     discourse participation discourse role verb NA                   46
-# 8 nonEmoComm     discourse participation mode verb           say-with-attitude     1
-# 9 nonEmoComm     discourse participation NA                  NA                   55
-# 10 nonEmoComm     pure                    discourse role verb NA                    5
-# 11 nonEmoComm     pure                    mode verb           say-by-means         25
-# 12 nonEmoComm     pure                    mode verb           say-with-attitude     1
-# 13 nonEmoComm     pure                    say                 NA                    1
-# 14 nonEmoComm     pure                    NA                  NA                   22
-# 15 nonEmoComm     state changing          discourse role verb NA                    5
-# 16 nonEmoComm     state changing          NA                  NA                   16
+# 4 emoComm        pure                    mode verb           say-with-attitude     3
+# 5 emoComm        pure                    NA                  NA                    2
+# 6 nonEmoComm     discourse participation discourse role verb NA                   46
+# 7 nonEmoComm     discourse participation mode verb           say-with-attitude     1
+# 8 nonEmoComm     discourse participation NA                  NA                   52
+# 9 nonEmoComm     pure                    discourse role verb NA                    5
+# 10 nonEmoComm     pure                    mode verb           say-by-means         25
+# 11 nonEmoComm     pure                    mode verb           say-with-attitude     5
+# 12 nonEmoComm     pure                    say                 NA                    1
+# 13 nonEmoComm     pure                    NA                  NA                   22
+# 14 nonEmoComm     state changing          discourse role verb NA                    5
+# 15 nonEmoComm     state changing          NA                  NA                   14
 
 #### plot ----
 mean.proj.overall <- d.proj.comm %>%
@@ -1267,9 +1261,9 @@ nrow(w) # 13915
 w2 <-  w %>%
   rename(verb = Word) %>%
   inner_join(d.proj.acc, by = "verb")
-nrow(w2) # 12041
-n_distinct(w2$verb) # 389
-n_distinct(w2$verb_renamed) # 402
+nrow(w2) # 11772
+n_distinct(w2$verb) # 380
+n_distinct(w2$verb_renamed) # 393
 
 # create predicate type, emotive component and environment columns
 w2 <-  w2 %>%
@@ -1298,10 +1292,10 @@ w3 <- w2 %>%
 mean.proj.vad <- left_join(w3, mean.proj, by = c("verb_renamed")) %>%
   distinct() %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj.vad) # 402
+nrow(mean.proj.vad) # 393
 
 # Warriner et al.' (2013) dataset contains valence, arousal and dominance ratings 
-# for 402 of the predicates in the MV dataset which belong to (only) one of our 5
+# for 393 of the predicates in the MV dataset which belong to (only) one of our 5
 # predicate types and have a mean acceptability rating greater than 4. 
 
 mean.proj.vad %>% 
@@ -1311,7 +1305,7 @@ mean.proj.vad %>%
 #   predicateType     n
 #   <chr>         <int>
 # 1 cognitive        47
-# 2 communicative   188
+# 2 communicative   178
 # 3 emotive          98
 # 4 evidential       69
 
@@ -1322,10 +1316,10 @@ mean.proj.vad %>%
 #   predicateType2     n
 #   <chr>          <int>
 # 1 cognitive         47
-# 2 emoComm           33
+# 2 emoComm           25
 # 3 emotive           98
 # 4 evidential        69
-# 5 nonEmoComm       155
+# 5 nonEmoComm       154
 
 ### X.01 rescale V + A + D ratings ----
 # Valence and dominance have extremes (unhappy - happy, controlled - controlling)
@@ -1390,16 +1384,19 @@ d.proj.vad = w2 %>%
 
 ### X.03 duplicates ----
 # predicates in both active and passive sentence frames with same predicate type
-new.scale[duplicated(new.scale[,cbind(2,14)]),] %>%
-  select(verb.x, predicateType2)
+
+# new.scale[duplicated(new.scale[,cbind(2,14)]),] %>%
+#   select(verb.x, predicateType2)
 #     verb.x predicateType2
 # 185 grieve        emotive
 # 237 marvel        emotive
 # 260  panic        emotive
 # 400  worry        emotive
-new.scale %>% 
-  filter(predicateType == "emotive") %>% 
-  nrow() # 98
+
+# new.scale %>% 
+#   filter(predicateType == "emotive") %>% 
+#   nrow() # 98
+
 # Of the 98 emotives with valence/arousal/dominance ratings, four predicates occur 
 # in both sentence frames in the MV data set. Beloew, the "active" and "passive 
 # voice" versions of these predicates are assigned the same valence/arousal/dominance 
@@ -1443,7 +1440,7 @@ ggsave("../graphs/valence-by-predicate2.pdf", height = 4, width = 13)
 ##### X.1.2.1 overall ----
 ###### plots ----
 # calculate valence by predicateType means
-mean.valence = new.scale %>%
+mean.valence <- new.scale %>%
   group_by(predicateType) %>%
   summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
             CIHigh = ci.high(V.Mean.Sum2)) %>%
@@ -1463,7 +1460,7 @@ ggplot(mean.valence, aes(x = predicateType, y = Mean.Valence, colour = predicate
 ggsave("../graphs/valence-by-predicateType.pdf", height = 8, width = 10)
 
 # calculate valence by predicateType2 means (communicatives with/without emotive component)
-mean.valence2 = new.scale %>%
+mean.valence2 <- new.scale %>%
   group_by(predicateType2) %>%
   summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
             CIHigh = ci.high(V.Mean.Sum2)) %>%
@@ -1484,20 +1481,20 @@ ggplot(mean.valence2, aes(x = predicateType2, y = Mean.Valence, colour = predica
 ggsave("../graphs/valence-by-predicateType2.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emotive"), new.scale) %>% 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # Coefficients:
 #                                                  Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                       0.44199    0.01719  25.708  < 2e-16 ***
-# fct_relevel(predicateType2, "emotive")cognitive  -0.12843    0.03020  -4.253 2.63e-05 ***
-# fct_relevel(predicateType2, "emotive")emoComm    -0.08343    0.03425  -2.436   0.0153 *  
-# fct_relevel(predicateType2, "emotive")evidential -0.22471    0.02675  -8.401 7.94e-16 ***
-# fct_relevel(predicateType2, "emotive")nonEmoComm -0.23896    0.02196 -10.879  < 2e-16 ***
+# (Intercept)                                       0.35654    0.03333  10.697  < 2e-16 ***
+# fct_relevel(predicateType2, "emoComm")cognitive  -0.04297    0.04154  -1.035 0.301514    
+# fct_relevel(predicateType2, "emoComm")emotive     0.08545    0.03749   2.279 0.023198 *  
+# fct_relevel(predicateType2, "emoComm")evidential -0.13926    0.03911  -3.561 0.000416 ***
+# fct_relevel(predicateType2, "emoComm")nonEmoComm -0.15133    0.03605  -4.198 3.35e-05 ***
 
 ##### X.1.2.2 with direction of valence ----
 ###### plot ----
 # calculate valence by predicateType2 means and direction of valence
-mean.valence3 = new.scale %>%
+mean.valence3 <- new.scale %>%
   group_by(predicateType2, V.Mean.Sum2.direction) %>%
   summarize(Mean.Valence = mean(V.Mean.Sum2), CILow = ci.low(V.Mean.Sum2), 
             CIHigh = ci.high(V.Mean.Sum2)) %>%
@@ -1523,7 +1520,7 @@ ggplot(mean.valence3, aes(x = predicateType2, y = Mean.Valence,
 ggsave("../graphs/valence-by-predicateType-and-direction.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "evidential") * V.Mean.Sum2.direction, 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm") * V.Mean.Sum2.direction, 
    new.scale) %>% 
   summary()
 # Significant at the 0.001 level for all predicate types.
@@ -1566,7 +1563,7 @@ ggsave("../graphs/arousal-by-predicate2.pdf", height = 4, width = 13)
 ##### X.2.2.1 overall ----
 ###### plots ----
 # calculate arousal by predicateType means
-mean.arousal = new.scale %>%
+mean.arousal <- new.scale %>%
   group_by(predicateType) %>%
   summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), 
             CIHigh = ci.high(A.Mean.Sum2)) %>%
@@ -1586,7 +1583,7 @@ ggplot(mean.arousal, aes(x = predicateType, y = Mean.Arousal, colour = predicate
 ggsave("../graphs/arousal-by-predicateType.pdf", height = 8, width = 10)
 
 # calculate arousal by predicateType2 means (communicatives with/without emotive component)
-mean.arousal2 = new.scale %>%
+mean.arousal2 <- new.scale %>%
   group_by(predicateType2) %>%
   summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), 
             CIHigh = ci.high(A.Mean.Sum2)) %>%
@@ -1607,7 +1604,7 @@ ggplot(mean.arousal2, aes(x = predicateType2, y = Mean.Arousal, colour = predica
 ggsave("../graphs/arousal-by-predicateType2.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), new.scale) %>% 
+lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance
 # cognitive       ***
@@ -1619,7 +1616,7 @@ lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), new.scale) %>%
 ##### X.2.2.2 with direction of valence ----
 ###### plot ----
 # calculate arousal by predicateType2 means and direction of valence
-mean.arousal3 = new.scale %>%
+mean.arousal3 <- new.scale %>%
   group_by(predicateType2, V.Mean.Sum2.direction) %>%
   summarize(Mean.Arousal = mean(A.Mean.Sum2), CILow = ci.low(A.Mean.Sum2), 
             CIHigh = ci.high(A.Mean.Sum2)) %>%
@@ -1645,7 +1642,7 @@ ggplot(mean.arousal3, aes(x = predicateType2, y = Mean.Arousal,
 ggsave("../graphs/arousal-by-predicateType-and-direction-of-valence.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "evidential") * V.Mean.Sum2.direction, 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm") * V.Mean.Sum2.direction, 
    new.scale) %>% 
   summary()
 
@@ -1697,19 +1694,18 @@ lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>%
   summary()
 # Coefficients:
 #                                                  Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                       0.19053    0.02489   7.656 1.47e-13 ***
-# fct_relevel(predicateType2, "emoComm")cognitive   0.06110    0.03261   1.873   0.0617 .  
-# fct_relevel(predicateType2, "emoComm")emotive     0.05365    0.02877   1.865   0.0630 .  
-# fct_relevel(predicateType2, "emoComm")evidential  0.07610    0.03026   2.515   0.0123 *  
-# fct_relevel(predicateType2, "emoComm")nonEmoComm  0.02110    0.02739   0.770   0.4415  
+# (Intercept)                                       0.19404    0.02789   6.958 1.48e-11 ***
+# fct_relevel(predicateType2, "emoComm")cognitive   0.06080    0.03476   1.749   0.0810 .  
+# fct_relevel(predicateType2, "emoComm")emotive     0.05015    0.03137   1.598   0.1107    
+# fct_relevel(predicateType2, "emoComm")evidential  0.07259    0.03272   2.218   0.0271 *  
+# fct_relevel(predicateType2, "emoComm")nonEmoComm  0.01305    0.03016   0.433   0.6655  
 
-# For all five predicate types there is a correlation with dominance ratings at the
-# 0.001 significance level.
+
 
 ##### X.3.2.2 with direction of valence ----
 ###### plot ----
 # calculate dominance by predicateType2 means and direction of valence
-mean.dominance2 = new.scale %>%
+mean.dominance2 <- new.scale %>%
   group_by(predicateType2, V.Mean.Sum2.direction) %>%
   summarize(Mean.Dominance = mean(D.Mean.Sum2), CILow = ci.low(D.Mean.Sum2), 
             CIHigh = ci.high(D.Mean.Sum2)) %>%
@@ -1734,7 +1730,7 @@ ggplot(mean.dominance2, aes(x = predicateType2, y = Mean.Dominance,
 ggsave("../graphs/Dominance-by-predicateType-and-direction-of-valence.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "cognitive") * V.Mean.Sum2.direction, 
+lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm") * V.Mean.Sum2.direction, 
    new.scale) %>% 
   summary()
 # Significant at the 0.001 level for all predicate types.
@@ -1767,7 +1763,7 @@ ggplot(mean.dominance3, aes(x = predicateType2, y = Mean.Dominance,
 ggsave("../graphs/Dominance-by-predicateType-and-direction-of-dominance.pdf", height = 8, width = 10)
 
 ###### linear model ----
-lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "cognitive") * D.Mean.Sum2.direction, 
+lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm") * D.Mean.Sum2.direction, 
    new.scale) %>% 
   summary()
 # Significant at the 0.001 level for all predicate types.
@@ -1777,17 +1773,18 @@ new.scale %>%
   filter(D.Mean.Sum2.direction == "positive") %>% 
   slice_max(D.Mean.Sum2, n = 10) %>% 
   select(verb_renamed, D.Mean.Sum2, predicateType2)
-#    verb_renamed D.Mean.Sum2 predicateType2
-# 1  be delighted      0.5725        emotive
-# 2         enjoy      0.5700        emotive
-# 3       approve      0.5650     nonEmoComm
-# 4  be comforted      0.5450        emotive
-# 5      research      0.5400     evidential
-# 6        detail      0.5350     nonEmoComm
-# 7     recognize      0.5275     evidential
-# 8     determine      0.5225     evidential
-# 9        signal      0.5125     nonEmoComm
-# 10 be signalled      0.5125     evidential
+# 1      be delighted      0.5725        emotive
+# 2             enjoy      0.5700        emotive
+# 3      be comforted      0.5450        emotive
+# 4          research      0.5400     evidential
+# 5            detail      0.5350     nonEmoComm
+# 6         recognize      0.5275     evidential
+# 7         determine      0.5225     evidential
+# 8            signal      0.5125     nonEmoComm
+# 9      be signalled      0.5125     evidential
+# 10       appreciate      0.5000      cognitive
+# 11 be congratulated      0.5000     evidential
+# 12            learn      0.5000     evidential
 
 new.scale %>% 
   filter(D.Mean.Sum2.direction == "positive") %>% 
@@ -1797,10 +1794,10 @@ new.scale %>%
 #   predicateType2     n
 #   <chr>          <int>
 # 1 cognitive         37
-# 2 emoComm           19
+# 2 emoComm           12
 # 3 emotive           44
 # 4 evidential        57
-# 5 nonEmoComm       112
+# 5 nonEmoComm       113
 
 new.scale %>% 
   filter(D.Mean.Sum2.direction == "negative") %>% 
@@ -1816,8 +1813,8 @@ new.scale %>%
 # 7      be fooled      0.5150
 # 8          doubt      0.4850
 # 9           envy      0.4600
-# 10         worry      0.4575
-# 11    be worried      0.4575
+# 10    be worried      0.4575
+# 11         worry      0.4575
 
 new.scale %>% 
   filter(D.Mean.Sum2.direction == "negative") %>% 
@@ -1827,10 +1824,10 @@ new.scale %>%
 #   predicateType2     n
 #   <chr>          <int>
 # 1 cognitive         10
-# 2 emoComm           14
+# 2 emoComm           13
 # 3 emotive           54
 # 4 evidential        12
-# 5 nonEmoComm        43
+# 5 nonEmoComm        41
 
 
 ### X.4 valence + arousal + dominance distributions and correlations ----
@@ -2033,6 +2030,40 @@ new.scale %>%
                     labels = predicateType2_names)
 ggsave("../graphs/valence-arousal-dominance-by-predicateType2.pdf", height = 6, width = 10)
 
+ggplot() +
+  geom_point(data = mean.valence2, 
+             aes(x = factor(predicateType2, levels = c("cognitive", "emoComm", "emotive", "evidential", "nonEmoComm")), y = Mean.Valence, colour = "valence"), 
+             position = position_nudge(x = - 0.1)) +
+  geom_errorbar(data = mean.valence2, 
+                aes(x = predicateType2, y = Mean.Valence, ymin = YMin.Valence, 
+                    ymax = YMax.Valence,colour = "valence"), 
+                width = 0, position = position_nudge(x = -0.1)) +
+  geom_point(data = mean.arousal2, 
+             aes(x = predicateType2, y = Mean.Arousal,colour = "arousal")) +
+  geom_errorbar(data = mean.arousal2, 
+                aes(x = predicateType2, y = Mean.Arousal, ymin = YMin.Arousal, 
+                    ymax = YMax.Arousal, colour = "arousal"), 
+                width = 0) +
+  geom_point(data = mean.dominance, 
+             aes(x = predicateType2, y = Mean.Dominance, colour = "dominance"),
+             position = position_nudge(x = 0.1)) +
+  geom_errorbar(data = mean.dominance, 
+                aes(x = predicateType2, y = Mean.Dominance, ymin = YMin.Dominance, 
+                    ymax = YMax.Dominance, colour = "dominance"), 
+                width = 0, position = position_nudge(x = 0.1)) +
+  theme(legend.position = "top",
+        legend.title = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_text(colour = cols2, face = "bold"),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean valence / arousal / dominance rating") +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(limits = c("valence", "arousal", "dominance"),
+                      values = c("blue3", "red3", "grey30"))
+ggsave("../graphs/valence-arousal-dominance-by-predicateType2-2.pdf", height = 6, width = 10)
+
+
 # distribution of valence, arousal and dominance ratings by communicative predicates
 new.scale %>% 
   filter(predicateType == "communicative") %>% 
@@ -2145,33 +2176,33 @@ lm(V.Mean.Sum2 ~ A.Mean.Sum2, new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.01340    0.03293   0.407    0.684    
-# A.Mean.Sum2  0.66792    0.07665   8.714   <2e-16 ***
+# (Intercept)  0.01596    0.03327   0.480    0.632    
+# A.Mean.Sum2  0.66335    0.07764   8.544 2.94e-16 ***
 
-lm(V.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "cognitive"), new.scale) %>% 
+lm(V.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of A.Mean.Sum2
-# cognitive       n.s.
-# emoComm         *
-# emotive         **
-# evidential      *
-# nonEmoComm      **
+# cognitive       
+# emoComm         n.s.
+# emotive         
+# evidential      
+# nonEmoComm      
 
 lm(A.Mean.Sum2 ~ V.Mean.Sum2, new.scale) %>% 
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept) 0.344125   0.009586  35.901   <2e-16 ***
-# V.Mean.Sum2 0.238867   0.027412   8.714   <2e-16 ***
+# (Intercept) 0.343505   0.009699  35.417  < 2e-16 ***
+# V.Mean.Sum2 0.237155   0.027758   8.544 2.94e-16 ***
 
-lm(A.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), new.scale) %>% 
+lm(A.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of V.Mean.Sum2
-# cognitive       n.s.
-# emoComm         *
-# emotive         **
-# evidential      *
-# nonEmoComm      **
+# cognitive       
+# emoComm         n.s.
+# emotive         
+# evidential      
+# nonEmoComm      
 
 
 ##### X.4.3.2 valence + dominance ----
@@ -2239,33 +2270,33 @@ lm(V.Mean.Sum2 ~ D.Mean.Sum2, new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.18431    0.01753  10.517  < 2e-16 ***
-# D.Mean.Sum2  0.45334    0.06420   7.062 7.33e-12 ***
+# (Intercept)  0.18530    0.01775  10.437  < 2e-16 ***
+# D.Mean.Sum2  0.44915    0.06515   6.894 2.18e-11 ***
 
-lm(V.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "cognitive"), new.scale) %>% 
+lm(V.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of D.Mean.Sum2
-# cognitive       ***
-# emoComm         *
-# emotive         ***
-# evidential      .
-# nonEmoComm      *
+# cognitive       
+# emoComm         .
+# emotive         
+# evidential      
+# nonEmoComm      
 
 lm(D.Mean.Sum2 ~ V.Mean.Sum2, new.scale) %>% 
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.16109    0.01211  13.304  < 2e-16 ***
-# V.Mean.Sum2  0.24451    0.03463   7.062 7.33e-12 ***
+# (Intercept)  0.16182    0.01223  13.231  < 2e-16 ***
+# V.Mean.Sum2  0.24132    0.03500   6.894 2.18e-11 ***
 
-lm(D.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "cognitive"), new.scale) %>% 
+lm(D.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of V.Mean.Sum2
-# cognitive       ***
+# cognitive       
 # emoComm         .
-# emotive         ***
-# evidential      *
-# nonEmoComm      **
+# emotive         
+# evidential      
+# nonEmoComm      
 
 
 ##### X.4.3.3 arousal + dominance ----
@@ -2333,41 +2364,41 @@ lm(A.Mean.Sum2 ~ D.Mean.Sum2, new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.40525    0.01110  36.493   <2e-16 ***
-# D.Mean.Sum2  0.03452    0.04068   0.849    0.397 
+# (Intercept)  0.40503    0.01123  36.052   <2e-16 ***
+# D.Mean.Sum2  0.03065    0.04122   0.743    0.458 
 
-lm(A.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "evidential"), new.scale) %>% 
+lm(A.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of D.Mean.Sum2
-# cognitive       n.s.
-# emoComm         *
-# emotive         n.s.
-# evidential      n.s.
-# nonEmoComm      n.s. 
+# cognitive       
+# emoComm         n.s.
+# emotive         
+# evidential      
+# nonEmoComm      
 
 lm(D.Mean.Sum2 ~ A.Mean.Sum2, new.scale) %>% 
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.21034    0.02636   7.981 1.55e-14 ***
-# A.Mean.Sum2  0.05206    0.06135   0.849    0.397 
+# (Intercept)  0.21266    0.02654   8.012 1.31e-14 ***
+# A.Mean.Sum2  0.04606    0.06195   0.743    0.458 
 
-lm(D.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emotive"), new.scale) %>% 
+lm(D.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of A.Mean.Sum2
-# cognitive       n.s.
-# emoComm         *
-# emotive         n.s.
-# evidential      n.s.
-# nonEmoComm      n.s. 
+# cognitive       
+# emoComm         n.s.
+# emotive         
+# evidential      
+# nonEmoComm      
 
 ##### X.4.3.4 direction of valence + direction of dominance ----
 ###### tables ----
 contingency_table <- table(new.scale$D.Mean.Sum2.direction, new.scale$V.Mean.Sum2.direction)
 print(contingency_table)
 #          negative positive
-# negative      114       19
-# positive       63      206
+# negative      111       19
+# positive       61      202
 
 # Chi-square test
 chisq.test(contingency_table) %>% 
@@ -2375,9 +2406,9 @@ chisq.test(contingency_table) %>%
 # Pearson's Chi-squared test with Yates' continuity correction
 # 
 # data:  contingency_table
-# X-squared = 137.63, df = 1, p-value < 2.2e-16
+# X-squared = 134.2, df = 1, p-value < 2.2e-16
 
-# The direction of dominance and valence seem highly correlated.
+# The directions of dominance and valence seem highly correlated.
 
 # distribution of direction within predicate types
 new.scale %>% 
@@ -2385,28 +2416,28 @@ new.scale %>%
 #    predicateType2 D.Mean.Sum2.direction   n
 # 1       cognitive              negative  10 21% of cognitives
 # 2       cognitive              positive  37
-# 3         emoComm              negative  14 42% of emoComms
-# 4         emoComm              positive  19
+# 3         emoComm              negative  13 52% of emoComms
+# 4         emoComm              positive  12
 # 5         emotive              negative  54 55% of emotives
 # 6         emotive              positive  44
 # 7      evidential              negative  12 17% of evidentials
 # 8      evidential              positive  57
-# 9      nonEmoComm              negative  43 28% of nonEmoComms
+# 9      nonEmoComm              negative  41 27% of nonEmoComms
 # 10     nonEmoComm              positive 112
 
 new.scale %>% 
   count(predicateType2, V.Mean.Sum2.direction)
 #    predicateType2 V.Mean.Sum2.direction  n
 # 1       cognitive              negative 14 30% of cognitives
-# 2       cognitive              positive 32
-# 3         emoComm              negative 25 76 % of emoComms
-# 4         emoComm              positive  8
+# 2       cognitive              positive 33
+# 3         emoComm              negative 21 84% of emoComms
+# 4         emoComm              positive  4
 # 5         emotive              negative 63 64% of emotives
 # 6         emotive              positive 35
 # 7      evidential              negative 16 23% of evidentials
 # 8      evidential              positive 53
-# 9      nonEmoComm              negative 59 38% of nonEmoComms
-# 10     nonEmoComm              positive 97
+# 9      nonEmoComm              negative 58 38% of nonEmoComms
+# 10     nonEmoComm              positive 96
 
 # The proportion of negative compared to posiitve valence predicates is higher than
 # the proportion of negative vs positive dominance predicates in all predicate
@@ -2415,32 +2446,32 @@ new.scale %>%
 
 #### X.4.4 predicate types predicting VAD ratings ----
 ##### linear models ----
-lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), new.scale) %>% 
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of V.Mean.Sum2
-# cognitive       ***
+# cognitive       
 # emoComm         ***
-# emotive         ***
-# evidential      ***
-# nonEmoComm      ***
+# emotive         
+# evidential      
+# nonEmoComm      
 
-lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "cognitive"), new.scale) %>% 
+lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of A.Mean.Sum2
-# cognitive       ***
+# cognitive       
 # emoComm         ***
-# emotive         ***
-# evidential      ***
-# nonEmoComm      ***
+# emotive         
+# evidential      
+# nonEmoComm      
 
-lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), new.scale) %>% 
+lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "emoComm"), new.scale) %>% 
   summary()
 # predicateType2  significance of D.Mean.Sum2
-# cognitive       ***
+# cognitive       
 # emoComm         ***
-# emotive         ***
-# evidential      ***
-# nonEmoComm      *** 
+# emotive         
+# evidential      
+# nonEmoComm       
 
 # All predicate types seem to be highly correlated with VAD ratings.
 
@@ -2525,25 +2556,13 @@ lm(Mean.Proj ~ V.Mean.Sum2, data = new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.26617    0.02329  11.430  < 2e-16 ***
-# V.Mean.Sum2  0.46447    0.06659   6.975 1.28e-11 ***
+# (Intercept)  0.26839    0.02368  11.334  < 2e-16 ***
+# V.Mean.Sum2  0.45288    0.06777   6.683 8.11e-11 ***
 
 lm(Mean.Proj ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), data = new.scale) %>% 
   summary()
-# Coefficients:
-#                                                              Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                                   0.30707    0.07628   4.025 6.83e-05 ***
-# V.Mean.Sum2                                                   0.33922    0.18944   1.791   0.0741 .  
-# fct_relevel(predicateType2, "emoComm")cognitive              -0.08963    0.09599  -0.934   0.3510    
-# fct_relevel(predicateType2, "emoComm")emotive                 0.41805    0.09081   4.603 5.62e-06 ***
-# fct_relevel(predicateType2, "emoComm")evidential              0.02848    0.08839   0.322   0.7474    
-# fct_relevel(predicateType2, "emoComm")nonEmoComm             -0.02911    0.08079  -0.360   0.7188    
-# V.Mean.Sum2:fct_relevel(predicateType2, "emoComm")cognitive  -0.33153    0.24660  -1.344   0.1796    
-# V.Mean.Sum2:fct_relevel(predicateType2, "emoComm")emotive    -0.32522    0.21503  -1.512   0.1312    
-# V.Mean.Sum2:fct_relevel(predicateType2, "emoComm")evidential -0.52484    0.25670  -2.045   0.0416 *  
-# V.Mean.Sum2:fct_relevel(predicateType2, "emoComm")nonEmoComm -0.29548    0.21673  -1.363   0.1735     
-
-# not significant for any of the other predicate types.
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         .
 
 ###### ordinal models ----
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + (1 | environment),
@@ -2551,10 +2570,10 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + (1 | enviro
   summary()
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2   1.9787     0.1022   19.35   <2e-16 ***
+# V.Mean.Sum2   1.9201     0.1034   18.57   <2e-16 ***
 
 # with predicate type
-clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm") + 
+clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType 2   significance of V.Mean.Sum2
@@ -2573,16 +2592,16 @@ cbind(new.scale, residual) %>%
   slice_head(n = 10) %>% 
   select(verb_renamed, predicateType2, residual)
 #      verb_renamed predicateType2   residual
-# 136         dream      cognitive -0.7483372
-# 169     be fooled     evidential -0.7000484
-# 91       daydream      cognitive -0.6824912
-# 274       pretend     nonEmoComm -0.6769648
-# 239     be misled     evidential -0.6751837
-# 373    be tricked     evidential -0.6456133
-# 42    be bothered        emotive  0.6354675
-# 30  be astonished        emotive  0.6032954
-# 158     fantasize      cognitive -0.5984070
-# 201       imagine      cognitive -0.5905959
+# 130         dream      cognitive -0.7435833
+# 163     be fooled     evidential -0.6981746
+# 85       daydream      cognitive -0.6785519
+# 267       pretend     nonEmoComm -0.6781747
+# 232     be misled     evidential -0.6722626
+# 366    be tricked     evidential -0.6476087
+# 39    be bothered        emotive  0.6347813
+# 29  be astonished        emotive  0.6025800
+# 152     fantasize      cognitive -0.5949041
+# 195       imagine      cognitive -0.5865111
 
 # predicates grouped by predicate type
 cbind(new.scale, residual) %>% 
@@ -2593,56 +2612,56 @@ cbind(new.scale, residual) %>%
   print(n = 50)
 #   verb_renamed  predicateType2 residual
 #   <fct>         <chr>             <dbl>
-# 1 dream         cognitive        -0.748
-# 2 daydream      cognitive        -0.682
-# 3 fantasize     cognitive        -0.598
-# 4 imagine       cognitive        -0.591
-# 5 be deluded    cognitive        -0.560
-# 6 picture       cognitive        -0.534
-# 7 believe       cognitive        -0.504
-# 8 think         cognitive        -0.495
-# 9 hope          cognitive        -0.487
-# 10 trust         cognitive        -0.460
-# 11 joke          emoComm          -0.501
-# 12 quarrel       emoComm          -0.384
-# 13 cry           emoComm           0.360
-# 14 jest          emoComm          -0.339
-# 15 cringe        emoComm           0.329
-# 16 flaunt        emoComm           0.230
-# 17 bicker        emoComm          -0.220
-# 18 pout          emoComm           0.207
-# 19 implore       emoComm          -0.194
-# 20 grunt         emoComm          -0.186
+# 1 dream         cognitive        -0.744
+# 2 daydream      cognitive        -0.679
+# 3 fantasize     cognitive        -0.595
+# 4 imagine       cognitive        -0.587
+# 5 be deluded    cognitive        -0.558
+# 6 picture       cognitive        -0.531
+# 7 believe       cognitive        -0.501
+# 8 think         cognitive        -0.492
+# 9 hope          cognitive        -0.483
+# 10 trust         cognitive        -0.455
+# 11 quarrel       emoComm          -0.380
+# 12 cry           emoComm           0.363
+# 13 scream        emoComm          -0.293
+# 14 flaunt        emoComm           0.229
+# 15 pout          emoComm           0.209
+# 16 implore       emoComm          -0.195
+# 17 whine         emoComm           0.185
+# 18 grunt         emoComm          -0.185
+# 19 weep          emoComm           0.125
+# 20 complain      emoComm           0.116
 # 21 be bothered   emotive           0.635
 # 22 be astonished emotive           0.603
-# 23 be floored    emotive           0.584
-# 24 be startled   emotive           0.560
-# 25 be offended   emotive           0.502
-# 26 resent        emotive           0.501
-# 27 be astounded  emotive           0.483
-# 28 be stunned    emotive           0.482
+# 23 be floored    emotive           0.582
+# 24 be startled   emotive           0.559
+# 25 be offended   emotive           0.505
+# 26 resent        emotive           0.503
+# 27 be astounded  emotive           0.484
+# 28 be stunned    emotive           0.481
 # 29 be jarred     emotive           0.479
-# 30 be shocked    emotive           0.473
-# 31 be fooled     evidential       -0.700
-# 32 be misled     evidential       -0.675
-# 33 be tricked    evidential       -0.646
-# 34 be promised   evidential       -0.557
-# 35 be warned     evidential        0.489
-# 36 be duped      evidential       -0.449
-# 37 realize       evidential        0.433
-# 38 spot          evidential        0.420
-# 39 be informed   evidential        0.413
-# 40 check         evidential       -0.413
-# 41 pretend       nonEmoComm       -0.677
-# 42 fake          nonEmoComm       -0.509
+# 30 be disgusted  emotive           0.475
+# 31 be fooled     evidential       -0.698
+# 32 be misled     evidential       -0.672
+# 33 be tricked    evidential       -0.648
+# 34 be promised   evidential       -0.554
+# 35 be warned     evidential        0.487
+# 36 be duped      evidential       -0.448
+# 37 realize       evidential        0.435
+# 38 spot          evidential        0.418
+# 39 be informed   evidential        0.411
+# 40 check         evidential       -0.411
+# 41 pretend       nonEmoComm       -0.678
+# 42 fake          nonEmoComm       -0.505
 # 43 suggest       nonEmoComm       -0.497
-# 44 feign         nonEmoComm       -0.463
-# 45 apologize     nonEmoComm        0.451
-# 46 reject        nonEmoComm       -0.438
-# 47 lie           nonEmoComm       -0.403
-# 48 claim         nonEmoComm       -0.384
-# 49 promise       nonEmoComm       -0.357
-# 50 sing          nonEmoComm       -0.350
+# 44 joke          nonEmoComm       -0.495
+# 45 feign         nonEmoComm       -0.464
+# 46 apologize     nonEmoComm        0.449
+# 47 reject        nonEmoComm       -0.434
+# 48 lie           nonEmoComm       -0.397
+# 49 claim         nonEmoComm       -0.385
+# 50 promise       nonEmoComm       -0.354
 
 
 
@@ -2699,17 +2718,17 @@ lm(Mean.Proj ~ V.Mean.Sum2.direction, data = new.scale) %>%
   summary()
 # Coefficients:
 #                               Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                    0.45041    0.02059  21.874  < 2e-16 ***
-# V.Mean.Sum2.directionpositive -0.08899    0.02752  -3.233  0.00133 ** 
+# (Intercept)                    0.45237    0.02094  21.603  < 2e-16 ***
+# V.Mean.Sum2.directionpositive -0.09372    0.02786  -3.364 0.000844 ***
 
 lm(Mean.Proj ~ V.Mean.Sum2 * V.Mean.Sum2.direction, data = new.scale) %>% 
   summary()
 # Coefficients:
 #                                           Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                0.28464    0.03523   8.080 7.85e-15 ***
-# V.Mean.Sum2                                0.52054    0.09202   5.657 2.96e-08 ***
-# V.Mean.Sum2.directionpositive             -0.01820    0.04699  -0.387    0.699    
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive -0.16426    0.13356  -1.230    0.219  
+# (Intercept)                                0.28841    0.03608   7.994 1.50e-14 ***
+# V.Mean.Sum2                                0.50945    0.09338   5.456 8.69e-08 ***
+# V.Mean.Sum2.directionpositive             -0.01832    0.04790  -0.382    0.702    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive -0.17444    0.13615  -1.281    0.201  
 
 ###### ordinal models ----
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) + 
@@ -2717,48 +2736,49 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) +
   summary()
 # Coefficients:
 #                               Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2.directionpositive -0.39482    0.03895  -10.14   <2e-16 ***
+# V.Mean.Sum2.directionpositive  -0.4139     0.0395  -10.48   <2e-16 ***
 
 # with predicate type
-clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * fct_relevel(predicateType2, "emotive") + 
+clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * fct_relevel(predicateType2, "emoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # Coefficients:
-#                                                                            Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2.directionpositive                                                   0.26072    0.10004   2.606 0.009158 ** 
-# fct_relevel(predicateType2, "emotive")cognitive                                -1.93073    0.12058 -16.012  < 2e-16 ***
-# fct_relevel(predicateType2, "emotive")emoComm                                  -1.25391    0.09827 -12.760  < 2e-16 ***
-# fct_relevel(predicateType2, "emotive")evidential                               -2.33737    0.11853 -19.719  < 2e-16 ***
-# fct_relevel(predicateType2, "emotive")nonEmoComm                               -1.91601    0.07816 -24.513  < 2e-16 ***
-# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")cognitive  -0.70222    0.16042  -4.377  1.2e-05 ***
-# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")emoComm    -0.66522    0.18809  -3.537 0.000405 ***
-# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")evidential  0.29768    0.15257   1.951 0.051035 .  
-# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emotive")nonEmoComm -0.24621    0.11855  -2.077 0.037816 *  
+#                                                                                Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2.directionpositive                                                   -0.3351     0.1952  -1.716  0.08608 .  
+# fct_relevel(predicateType2, "emoComm")cognitive                                 -0.7112     0.1360  -5.231 1.69e-07 ***
+# fct_relevel(predicateType2, "emoComm")emotive                                    1.2228     0.1045  11.699  < 2e-16 ***
+# fct_relevel(predicateType2, "emoComm")evidential                                -1.1234     0.1339  -8.388  < 2e-16 ***
+# fct_relevel(predicateType2, "emoComm")nonEmoComm                                -0.7058     0.1011  -6.979 2.97e-12 ***
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emoComm")cognitive   -0.1074     0.2316  -0.464  0.64275    
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emoComm")emotive      0.5942     0.2198   2.704  0.00685 ** 
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emoComm")evidential   0.8984     0.2269   3.960 7.50e-05 ***
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "emoComm")nonEmoComm   0.3391     0.2058   1.648  0.09933 . 
+
 
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * V.Mean.Sum2.direction + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # Coefficients:
-#                                            stimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2                                2.28242    0.14449  15.796  < 2e-16 ***
-# V.Mean.Sum2.directionpositive             -0.07741    0.06979  -1.109    0.267    
-# V.Mean.Sum2:V.Mean.Sum2.directionpositive -0.80908    0.20361  -3.974 7.08e-05 ***
+#                                           Estimate Std. Error z value Pr(>|z|)    
+# V.Mean.Sum2                                2.21967    0.14589  15.214  < 2e-16 ***
+# V.Mean.Sum2.directionpositive             -0.08036    0.07090  -1.133    0.257    
+# V.Mean.Sum2:V.Mean.Sum2.directionpositive -0.83993    0.20657  -4.066 4.78e-05 ***
 
 # with predicate type
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(V.Mean.Sum2.direction, "positive") * 
-       fct_relevel(predicateType2, "cognitive") +  (1 | participant) + (1 | environment), 
+       fct_relevel(predicateType2, "emoComm") +  (1 | participant) + (1 | environment), 
      data = d.proj.vad) %>% 
   summary()
 # predicateType2  direction significance of V.Mean.Sum2
-# cognitive       negative  .
+# cognitive       negative  n.s.
 # emoComm         negative  ***
-# emotive         negative  n.s.
-# evidential      negative  n.s.
+# emotive         negative  
+# evidential      negative  
 # nonEmoComm      negative  n.s.
-# cognitive       positive  n.s.
-# emoComm         positive  .
-# emotive         positive  *
-# evidential      positive  .
+# cognitive       positive  
+# emoComm         positive  *
+# emotive         positive  
+# evidential      positive  
 # nonEmoComm      positive  n.s.
 
 ##### X.5.1.3 communicative type ----
@@ -2927,10 +2947,10 @@ lm(Mean.Proj ~ A.Mean.Sum2, data = new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.13526    0.04875   2.774  0.00579 ** 
-# A.Mean.Sum2  0.64208    0.11348   5.658 2.92e-08 ***
+# (Intercept)  0.13827    0.04939   2.800  0.00537 ** 
+# A.Mean.Sum2  0.63369    0.11527   5.497 6.97e-08 ***
 
-lm(Mean.Proj ~ A.Mean.Sum2 * fct_relevel(predicateType2, "evidential"), data = new.scale) %>% 
+lm(Mean.Proj ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), data = new.scale) %>% 
   summary()
 # predicateType2	significance of A.Mean.Sum2
 # cognitive       n.s.
@@ -2945,17 +2965,17 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | enviro
   summary()
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2   2.5850     0.1685   15.34   <2e-16 ***
+# A.Mean.Sum2   2.5660     0.1708   15.03   <2e-16 ***
 
-clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "evidential") + 
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType2	significance of A.Mean.Sum2
-# cognitive       *
-# emoComm         * 
+# cognitive       .
+# emoComm         n.s. 
 # emotive         n.s.   
 # evidential      n.s.
-# nonEmoComm      n.s.
+# nonEmoComm      .
 
 
 ##### X.5.2.2 with direction of valence ----
@@ -3011,69 +3031,69 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2.direction +
   summary()
 # Coefficients:
 #                                           Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2                                 2.3725     0.2549   9.307   <2e-16 ***
-# V.Mean.Sum2.directionpositive              -0.1481     0.1521  -0.973    0.330    
-# A.Mean.Sum2:V.Mean.Sum2.directionpositive  -0.1832     0.3523  -0.520    0.603     
+# A.Mean.Sum2                                 2.3365     0.2580   9.054   <2e-16 ***
+# V.Mean.Sum2.directionpositive              -0.1501     0.1546  -0.971    0.331    
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive  -0.2205     0.3586  -0.615    0.539     
 
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * 
-       fct_relevel(V.Mean.Sum2.direction, "negative") * 
-       fct_relevel(predicateType2, "emotive") + 
+       fct_relevel(V.Mean.Sum2.direction, "positive") * 
+       fct_relevel(predicateType2, "nonEmoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType2  direction	significance of A.Mean.Sum2
-# cognitive	      negative  n.s.
-# emoComm		      negative	*
-# emotive		      negative	*
-# evidential      negative  *
+# cognitive	      negative  
+# emoComm		      negative	n.s.
+# emotive		      negative	
+# evidential      negative  
 # nonEmoComm	    negative  n.s.
-# cognitive	      positive  *
-# emoComm		      positive  **
-# emotive		      positive  ***
-# evidential	    positive  n.s.
-# nonEmoComm	    positive  n.s.
+# cognitive	      positive  
+# emoComm		      positive  n.s.
+# emotive		      positive  
+# evidential	    positive  
+# nonEmoComm	    positive  *
 
 # how many predicates in each predicate types within the two valence categories?
 new.scale %>% 
   count(V.Mean.Sum2.direction, predicateType2)
 #    V.Mean.Sum2.direction predicateType2  n
 # 1               negative      cognitive 14
-# 2               negative        emoComm 25
+# 2               negative        emoComm 21
 # 3               negative        emotive 63
 # 4               negative     evidential 16
-# 5               negative     nonEmoComm 59
-# 6               positive      cognitive 32
-# 7               positive        emoComm  8
+# 5               negative     nonEmoComm 58
+# 6               positive      cognitive 33
+# 7               positive        emoComm  4
 # 8               positive        emotive 35
 # 9               positive     evidential 53
-# 10              positive     nonEmoComm 97
+# 10              positive     nonEmoComm 96
 
 ###### negative / positive valence only ----
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | environment), 
-     data = d.proj.vad %>%  filter(V.Mean.Sum2.direction == "negative")) %>% 
+     data = d.proj.vad %>% filter(V.Mean.Sum2.direction == "positive")) %>% 
   summary()
 # Coefficients: 
 #             Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2   2.2145     0.2525   8.769   <2e-16 *** [negative]
+# A.Mean.Sum2   2.1784     0.2553   8.532   <2e-16 *** [negative]
 
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2   2.3366     0.2547   9.175   <2e-16 *** [positive]
+# A.Mean.Sum2   2.2573     0.2609   8.652   <2e-16 *** [positive]
 
-clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "evidential") + 
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm") + 
        (1 | participant) + (1 | environment), 
      data = d.proj.vad %>% filter(V.Mean.Sum2.direction == "positive")) %>% 
   summary()
 # predicateType2	direction	significance of A.Mean.Sum2
-# cognitive	      negative  n.s.
-# emoComm	      	negative	.
-# emotive		      negative	*
-# evidential	    negative  n.s.
+# cognitive	      negative  
+# emoComm	      	negative	n.s.
+# emotive		      negative	
+# evidential	    negative  
 # nonEmoComm	    negative  n.s.
-# cognitive	      positive  *
-# emoComm		      positive  **
-# emotive		      positive  ***
-# evidential	    positive  n.s.
-# nonEmoComm	    positive  n.s.
+# cognitive	      positive  
+# emoComm		      positive  n.s.
+# emotive		      positive  
+# evidential	    positive  
+# nonEmoComm	    positive  *
 
 ##### X.5.2.3 communicative type ----
 ###### plot ----
@@ -3221,16 +3241,17 @@ lm(Mean.Proj ~ D.Mean.Sum2, data = new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.38078    0.02619  14.539   <2e-16 ***
-# D.Mean.Sum2  0.08550    0.09594   0.891    0.373 
+# (Intercept)  0.38541    0.02658  14.498   <2e-16 ***
+# D.Mean.Sum2  0.06053    0.09755   0.621    0.535 
 
 lm(Mean.Proj ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), data = new.scale) %>% 
   summary()
-# emoComm: 0.05
-# nonEmoComm: n.s.
-# emotive: n.s.
-# evidential: n.s.
-# cognitive: n.s.
+# predicateType2  significance of D.Mean.Sum2
+# emoComm:        *
+# nonEmoComm:     n.s.
+# emotive:        n.s.
+# evidential:     n.s.
+# cognitive:      n.s.
 
 ###### ordinal models ----
 clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 + (1 | participant) + (1 | environment), 
@@ -3238,17 +3259,17 @@ clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 + (1 | participant) + (1 | enviro
   summary()
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)   
-# D.Mean.Sum2   0.4336     0.1332   3.255  0.00113 **
+# D.Mean.Sum2   0.3342     0.1352   2.472   0.0134 *
 
-clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * fct_relevel(predicateType2, "evidential") + 
+clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emotive") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType2	significance of D.Mean.Sum2
-# cognitive       
-# emoComm         
-# emotive            
-# evidential      
-# nonEmoComm      
+# cognitive       n.s.
+# emoComm         ***
+# emotive         **   
+# evidential      n.s.
+# nonEmoComm      n.s.
 
 
 ##### X5.3.2 with direction of valence ----
@@ -3307,26 +3328,26 @@ clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * V.Mean.Sum2.direction +
   summary()
 # Coefficients:
 #                                           Estimate Std. Error z value Pr(>|z|)    
-# D.Mean.Sum2                                 0.9302     0.2094   4.442 8.91e-06 ***
-# V.Mean.Sum2.directionpositive              -0.3935     0.0735  -5.354 8.62e-08 ***
-# D.Mean.Sum2:V.Mean.Sum2.directionpositive  -0.2469     0.2785  -0.886    0.375 
+# D.Mean.Sum2                                0.77050    0.21181   3.638 0.000275 ***
+# V.Mean.Sum2.directionpositive             -0.42223    0.07436  -5.678 1.36e-08 ***
+# D.Mean.Sum2:V.Mean.Sum2.directionpositive -0.15880    0.28156  -0.564 0.572751 
 
 # with direction of valence + predicate type
 clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * fct_relevel(V.Mean.Sum2.direction, "positive") * 
-       fct_relevel(predicateType2, "nonEmoComm") +  (1 | participant) + (1 | environment), 
+       fct_relevel(predicateType2, "emoComm") +  (1 | participant) + (1 | environment), 
      data = d.proj.vad) %>% 
   summary()
 # direction predicateType2  significance of D.Mean.Sum2
-# negative  cognitive       .
-# negative  emotive         ***
+# negative  cognitive       
+# negative  emotive         
 # negative  emoComm         ***
-# negative  evidential      ***
-# negative  nonEmoComm      **
-# positive  cognitive       **
-# positive  emotive         n.s.
-# positive  emoComm         **
-# positive  evidential      *
-# positive  nonEmoComm      *
+# negative  evidential      
+# negative  nonEmoComm      n.s.
+# positive  cognitive       
+# positive  emotive         
+# positive  emoComm         *
+# positive  evidential      
+# positive  nonEmoComm      n.s.
 # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
@@ -3388,26 +3409,26 @@ clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * D.Mean.Sum2.direction +
   summary()
 # Coefficients:
 #                                           Estimate Std. Error z value Pr(>|z|)    
-# D.Mean.Sum2                                1.38723    0.23043   6.020 1.74e-09 ***
-# D.Mean.Sum2.directionpositive             -0.25866    0.07395  -3.498 0.000469 ***
-# D.Mean.Sum2:D.Mean.Sum2.directionpositive -1.05333    0.28664  -3.675 0.000238 ***
+# D.Mean.Sum2                                1.24004    0.23222   5.340 9.29e-08 ***
+# D.Mean.Sum2.directionpositive             -0.28257    0.07499  -3.768 0.000165 ***
+# D.Mean.Sum2:D.Mean.Sum2.directionpositive -0.98643    0.28982  -3.404 0.000665 ***
 
 # with 'direction' of dominance + predicate type
 clmm(as.factor(veridicality_num) ~ D.Mean.Sum2 * fct_relevel(D.Mean.Sum2.direction, "positive") * 
-       fct_relevel(predicateType2, "nonEmoComm") +  (1 | participant) + (1 | environment), 
+       fct_relevel(predicateType2, "emoComm") +  (1 | participant) + (1 | environment), 
      data = d.proj.vad) %>% 
   summary()
 # direction predicateType2  significance of D.Mean.Sum2
-# negative  cognitive       n.s.
-# negative  emotive         ***
+# negative  cognitive       
+# negative  emotive         
 # negative  emoComm         ***
-# negative  evidential      ***
-# negative  nonEmoComm      .
-# positive  cognitive       n.s.
-# positive  emotive         n.s.
+# negative  evidential      
+# negative  nonEmoComm      n.s.
+# positive  cognitive       
+# positive  emotive         
 # positive  emoComm         n.s.
-# positive  evidential      **
-# positive  nonEmoComm      **
+# positive  evidential      
+# positive  nonEmoComm      *
 
 ##### X.5.3.4 communicative type ----
 ###### plot ----
@@ -3517,9 +3538,9 @@ lm(Mean.Proj ~ V.Mean.Sum2 + A.Mean.Sum2, data = new.scale) %>%
   summary()
 # Coefficients:
 #             Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)  0.13030    0.04727   2.756  0.00611 ** 
-# V.Mean.Sum2  0.37015    0.07176   5.158 3.94e-07 ***
-# A.Mean.Sum2  0.39484    0.12000   3.290  0.00109 ** 
+# (Intercept)  0.13254    0.04800   2.761  0.00603 ** 
+# V.Mean.Sum2  0.35909    0.07294   4.923 1.26e-06 ***
+# A.Mean.Sum2  0.39549    0.12200   3.242  0.00129 ** 
 
 ##### ordinal models ----
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant) + 
@@ -3527,19 +3548,19 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant)
   summary()
 # Coefficients:
 #                         Estimate Std. Error z value Pr(>|z|)   
-# A.Mean.Sum2               1.0198     0.3324   3.068  0.00216 **
-# V.Mean.Sum2               0.9229     0.3879   2.380  0.01733 * 
-# A.Mean.Sum2:V.Mean.Sum2   1.5926     0.8495   1.875  0.06083 . 
+# A.Mean.Sum2               1.1062     0.3360   3.292 0.000996 ***
+# V.Mean.Sum2               0.9359     0.3936   2.377 0.017431 *  
+# A.Mean.Sum2:V.Mean.Sum2   1.4276     0.8666   1.647 0.099483 . 
 
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
-       fct_relevel(predicateType2, "evidential") + (1 | participant) + (1 | environment), 
+       fct_relevel(predicateType2, "emoComm") + (1 | participant) + (1 | environment), 
      data = d.proj.vad) %>% 
   summary()
 # predicateType2	significance of A.Mean.Sum2 / V.Mean.Sum2
-# cognitive       **    ***
-# emoComm         .     * 
-# emotive         n.s.  n.s. 
-# evidential      n.s.  n.s.
+# cognitive           
+# emoComm         *     ***  
+# emotive          
+# evidential      
 # nonEmoComm      n.s.  n.s.
 
 ##### negative / positive valence predicates only ----
@@ -3548,31 +3569,31 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 + (1 | participant)
   summary()
 # Coefficients:
 #                          Estimate Std. Error z value Pr(>|z|)    [negative]
-# A.Mean.Sum2               1.9393     0.4987   3.888 0.000101 ***
-# V.Mean.Sum2               3.6853     0.6300   5.850 4.92e-09 ***
-# A.Mean.Sum2:V.Mean.Sum2  -3.8546     1.3069  -2.949 0.003184 ** 
+# A.Mean.Sum2               2.0501     0.5002   4.098 4.16e-05 ***
+# V.Mean.Sum2               3.7999     0.6292   6.039 1.55e-09 ***
+# A.Mean.Sum2:V.Mean.Sum2  -4.2317     1.3057  -3.241  0.00119 ** 
 
 
 # Coefficients:
 #                          Estimate Std. Error z value Pr(>|z|)    [positive]
-# A.Mean.Sum2              0.008514   0.475030   0.018    0.986    
-# V.Mean.Sum2             -0.787948   0.517284  -1.523    0.128    
-# A.Mean.Sum2:V.Mean.Sum2  5.038373   1.193637   4.221 2.43e-05 ***
+# A.Mean.Sum2              0.005039   0.482831   0.010   0.9917    
+# V.Mean.Sum2             -0.903124   0.535123  -1.688   0.0915 .  
+# A.Mean.Sum2:V.Mean.Sum2  5.197391   1.250262   4.157 3.22e-05 ***
 
 clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 * 
-       fct_relevel(predicateType2, "emotive") + (1 | participant) + (1 | environment), 
+       fct_relevel(predicateType2, "emoComm") + (1 | participant) + (1 | environment), 
      data = d.proj.vad %>% filter(V.Mean.Sum2.direction == "positive")) %>% 
   summary()
 # predicateType2	direction	significance of A.Mean.Sum2 / V.Mean.Sum2
-# cognitive	      negative  .     *
-# emoComm	      	negative	.     *
-# emotive		      negative	n.s., n.s.
-# evidential	    negative  n.s.  *
+# cognitive	      negative       
+# emoComm	      	negative	*     ***
+# emotive		      negative	
+# evidential	    negative  
 # nonEmoComm	    negative  n.s.  n.s.
-# cognitive	      positive  **    ***
+# cognitive	      positive  
 # emoComm		      positive  n.s.  n.s.
-# emotive		      positive  **    ***
-# evidential	    positive  n.s.  .
+# emotive		      positive  
+# evidential	    positive  
 # nonEmoComm	    positive  n.s.  n.s.
 
 
@@ -3616,12 +3637,12 @@ lm(Mean.Proj ~ fct_relevel(volition, "volitional"), data = mean.proj.acc) %>%
   summary()
 # Coefficients:
 #                                                   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                        0.28830    0.01852  15.569   <2e-16 ***
-# fct_relevel(volition, "volitional")non-volitional  0.22172    0.02391   9.275   <2e-16 ***
+# (Intercept)                                        0.28114    0.01890  14.875   <2e-16 ***
+# fct_relevel(volition, "volitional")non-volitional  0.22678    0.02421   9.368   <2e-16 ***
 
 ### V.1.2 by predicate type ----
 #### plot ----
-mean.proj.vol = d.proj.acc %>%
+mean.proj.vol <- d.proj.acc %>%
   group_by(predicateType2, volition) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num)) %>%
@@ -3661,15 +3682,15 @@ d.proj.acc %>%
 
 #   predicateType2 volition       count
 #   <chr>          <chr>          <int>
-# 1 cognitive      non-volitional    43
+# 1 cognitive      non-volitional    42
 # 2 cognitive      volitional        10
-# 3 emoComm        non-volitional    19
-# 4 emoComm        volitional        19
-# 5 emotive        non-volitional   144
+# 3 emoComm        non-volitional    16
+# 4 emoComm        volitional        11
+# 5 emotive        non-volitional   145
 # 6 evidential     non-volitional    75
-# 7 evidential     volitional         3
+# 7 evidential     volitional         4
 # 8 nonEmoComm     non-volitional    13
-# 9 nonEmoComm     volitional       164
+# 9 nonEmoComm     volitional       163
 
 # All emotives are non-volitional. Almost all evidentials are non-volitional.
 
@@ -3695,8 +3716,8 @@ lm(Mean.Proj ~ fct_relevel(volition, "volitional"), data = mean.proj.comm) %>%
   summary()
 # Coefficients:
 #                                                   Estimate Std. Error t value Pr(>|t|)    
-# (Intercept)                                        0.28546    0.01331  21.442  < 2e-16 ***
-# fct_relevel(volition, "volitional")non-volitional  0.15983    0.03459   4.621  6.6e-06 ***
+# (Intercept)                                        0.27953    0.01300  21.496  < 2e-16 ***
+# fct_relevel(volition, "volitional")non-volitional  0.14101    0.03383   4.169 4.55e-05 ***
 
 
 #### distribution ----
@@ -3705,10 +3726,10 @@ mean.proj.comm %>%
   count()
 #   predicateType2 volition           n
 #   <chr>          <chr>          <int>
-# 1 emoComm        non-volitional    19
-# 2 emoComm        volitional        19
+# 1 emoComm        non-volitional    16
+# 2 emoComm        volitional        11
 # 3 nonEmoComm     non-volitional    13
-# 4 nonEmoComm     volitional       164
+# 4 nonEmoComm     volitional       163
 
 # W ----
 mean.proj.comm %>% 
@@ -3719,13 +3740,13 @@ mean.proj.comm %>%
 # two possible interpretation: CC was not said vs was not said in a certain way /
 # with a certain attitude etc.
 
-# emoComms: 38/38
+# emoComms: all
 # commType discourse participation: mixed, more single interpretation
 # commType pure: mixed, more focus-sensitive interpretation
 # commType state changing: mixed
 # say verbs discourse role: mainly single interpretation (exceptions: apologize, insist...)  
-# mode verbs say-with-attitude: 13/13
-# say-by-means verbs sound: 5/5, manner: 22/22, form: 0/14
+# mode verbs say-with-attitude: all
+# say-by-means verbs sound: all, manner: all, form: none
 
 
 # Z projection by communicatives ----
@@ -3748,7 +3769,7 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "dodgerblue4") +
+                   colour = "blue") +
   geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
@@ -3772,7 +3793,7 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "think", "believe", "know"),
-                      values = c("deepskyblue2", "dodgerblue4", "deeppink", "orange2", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "deeppink", "orange2", "darkgreen"))
 ggsave("../graphs/projection-by-communicative.pdf", height = 4, width = 13)
 
 ## with highly projective predicates ---- 
@@ -3784,19 +3805,14 @@ mean.proj.acc %>% filter(predicateType == "communicative" &
 # verb_renamed Mean.Proj commType                sayVerbType        
 #   <fct>            <dbl> <chr>                   <chr>              
 # 1 cry              0.833 pure                    mode verb          
-# 2 flip out         0.833 pure                    NA                 
-# 3 cringe           0.8   pure                    NA                 
-# 4 celebrate        0.733 pure                    NA                 
-# 5 fess up          0.733 discourse participation NA                 
-# 6 apologize        0.724 discourse participation discourse role verb
-# 7 whine            0.7   pure                    mode verb          
-# 8 approve          0.667 discourse participation NA                 
-# 9 disclose         0.667 discourse participation NA                 
-# 10 grimace          0.667 pure                    NA                 
-# 11 pout             0.667 pure                    NA                 
-# 12 bitch            0.633 discourse participation mode verb          
-# 13 document         0.633 pure                    mode verb          
-# 14 weep             0.633 pure                    mode verb   
+# 2 fess up          0.733 discourse participation NA                 
+# 3 apologize        0.724 discourse participation discourse role verb
+# 4 whine            0.7   pure                    mode verb          
+# 5 disclose         0.667 discourse participation NA                 
+# 6 pout             0.667 pure                    NA                 
+# 7 bitch            0.633 discourse participation mode verb          
+# 8 document         0.633 pure                    mode verb          
+# 9 weep             0.633 pure                    mode verb   
 
 ### plot ----
 # with labels for highly projective predicates
@@ -3818,7 +3834,7 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "dodgerblue4") +
+                   colour = "blue") +
   geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
@@ -3845,7 +3861,7 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "dodgerblue4", "deeppink", "green4", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "deeppink", "green4", "darkgreen"))
 ggsave("../graphs/projection-by-communicative-highest.pdf", height = 4, width = 13)
 
 
@@ -3856,6 +3872,7 @@ slice_max(mean.proj.comm, Mean.Proj, with_ties = FALSE)$Mean.Proj -
   subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj
 # 0.2
 
+### lists ----
 # communicative predicates whose projection rating ranges between that of 'think'
 # and think + 0.2:
 aaa <- mean.proj.acc %>% filter(predicateType == "communicative" & 
@@ -3864,10 +3881,8 @@ aaa <- mean.proj.acc %>% filter(predicateType == "communicative" &
   arrange(Mean.Proj) %>% 
   select(verb_renamed, Mean.Proj, commType, sayVerbType) %>% 
   print(n = Inf)
-aaa %>% write.csv("../data/barely-projective-communicatives.csv")
-# verb_renamed Mean.Proj commType                sayVerbType        
-# <fct>            <dbl> <chr>                   <chr>              
-#   1 charge         -0.0333 discourse participation NA                 
+# aaa %>% write.csv("../data/barely-projective-communicatives.csv")
+# 1 charge         -0.0333 discourse participation NA                 
 # 2 allege          0      discourse participation discourse role verb
 # 3 demand          0.0333 discourse participation discourse role verb
 # 4 fake            0.0333 state changing          NA                 
@@ -3881,39 +3896,35 @@ aaa %>% write.csv("../data/barely-projective-communicatives.csv")
 # 12 propose         0.0667 discourse participation discourse role verb
 # 13 reject          0.0667 discourse participation NA                 
 # 14 forecast        0.0690 pure                    NA                 
-# 15 bet             0.1    discourse participation NA                 
-# 16 dispel          0.1    discourse participation NA                 
-# 17 generalize      0.1    state changing          NA                 
-# 18 holler          0.1    pure                    mode verb          
-# 19 joke            0.1    pure                    mode verb          
-# 20 posit           0.1    discourse participation discourse role verb
-# 21 promise         0.1    state changing          discourse role verb
-# 22 type            0.1    pure                    mode verb          
-# 23 wager           0.1    discourse participation NA                 
-# 24 depict          0.133  pure                    NA                 
-# 25 implore         0.133  state changing          NA                 
-# 26 narrate         0.133  pure                    NA                 
-# 27 proclaim        0.133  discourse participation discourse role verb
-# 28 prophesy        0.133  pure                    NA                 
-# 29 quarrel         0.133  discourse participation NA                 
-# 30 recap           0.133  discourse participation discourse role verb
-# 31 request         0.133  discourse participation NA                 
-# 32 rule            0.133  discourse participation discourse role verb
-# 33 demonstrate     0.138  state changing          NA                 
-# 34 challenge       0.167  discourse participation NA                 
-# 35 corroborate     0.167  discourse participation NA                 
-# 36 debate          0.167  discourse participation NA                 
-# 37 establish       0.167  discourse participation discourse role verb
-# 38 express         0.167  pure                    NA                 
-# 39 indict          0.167  discourse participation NA                 
-# 40 insinuate       0.167  discourse participation NA                 
-# 41 insist          0.167  state changing          discourse role verb
-# 42 lie             0.167  state changing          discourse role verb
-# 43 mark            0.167  pure                    discourse role verb
-# 44 post            0.167  pure                    mode verb          
-# 45 reassert        0.167  discourse participation discourse role verb
-# 46 submit          0.167  discourse participation NA                 
-# 47 tease           0.167  discourse participation mode verb  
+# 15 dispel          0.1    discourse participation NA                 
+# 16 holler          0.1    pure                    mode verb          
+# 17 joke            0.1    pure                    mode verb          
+# 18 posit           0.1    discourse participation discourse role verb
+# 19 promise         0.1    state changing          discourse role verb
+# 20 type            0.1    pure                    mode verb          
+# 21 wager           0.1    discourse participation NA                 
+# 22 depict          0.133  pure                    NA                 
+# 23 narrate         0.133  pure                    NA                 
+# 24 proclaim        0.133  discourse participation discourse role verb
+# 25 prophesy        0.133  pure                    NA                 
+# 26 quarrel         0.133  discourse participation NA                 
+# 27 recap           0.133  discourse participation discourse role verb
+# 28 request         0.133  discourse participation NA                 
+# 29 rule            0.133  discourse participation discourse role verb
+# 30 demonstrate     0.138  state changing          NA                 
+# 31 challenge       0.167  discourse participation NA                 
+# 32 corroborate     0.167  discourse participation NA                 
+# 33 debate          0.167  discourse participation NA                 
+# 34 establish       0.167  discourse participation discourse role verb
+# 35 express         0.167  pure                    NA                 
+# 36 insinuate       0.167  discourse participation NA                 
+# 37 insist          0.167  state changing          discourse role verb
+# 38 lie             0.167  state changing          discourse role verb
+# 39 mark            0.167  pure                    discourse role verb
+# 40 post            0.167  pure                    mode verb          
+# 41 reassert        0.167  discourse participation discourse role verb
+# 42 submit          0.167  discourse participation NA                 
+# 43 tease           0.167  discourse participation mode verb   
 
 # communicative predicates with similar projection ratings as 'know': 
 # (know - 0.2) to max [= know + 0.2] 
@@ -3922,62 +3933,55 @@ bbb <- mean.proj.acc %>% filter(predicateType == "communicative" &
   arrange(desc(Mean.Proj)) %>% 
   select(verb_renamed, Mean.Proj, commType, sayVerbType) %>% 
   print(n = Inf)
-bbb %>% write.csv("../data/highly-projective-communicatives.csv")
-# verb_renamed Mean.Proj commType                sayVerbType        
-# <fct>            <dbl> <chr>                   <chr>              
+# bbb %>% write.csv("../data/highly-projective-communicatives.csv")
 # 1 cry              0.833 pure                    mode verb          
-# 2 flip out         0.833 pure                    NA                 
-# 3 cringe           0.8   pure                    NA                 
-# 4 celebrate        0.733 pure                    NA                 
-# 5 fess up          0.733 discourse participation NA                 
-# 6 apologize        0.724 discourse participation discourse role verb
-# 7 whine            0.7   pure                    mode verb          
-# 8 approve          0.667 discourse participation NA                 
-# 9 disclose         0.667 discourse participation NA                 
-# 10 grimace          0.667 pure                    NA                 
-# 11 pout             0.667 pure                    NA                 
-# 12 bitch            0.633 discourse participation mode verb          
-# 13 document         0.633 pure                    mode verb          
-# 14 weep             0.633 pure                    mode verb          
-# 15 complain         0.6   discourse participation mode verb          
-# 16 conceal          0.6   state changing          NA                 
-# 17 explain          0.6   discourse participation discourse role verb
-# 18 stress           0.6   discourse participation NA                 
-# 19 publicize        0.586 pure                    NA                 
-# 20 flaunt           0.567 discourse participation NA                 
-# 21 fuss             0.567 discourse participation NA                 
-# 22 leak             0.567 discourse participation NA                 
-# 23 point out        0.567 discourse participation discourse role verb
-# 24 reveal           0.567 discourse participation NA                 
-# 25 share            0.567 discourse participation NA                 
-# 26 warn             0.552 state changing          NA                 
-# 27 announce         0.533 discourse participation discourse role verb
-# 28 cheer            0.533 pure                    mode verb          
-# 29 expose           0.533 state changing          NA                 
-# 30 log              0.533 pure                    mode verb          
-# 31 reiterate        0.533 discourse participation discourse role verb
-# 32 snitch           0.533 discourse participation NA                 
-# 33 divulge          0.5   discourse participation NA                 
-# 34 emphasize        0.5   pure                    NA                 
-# 35 gab              0.5   pure                    NA                 
-# 36 grumble          0.5   pure                    mode verb          
-# 37 address          0.467 discourse participation NA                 
-# 38 gasp             0.467 pure                    mode verb          
-# 39 gush             0.467 pure                    mode verb          
-# 40 moan             0.467 pure                    mode verb          
-# 41 shriek           0.467 pure                    mode verb          
-# 42 sob              0.467 pure                    mode verb          
-# 43 whimper          0.467 pure                    mode verb          
-# 44 admit            0.433 discourse participation discourse role verb
-# 45 broadcast        0.433 pure                    mode verb          
-# 46 detail           0.433 discourse participation NA                 
-# 47 murmur           0.433 pure                    mode verb          
-# 48 spout            0.433 pure                    NA                 
-# 49 stammer          0.433 pure                    mode verb          
-# 50 voice            0.433 pure                    NA    
+# 2 fess up          0.733 discourse participation NA                 
+# 3 apologize        0.724 discourse participation discourse role verb
+# 4 whine            0.7   pure                    mode verb          
+# 5 disclose         0.667 discourse participation NA                 
+# 6 pout             0.667 pure                    NA                 
+# 7 bitch            0.633 discourse participation mode verb          
+# 8 document         0.633 pure                    mode verb          
+# 9 weep             0.633 pure                    mode verb          
+# 10 complain         0.6   discourse participation mode verb          
+# 11 explain          0.6   discourse participation discourse role verb
+# 12 stress           0.6   discourse participation NA                 
+# 13 publicize        0.586 pure                    NA                 
+# 14 flaunt           0.567 discourse participation NA                 
+# 15 fuss             0.567 discourse participation NA                 
+# 16 leak             0.567 discourse participation NA                 
+# 17 point out        0.567 discourse participation discourse role verb
+# 18 reveal           0.567 discourse participation NA                 
+# 19 share            0.567 discourse participation NA                 
+# 20 warn             0.552 state changing          NA                 
+# 21 announce         0.533 discourse participation discourse role verb
+# 22 cheer            0.533 pure                    mode verb          
+# 23 expose           0.533 state changing          NA                 
+# 24 log              0.533 pure                    mode verb          
+# 25 reiterate        0.533 discourse participation discourse role verb
+# 26 snitch           0.533 discourse participation NA                 
+# 27 divulge          0.5   discourse participation NA                 
+# 28 emphasize        0.5   pure                    NA                 
+# 29 gab              0.5   pure                    NA                 
+# 30 grumble          0.5   pure                    mode verb          
+# 31 address          0.467 discourse participation NA                 
+# 32 gasp             0.467 pure                    mode verb          
+# 33 gush             0.467 pure                    mode verb          
+# 34 moan             0.467 pure                    mode verb          
+# 35 shriek           0.467 pure                    mode verb          
+# 36 sob              0.467 pure                    mode verb          
+# 37 whimper          0.467 pure                    mode verb          
+# 38 admit            0.433 discourse participation discourse role verb
+# 39 broadcast        0.433 pure                    mode verb          
+# 40 detail           0.433 discourse participation NA                 
+# 41 murmur           0.433 pure                    mode verb          
+# 42 spout            0.433 pure                    NA                 
+# 43 stammer          0.433 pure                    mode verb          
+# 44 voice            0.433 pure                    NA 
 
 ### plots ----
 # with labels for extreme predicates
+#### 41-9 ----
 # 0 to (think + 0.2) and know to (know + 0.2)
 ggplot(mean.proj.acc %>% 
          filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
@@ -4001,7 +4005,7 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "dodgerblue4") +
+                   colour = "blue") +
   geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
                                                      Mean.Proj <= subset(mean.proj.acc, verb_renamed == "think")$Mean.Proj + 0.2 & 
                                                      Mean.Proj >= 0),
@@ -4037,15 +4041,15 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
-ggsave("../graphs/projection-by-communicative-extremes.pdf", height = 4, width = 13)
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-41-9.pdf", height = 4, width = 13)
 
-
-# with labels for 13/14 extreme predicates on both ends
-# There are 14 predicates that project as much or more strongly than 'know'
-# The 13 least projective predicates from 0 have a mean projection rating of up 
-# to 0.0690. Predicates 14 to 22 have a rating of 0.1. Therefore, on the lower 
-# end of the projection scale only 13 predicates are included.
+#### 12-9 ----
+# with labels for 12/9 extreme predicates on both ends
+# There are 9 predicates that project as much or more strongly than 'know'
+# Of the 12 least projective predicates from 0, predicates 5-12 have a mean 
+# projection rating of 0.6770. Predicate 13 has a rating 0.690. Therefore, on 
+# the lower end of the projection scale 12 predicates are included.
 
 ggplot(mean.proj.acc %>% 
          filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
@@ -4055,7 +4059,7 @@ ggplot(mean.proj.acc %>%
   geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
   geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
-                                                         Mean.Proj >= 0), Mean.Proj, n = 13), 
+                                                         Mean.Proj >= 0), Mean.Proj, n = 12), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
   geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
@@ -4068,9 +4072,9 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "dodgerblue4") +
+                   colour = "blue") +
   geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
-                                                                Mean.Proj >= 0), Mean.Proj, n = 13),
+                                                                Mean.Proj >= 0), Mean.Proj, n = 12),
                    aes(label = verb_renamed), 
                    alpha = 0.7,
                    min.segment.length = 0,
@@ -4103,19 +4107,20 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
-ggsave("../graphs/projection-by-communicative-extremes-14.pdf", height = 4, width = 13)
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-12-9.pdf", height = 4, width = 13)
 
+#### 28-25 ----
 # some more predicates - how many?
 mean.proj.acc %>% 
   filter(predicateType == "communicative" & 
            Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.1) %>% 
-  nrow() # 32
-# The first 32 predicates from 0 include those with a mean projection rating of 
-# up to 0.133. The 33rd predicate has a rating of 0.167. 32 is therefore a good 
-# number of predicates to consider on both ends.
+  nrow() # 26
+# Of the predicates with the lowest projection ratings from 0, no. 28 has a 
+# mean projection rating of 0.133. The 29th predicate has a rating of 0.167. 
+# Therefore, the number of predicates considered on the lower end is 28.
 
-# with labels for 32 extreme predicates on both ends
+# with labels for 28/26 extreme predicates on the ends
 ggplot(mean.proj.acc %>% 
          filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
        aes(x = verb_renamed, y = Mean.Proj)) +
@@ -4124,7 +4129,7 @@ ggplot(mean.proj.acc %>%
   geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
   geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
-                                                          Mean.Proj >= 0), Mean.Proj, n = 32), 
+                                                          Mean.Proj >= 0), Mean.Proj, n = 28), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
   geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
              aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
@@ -4137,9 +4142,9 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "dodgerblue4") +
+                   colour = "blue") +
   geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
-                                                                Mean.Proj >= 0), Mean.Proj, n = 32),
+                                                                Mean.Proj >= 0), Mean.Proj, n = 28),
                    aes(label = verb_renamed), 
                    alpha = 0.7,
                    min.segment.length = 0,
@@ -4172,5 +4177,368 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "dodgerblue4", "hotpink", "deeppink", "green4", "darkgreen"))
-ggsave("../graphs/projection-by-communicative-extremes-32.pdf", height = 4, width = 13)
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-28-26.pdf", height = 4, width = 13)
+
+
+#### 41-44 ----
+# even more predicates - how many?
+mean.proj.acc %>% 
+  filter(predicateType == "communicative" & 
+           Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2) %>% 
+  nrow() # 44
+# Of the predicates with the lowest projection ratings from 0, the 41st has a 
+# mean projection rating of 0.167. The 42nd predicate has a rating of 0.2. 
+# Therefore, the number of predicates considered on the lower end is 41.
+
+# with labels for 41/44 extreme predicates on the ends
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                         Mean.Proj >= 0), Mean.Proj, n = 41), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                               Mean.Proj >= 0), Mean.Proj, n = 41),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 2, nudge_y = -0.7,
+                   colour = "hotpink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                     Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.7,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-41-44.pdf", height = 4, width = 13)
+
+
+## all emoComms ----
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType2 == "emoComm"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoComms", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType2 == "emoComm"),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "emoComms", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-emoComms.pdf", height = 4, width = 13)
+
+### all predicates ----
+ggplot(mean.proj.acc, 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType2 == "emoComm"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoComms", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType2 == "emoComm"),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("predicate", "say", "think", "emoComms", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-predicate-emoComms.pdf", height = 4, width = 13)
+
+### manner - attitude ----
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(emoCommType == "manner"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoCommsManner", alpha = 0.9)) +
+  geom_point(data = mean.proj.acc %>% filter(emoCommType == "attitude"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoCommsAttitude", alpha = 0.9)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(emoCommType == "attitude"),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.7,
+                   colour = "darkolivegreen") +
+  geom_label_repel(data = mean.proj.acc %>% filter(emoCommType == "manner"),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "springgreen4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", 
+                                 "emoCommsAttitude", "emoCommsManner", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", 
+                                 "darkolivegreen", "springgreen4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-emoComms-manner-attitude.pdf", height = 4, width = 13)
+
+
+## acceptability > 5 ----
+# the following 15 emoComms are considered:
+zzz <- mean.proj.acc %>% filter(predicateType2 == "emoComm" & Mean.Acc > 5) %>% 
+  select(verb_renamed) %>% droplevels() %>% unlist() %>% as.vector() %>% print()
+# [1] "bitch"    "boast"    "brag"     "cheer"    "complain" "cry"      "exclaim"  
+# "fuss"     "gloat"    "mutter"   "pout"    
+# [12] "rant"     "rave"     "scream"   "whine"
+
+# the following 12 predicates with ratings of up to 5 are excluded:
+www <- mean.proj.acc %>% filter(predicateType2 == "emoComm") %>% select(verb_renamed) %>% 
+  droplevels() %>% unlist() %>% as.vector() 
+setdiff(www, zzz)
+# [1] "groan"   "grumble" "grunt"   "howl"    "moan"    "quarrel" "shriek"  "sigh"    
+# "sob"     "squeal"  "weep"    "whimper"
+
+mean.proj.comm %>% filter(verb_renamed %in% www) %>% group_by(emoCommType) %>% count()
+#   emoCommType     n
+#   <chr>       <int>
+# 1 attitude       11
+# 2 manner         16
+
+mean.proj.comm %>% filter(verb_renamed %in% zzz) %>% group_by(emoCommType) %>% count()
+# emoCommType     n
+# <chr>       <int>
+# 1 attitude       10
+# 2 manner          5
+
+### 34-32 ----
+ggplot(mean.proj.acc %>% 
+         filter((predicateType == "communicative" | verb_renamed %in% c("think", "know")) & Mean.Acc > 5), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                                         Mean.Proj >= 0 & Mean.Acc > 5), 
+                              Mean.Proj, n = 32), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "barely projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType == "communicative" & 
+                                               Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2 &
+                                               Mean.Acc > 5), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highly projective", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = slice_min(mean.proj.acc %>% filter(predicateType == "communicative" &
+                                                               Mean.Proj >= 0  & Mean.Acc > 5),
+                                    Mean.Proj, n = 32),
+                   aes(label = verb_renamed),
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100,
+                   nudge_x = 2, nudge_y = -0.7,
+                   colour = "hotpink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType == "communicative" &
+                                                     Mean.Proj >= subset(mean.proj.acc, verb_renamed == "know")$Mean.Proj - 0.2 & 
+                                                     Mean.Acc > 5),
+                   aes(label = verb_renamed),
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100,
+                   nudge_x = 0.2, nudge_y = -0.7,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-extremes-34-32-acc5.pdf", height = 4, width = 13)
+
+
+### all emoComms ----
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know") & Mean.Acc > 5), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say" & Mean.Acc > 5), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think" & Mean.Acc > 5), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType2 == "emoComm" & Mean.Acc > 5), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoComms", alpha = 0.5)) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know" & Mean.Acc > 5), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say" & Mean.Acc > 5),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think" & Mean.Acc > 5),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(predicateType2 == "emoComm" & Mean.Acc > 5),
+                   aes(label = verb_renamed), 
+                   alpha = 0.7,
+                   min.segment.length = 0,
+                   max.overlaps = 100, 
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "green4") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know" & Mean.Acc > 5),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "darkgreen") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "emoComms", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "green4", "darkgreen"))
+ggsave("../graphs/projection-by-communicative-emoComms-acc5.pdf", height = 4, width = 13)
