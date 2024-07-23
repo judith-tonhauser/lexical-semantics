@@ -1,11 +1,46 @@
 \newcommand{\noopsort}[1]{}\newcommand{\SortNoop}[1]{} \newcommand{\noop}[1]{}
-\begin{thebibliography}{1}
+\begin{thebibliography}{7}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
-\bibitem[Korotkova and Anand(2024)]{korotkova-anand-dgfs2024}
-Korotkova, Natasha and Parnav Anand. 2024.
-\newblock Today {I} learned: English `coming-to-know' predicates.
-\newblock Presentation at the Annual Meeting of the {\em Deutsche Gesellschaft
-  f\"ur Sprachwissenschaft}, Bochum, March 2024.
+\bibitem[Anand and Hacquard(2014)]{anand-hacquard2014}
+Anand, Pranav and Valentine Hacquard. 2014.
+\newblock Factivity, belief and discourse.
+\newblock In L.~Crni\v{c} and U.~Sauerland, eds., {\em The Art and Craft of
+  Semantics: A Festschrift for {I}rene {H}eim\/}, pages 69--90. MIT Working
+  Papers in Linguistics.
+
+\bibitem[Degen and Tonhauser(2022)]{degen-tonhauser-language}
+Degen, Judith and Judith Tonhauser. 2022.
+\newblock Are there factive predicates? {A}n empirical investigation.
+\newblock {\em Language\/} 98:552--591.
+
+\bibitem[Fisher et~al.(1991)Fisher, Gleitman, and Gleitman]{fisher1991}
+Fisher, Cynthia, Henry Gleitman, and Lila~R Gleitman. 1991.
+\newblock On the semantic content of subcategorization frames.
+\newblock {\em Cognitive psychology\/} 23(3):331--392.
+
+\bibitem[Kiparsky and Kiparsky(1970)]{kiparsky-kiparsky70}
+Kiparsky, Paul and Carol Kiparsky. 1970.
+\newblock Fact.
+\newblock In M.~Bierwisch and K.~Heidolph, eds., {\em Progress in
+  Linguistics\/}, pages 143--173. The Hague: Mouton.
+
+\bibitem[Levin(1993)]{levin1993}
+Levin, Beth. 1993.
+\newblock {\em English verb classes and alternations: A preliminary
+  investigation\/}.
+\newblock University of Chicago press.
+
+\bibitem[Warriner et~al.(2013)Warriner, Kuperman, and
+  Brysbaert]{warriner-etal2013}
+Warriner, {Amy Beth}, Victor Kuperman, and Marc Brysbaert. 2013.
+\newblock Norms of valuence, arousal, and dominance for 13,915 {E}nglish
+  lemmas.
+\newblock {\em Behavioral Research\/} 45:1191--1207.
+
+\bibitem[White and Rawlins(2018)]{white-rawlins-nels2018}
+White, Aaron~S. and Kyle Rawlins. 2018.
+\newblock The role of veridicality and factivity in clause selection.
+\newblock In {\em 48th Meeting of the North East Linguistic Society\/}, page~??
 
 \end{thebibliography}

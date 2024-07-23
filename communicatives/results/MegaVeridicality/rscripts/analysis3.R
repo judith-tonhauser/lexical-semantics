@@ -42,10 +42,10 @@ cols2 <- c(cognitive = "coral",
            nonEmoComm = "deepskyblue2")
 
 predicateType2_names <- c( "cognitive" = "cognitive", 
-                           "emoComm" = "communicative with\nemotive component", 
+                           "emoComm" = "communicative with\nemotion entailment", 
                            "emotive" = "emotive", 
                            "evidential" = "evidential", 
-                           "nonEmoComm" = "communicative without\nemotive component")
+                           "nonEmoComm" = "communicative without\nemotion entailment")
 
 # create dataset for projection inferences
 d.proj <- droplevels(subset(d,d$polarity == "negative" | d$conditional2 == "conditional"))
@@ -136,12 +136,12 @@ mean.proj.all %>%
 # predicateType2     n
 # <chr>          <int>
 # 1 cognitive         53
-# 2 comPriv           11
-# 3 emoComm           34
+# 2 comPriv           10
+# 3 emoComm           33
 # 4 emotive          149
 # 5 evidential        87
-# 6 nonEmoComm       185
-# 7 other             26
+# 6 nonEmoComm       187
+# 7 other             25
 
 # exclude "comPriv" and "other" predicates from analysis.
 mean.proj <- mean.proj.all %>% 
@@ -155,10 +155,10 @@ mean.proj %>%
 # predicateType2     n
 # <chr>          <int>
 # 1 cognitive         53
-# 2 emoComm           34
+# 2 emoComm           33
 # 3 emotive          149
 # 4 evidential        87
-# 5 nonEmoComm       185
+# 5 nonEmoComm       187
 
 # Subsets for all predicates / communicative predicates with mean acceptability
 # ratings greater than 4. See "Acceptability" below for the reasons for and the
@@ -409,6 +409,7 @@ ggplot(mean.proj.bt, aes(x = predicateType, y = Mean.Proj, colour = predicateTyp
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = cols)
 ggsave("../graphs/projection-by-predicateType.pdf", height = 4, width = 10)
+ggsave("../graphs/projection-by-predicateType.jpeg", height = 4, width = 10)
 
 # calculate by-predicateType2 means
 mean.proj.bt2 <- d.proj.acc %>%
@@ -438,10 +439,11 @@ ggplot(mean.proj.bt2,
        y = "Mean projection rating") +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_x_discrete(labels = c("cognitive", "evidential", 
-                              "communicative without\nemotive component", 
-                              "communicative with\nemotive component", "emotive")) +
+                              "communicative without\nemotion entailment", 
+                              "communicative with\nemotion entailment", "emotive")) +
   scale_colour_manual(values = cols2)
 ggsave("../graphs/projection-by-predicateType2.pdf", height = 4, width = 10)
+ggsave("../graphs/projection-by-predicateType2.jpeg", height = 4, width = 10)
 
 ### distribution ----
 mean.proj.acc %>% 
@@ -1261,9 +1263,9 @@ nrow(w) # 13915
 w2 <-  w %>%
   rename(verb = Word) %>%
   inner_join(d.proj.acc, by = "verb")
-nrow(w2) # 11772
-n_distinct(w2$verb) # 380
-n_distinct(w2$verb_renamed) # 393
+nrow(w2) # 11802
+n_distinct(w2$verb) # 381
+n_distinct(w2$verb_renamed) # 394
 
 # create predicate type, emotive component and environment columns
 w2 <-  w2 %>%
@@ -1292,10 +1294,10 @@ w3 <- w2 %>%
 mean.proj.vad <- left_join(w3, mean.proj, by = c("verb_renamed")) %>%
   distinct() %>%
   mutate(verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj.vad) # 393
+nrow(mean.proj.vad) # 394
 
 # Warriner et al.' (2013) dataset contains valence, arousal and dominance ratings 
-# for 393 of the predicates in the MV dataset which belong to (only) one of our 5
+# for 394 of the predicates in the MV dataset which belong to (only) one of our 5
 # predicate types and have a mean acceptability rating greater than 4. 
 
 mean.proj.vad %>% 
@@ -1305,7 +1307,7 @@ mean.proj.vad %>%
 #   predicateType     n
 #   <chr>         <int>
 # 1 cognitive        47
-# 2 communicative   178
+# 2 communicative   180
 # 3 emotive          98
 # 4 evidential       69
 
@@ -1319,14 +1321,14 @@ mean.proj.vad %>%
 # 2 emoComm           25
 # 3 emotive           98
 # 4 evidential        69
-# 5 nonEmoComm       154
+# 5 nonEmoComm       155
 
 ### X.01 rescale V + A + D ratings ----
 # Valence and dominance have extremes (unhappy - happy, controlled - controlling)
 # and a neutral state in between. The neutral state of arousal is not in the middle 
 # of the "calm - aroused" scale, but at the lower end: calmness is the absence of
 # arousal; there is no such thing as "negative" arousal. 
-# The ratings for valence and arousal are rescaled to range from 0 to 1. 
+# The ratings are rescaled to range from 0 to 1. 
 new.scale <- mean.proj.vad %>% 
   mutate(V.Mean.Sum2 = abs(V.Mean.Sum - 5)/4,
          V.Mean.Sum2.direction = case_when(V.Mean.Sum >= 5 ~ "positive",
@@ -2062,6 +2064,7 @@ ggplot() +
   scale_colour_manual(limits = c("valence", "arousal", "dominance"),
                       values = c("blue3", "red3", "grey30"))
 ggsave("../graphs/valence-arousal-dominance-by-predicateType2-2.pdf", height = 6, width = 10)
+ggsave("../graphs/valence-arousal-dominance-by-predicateType2-2.jpeg", height = 6, width = 10)
 
 
 # distribution of valence, arousal and dominance ratings by communicative predicates
@@ -2550,6 +2553,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   scale_colour_manual(values = cols2) +
   facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
 ggsave("../graphs/projection-by-valence-faceted2.pdf", height = 4, width = 9)
+ggsave("../graphs/projection-by-valence-faceted2.jpeg", height = 4, width = 9)
 
 ###### linear models ----
 lm(Mean.Proj ~ V.Mean.Sum2, data = new.scale) %>% 
@@ -2570,10 +2574,10 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 + (1 | participant) + (1 | enviro
   summary()
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2   1.9201     0.1034   18.57   <2e-16 ***
+# V.Mean.Sum2   1.9157     0.1032   18.56   <2e-16 ***
 
 # with predicate type
-clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm") + 
+clmm(as.factor(veridicality_num) ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType 2   significance of V.Mean.Sum2
@@ -2688,6 +2692,7 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
   scale_colour_manual(values = cols2, 
                       labels = predicateType2_names) 
 ggsave("../graphs/projection-by-valence-with-direction.pdf", height = 3.5, width = 6)
+ggsave("../graphs/projection-by-valence-with-direction.jpeg", height = 3.5, width = 6)
 
 # projection by valence faceted with emotive component
 ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
@@ -2711,6 +2716,8 @@ ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
                                                        "positive" = "positive valence")), 
                                  .cols = predicateType2_names)) 
 ggsave("../graphs/projection-by-valence-and-direction-of-valence-faceted2.pdf", 
+       height = 6, width = 10)
+ggsave("../graphs/projection-by-valence-and-direction-of-valence-faceted2.jpeg", 
        height = 6, width = 10)
 
 ###### linear models ----
@@ -2736,7 +2743,7 @@ clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction + (1 | participant) +
   summary()
 # Coefficients:
 #                               Estimate Std. Error z value Pr(>|z|)    
-# V.Mean.Sum2.directionpositive  -0.4139     0.0395  -10.48   <2e-16 ***
+# V.Mean.Sum2.directionpositive -0.41237    0.03941  -10.46   <2e-16 ***
 
 # with predicate type
 clmm(as.factor(veridicality_num) ~ V.Mean.Sum2.direction * fct_relevel(predicateType2, "emoComm") + 
@@ -2965,9 +2972,9 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 + (1 | participant) + (1 | enviro
   summary()
 # Coefficients:
 #             Estimate Std. Error z value Pr(>|z|)    
-# A.Mean.Sum2   2.5660     0.1708   15.03   <2e-16 ***
+# A.Mean.Sum2   2.5594     0.1707      15   <2e-16 ***
 
-clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm") + 
+clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emoComm") + 
        (1 | participant) + (1 | environment), data = d.proj.vad) %>% 
   summary()
 # predicateType2	significance of A.Mean.Sum2
@@ -3000,6 +3007,7 @@ ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
   scale_colour_manual(values = cols2, 
                       labels = predicateType2_names) 
 ggsave("../graphs/projection-by-arousal-with-direction.pdf", height = 3.5, width = 6)
+ggsave("../graphs/projection-by-arousal-with-direction.jpeg", height = 3.5, width = 6)
 
 # projection by arousal faceted with emotive component
 ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
@@ -3235,6 +3243,7 @@ ggplot(new.scale, aes(x = D.Mean.Sum2, y = Mean.Proj)) +
   scale_colour_manual(values = cols2) +
   facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
 ggsave("../graphs/projection-by-dominance-faceted2.pdf", height = 4, width = 9)
+ggsave("../graphs/projection-by-dominance-faceted2.jpeg", height = 4, width = 9)
 
 ###### linear models ----
 lm(Mean.Proj ~ D.Mean.Sum2, data = new.scale) %>% 
@@ -3296,6 +3305,7 @@ ggplot(new.scale, aes(x = D.Mean.Sum2, y = Mean.Proj)) +
   scale_colour_manual(values = cols2, 
                       labels = predicateType2_names) 
 ggsave("../graphs/projection-by-domiance-with-direction-of-valence.pdf", height = 3.5, width = 6)
+ggsave("../graphs/projection-by-domiance-with-direction-of-valence.jpeg", height = 3.5, width = 6)
 
 # faceted
 ggplot(new.scale, aes(x = D.Mean.Sum2, y = Mean.Proj)) +
@@ -3596,6 +3606,78 @@ clmm(as.factor(veridicality_num) ~ A.Mean.Sum2 * V.Mean.Sum2 *
 # evidential	    positive  
 # nonEmoComm	    positive  n.s.  n.s.
 
+
+#### X.5.5 valence + arousal + dominance ----
+##### plot ----
+# combined plot with two fitted lines
+
+# valence
+vplot <- ggplot(new.scale, aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+
+# arousal
+aplot <- ggplot(new.scale, aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names)
+
+# dominance
+dplot <- ggplot(new.scale, aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+
+vplot + aplot + dplot + plot_layout(guides = "collect", axis_titles = "collect")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence.pdf", height = 3.5, width = 12)
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence.jpeg", height = 3.5, width = 12)
 
 # V Volition ----
 ## V.1 all predicates ----
@@ -4098,7 +4180,7 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "darkgreen") +
+                   colour = "brown") +
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -4107,7 +4189,7 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "brown"))
 ggsave("../graphs/projection-by-communicative-extremes-12-9.pdf", height = 4, width = 13)
 
 #### 28-25 ----
@@ -4168,7 +4250,7 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "darkgreen") +
+                   colour = "brown") +
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -4177,7 +4259,7 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "brown"))
 ggsave("../graphs/projection-by-communicative-extremes-28-26.pdf", height = 4, width = 13)
 
 
@@ -4234,13 +4316,15 @@ ggplot(mean.proj.acc %>%
                    min.segment.length = 0,
                    max.overlaps = 100, 
                    nudge_x = 0.2, nudge_y = -0.7,
-                   colour = "green4") +
+                   colour = "orangered") +
   geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "darkgreen") +
+                   colour = "brown") +
   theme(legend.position = "none",
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
@@ -4248,9 +4332,9 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "barely projective", "think", "highly projective", "know"),
-                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "green4", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "hotpink", "deeppink", "orangered", "brown"))
 ggsave("../graphs/projection-by-communicative-extremes-41-44.pdf", height = 4, width = 13)
-
+ggsave("../graphs/projection-by-communicative-extremes-41-44.jpeg", height = 4, width = 13)
 
 ## all emoComms ----
 ggplot(mean.proj.acc %>% 
@@ -4287,8 +4371,10 @@ ggplot(mean.proj.acc %>%
                    aes(label = verb_renamed), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = 0.2,
-                   colour = "darkgreen") +
+                   colour = "brown") +
   theme(legend.position = "none",
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 12),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         panel.grid.major.x = element_blank()) +
@@ -4296,8 +4382,9 @@ ggplot(mean.proj.acc %>%
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
   scale_colour_manual(limits = c("communicative predicate", "say", "think", "emoComms", "know"),
-                      values = c("deepskyblue2", "blue", "deeppink", "green4", "darkgreen"))
+                      values = c("deepskyblue2", "blue", "deeppink", "green4", "brown"))
 ggsave("../graphs/projection-by-communicative-emoComms.pdf", height = 4, width = 13)
+ggsave("../graphs/projection-by-communicative-emoComms.jpeg", height = 4, width = 13)
 
 ### all predicates ----
 ggplot(mean.proj.acc, 
