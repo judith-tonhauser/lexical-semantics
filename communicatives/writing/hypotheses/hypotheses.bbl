@@ -1,5 +1,5 @@
 \newcommand{\noopsort}[1]{}\newcommand{\SortNoop}[1]{} \newcommand{\noop}[1]{}
-\begin{thebibliography}{7}
+\begin{thebibliography}{6}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[Anand and Hacquard(2014)]{anand-hacquard2014}
@@ -13,11 +13,6 @@ Anand, Pranav and Valentine Hacquard. 2014.
 Degen, Judith and Judith Tonhauser. 2022.
 \newblock Are there factive predicates? {A}n empirical investigation.
 \newblock {\em Language\/} 98:552--591.
-
-\bibitem[Fisher et~al.(1991)Fisher, Gleitman, and Gleitman]{fisher1991}
-Fisher, Cynthia, Henry Gleitman, and Lila~R Gleitman. 1991.
-\newblock On the semantic content of subcategorization frames.
-\newblock {\em Cognitive psychology\/} 23(3):331--392.
 
 \bibitem[Kiparsky and Kiparsky(1970)]{kiparsky-kiparsky70}
 Kiparsky, Paul and Carol Kiparsky. 1970.
