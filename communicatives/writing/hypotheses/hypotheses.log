@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.29)  20 AUG 2024 22:45
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.29)  10 SEP 2024 14:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1489,7 +1489,7 @@ Here is how much of TeX's memory you used:
  52337 multiletter control sequences out of 15000+600000
  587202 words of font info for 107 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 102i,6n,107p,3244b,670s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,6n,107p,3244b,664s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/rtcx
 r.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/
 rtxr.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfon
@@ -1497,7 +1497,7 @@ ts/txsy.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
 /utmb8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
 /utmr8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
 /utmri8a.pfb>
-Output written on hypotheses.pdf (11 pages, 356152 bytes).
+Output written on hypotheses.pdf (11 pages, 356278 bytes).
 PDF statistics:
  339 PDF objects out of 1000 (max. 8388607)
  68 named destinations out of 1000 (max. 500000)

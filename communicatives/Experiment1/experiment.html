@@ -58,7 +58,7 @@ var n_trials = 13; // 11 target trials, 2 control trials
 
 function generateItems() {
   const names = ["Blake", "Charlie", "Dylan", "Evan", "Frankie", "Harper", "Jamie", "Jordan", "Morgan", "Reese", "Stevie"];
-  const allPredicates = ["add", "address", "admit", "advertise", "advise", "affirm", "allege", "announce", "answer", "apologise", "argue", "articulate", "assert", "attest", "babble", "bellow", "bicker", "bitch", "blog", "boast", "brag", "broadcast", "certify", "challenge", "chant", "charge", "chatter", "cheer", "chronicle", "circulate", "claim", "clarify", "comment", "communicate", "complain", "concede", "confess", "confide", "confirm", "contend", "contest", "convey", "corroborate", "cry", "debate", "declare", "demonstrate", "denounce", "deny", "depict", "describe", "detail", "disclose", "discuss", "dismiss", "dispel", "display", "dispute", "divulge", "document", "elaborate", "email", "embellish", "emphasise", "endorse", "establish", "exclaim", "exhibit", "explain", "expose", "express", "fabricate", "fake", "fax", "fess up", "flaunt", "fuss", "gab", "gasp", "gloat", "gossip", "groan", "grumble", "grunt", "guarantee", "gush", "hint", "holler", "howl", "imply", "indicate", "insinuate", "insist", "jest", "joke", "leak", "lecture", "lie", "log", "maintain", "mark", "mention", "moan", "mumble", "murmur", "mutter", "narrate", "phone", "point out", "posit", "post", "pout", "praise", "preach", "pretend", "proclaim", "promise", "propose", "prove", "publicise", "publish", "quarrel", "question", "quip", "radio", "rant", "rave", "reaffirm", "reassert", "recap", "record", "reiterate", "reject", "relate", "remark", "repeat", "reply", "report", "respond", "restate", "retort", "retract", "reveal", "say", "scoff", "scream", "scribble", "share", "shout", "show", "showcase", "shriek", "sigh", "signal", "signify", "sing", "sketch", "snitch", "sob", "specify", "spout", "squeal", "stammer", "state", "stipulate", "stress", "submit", "suggest", "summarise", "swear", "tease", "testify", "tweet", "type", "uncover", "underline", "underscore", "uphold", "utter", "voice", "vow", "wager", "warn", "warrant", "weep", "whimper", "whine", "whisper", "write", "yell"];
+  const allPredicates = ["think", "know", "add", "address", "admit", "advertise", "advise", "affirm", "allege", "announce", "answer", "apologize", "argue", "articulate", "assert", "attest", "babble", "bellow", "bicker", "bitch", "blog", "boast", "brag", "broadcast", "certify", "challenge", "chant", "charge", "chatter", "cheer", "chronicle", "circulate", "claim", "clarify", "comment", "communicate", "complain", "concede", "confess", "confide", "confirm", "contend", "contest", "convey", "corroborate", "cry", "debate", "declare", "demonstrate", "denounce", "deny", "depict", "describe", "detail", "disclose", "discuss", "dismiss", "dispel", "display", "dispute", "divulge", "document", "elaborate", "email", "embellish", "emphasize", "endorse", "establish", "exclaim", "exhibit", "explain", "expose", "express", "fabricate", "fake", "fax", "fess up", "flaunt", "fuss", "gab", "gasp", "gloat", "gossip", "groan", "grumble", "grunt", "guarantee", "gush", "hint", "holler", "howl", "imply", "indicate", "insinuate", "insist", "jest", "joke", "leak", "lecture", "lie", "log", "maintain", "mark", "mention", "moan", "mumble", "murmur", "mutter", "narrate", "phone", "point out", "posit", "post", "pout", "praise", "preach", "pretend", "proclaim", "promise", "propose", "prove", "publicize", "publish", "quarrel", "question", "quip", "radio", "rant", "rave", "reaffirm", "reassert", "recap", "record", "reiterate", "reject", "relate", "remark", "repeat", "reply", "report", "respond", "restate", "retort", "retract", "reveal", "say", "scoff", "scream", "scribble", "share", "shout", "show", "showcase", "shriek", "sigh", "signal", "signify", "sing", "sketch", "snitch", "sob", "specify", "spout", "squeal", "stammer", "state", "stipulate", "stress", "submit", "suggest", "summarize", "swear", "tease", "testify", "tweet", "type", "uncover", "underline", "underscore", "uphold", "utter", "voice", "vow", "wager", "warn", "warrant", "weep", "whimper", "whine", "whisper", "write", "yell"]; // 'think' and 'know' are included for reference
   const complements = [
     "the balloon popped", 
     "the airbag deployed", 
@@ -68,7 +68,7 @@ function generateItems() {
     "the sauce thickened", 
     "the gate opened", 
     "the factory closed", 
-    "the paper burnt", 
+    "the paper burned", 
     "the egg cracked", 
     "the knot tightened"
   ];
@@ -81,7 +81,7 @@ function generateItems() {
 "the sauce thickened": "did the sauce thicken?",
 "the gate opened": "did the gate open?",
 "the factory closed": "did the factory close?",
-"the paper burnt": "did the paper burn?",
+"the paper burned": "did the paper burn?",
 "the egg cracked": "did the egg crack?",
 "the knot tightened": "did the knot tighten?"
   };
@@ -114,8 +114,8 @@ function generateItems() {
     
     const attention2 = {
         type: 'control', 
-        statement: "Taylor didn't faint when the vase shattered.",
-        question: "did the vase disappear?"
+        statement: "Taylor smiled when the vase didn't shatter.",
+        question: "did the vase shatter?"
     };
 
   items.push(attention1, attention2);
@@ -148,13 +148,13 @@ var consent_screen = {
   <p style='text-align:left'>In this experiment, you will read 13 statements followed by a question, as in the example below:</p>\
   <div style='display: flex; justify-content: center;'>\
     <div style='white-space: nowrap; text-align: left;'>\
-      <p style='text-align:left'> <i>Robin didn't think that the table wobbled.</i> </p>\
+      <p style='text-align:left'> <i>Robin didn't believe that the table wobbled.</i> </p>\
       <p style='text-align:left'> According to this statement, did the table wobble? </p>\
     </div>\
   </div>\
   <p style='text-align:left'>To answer the question, you will use a slider marked 'no' at one end and 'yes' at the other.</p>\
-  <p style='text-align:left'>The experiment will take about 3 minutes and you will be paid £0.50.</p>\
-  <p style='text-align:left' font size=\"1\">By clicking on the button below, you agree to participate in this experiment, which is conducted by researchers at the University of Stuttgart. You may withdraw from this experiment at any time. The data collected will be anonymous and confidential. If you have any questions, you may contact the requester through Prolific's platform, or directly at st166874@stud.uni-stuttgart.de.</p>",
+  <p style='text-align:left'>The experiment will take about 2.5 minutes and you will be paid £0.39.</p>\
+  <p style='text-align:left' font size=\"1\">By clicking the button below, you agree to participate in this experiment conducted by researchers at the University of Stuttgart. You may withdraw from the experiment at any time. The data collected will be anonymous and confidential. If you have any questions, you can contact the requester through Prolific or by writing directly to st166874@stud.uni-stuttgart.de.</p>",
   choices: ["Yes, I consent to participate"],
 };
 
@@ -358,8 +358,8 @@ var demographics = {
       },
       {
         type: 'multi-choice',
-        prompt: "Are you a speaker of British English (as opposed to, e.g., Indian English)?",
-        name: 'BE', 
+        prompt: "Are you a speaker of American English (as opposed to, e.g., Indian English)?",
+        name: 'AE', 
         columns: 2,
         options: ['yes', 'no'], 
         required: false,
