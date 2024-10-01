@@ -41,7 +41,7 @@
 \usepackage{dcolumn} % for printing model output tables directly from R
 
 \usepackage{graphics}
-\graphicspath{{../../results/MegaVeridicality/graphs/}}
+\graphicspath{{../../results/MegaVeridicality/graphs/}{../../results/Experiment1/graphs/}}
 
 %\usepackage{color}
 %\DeclareOuterCiteDelims{cite}{\textcolor{green}{\bibopenbracket}}{\textcolor{red}{\bibclosebracket}}
@@ -112,7 +112,7 @@
 \item Traditionally, projection of the CC of a \emph{that}-clause-embedding predicates is explained in terms of factivity: if a predicate is factive, its CC is presupposed and therefore projects; if it non-factive, the CC does not project (\citealt{kiparsky-kiparsky70}). 
 \item However, the categorical factive/non-factive distinction does not predict the projection ratings obtained in experiments, which show high levels of variability (\citealt{degen-tonhauser-language}). 
 \item The predicate type (cognitive, communicative, emotive, evidential) is another category that predicts projection ratings to some extent. However, within each type we again observe high variability, including within those predicate types thought to reflect the factive/non-factive distinction, i.e., the emotives, considered mostly factive, and the communicatives, considered generally non-factive (\citealt{anand-hacquard2014}).
-\item A good starting point for trying to find an explanation for the observed variability are the communicatives, precisely because their CC is not predicted to project and yet often does, with some of these predicates receiving even higher projection ratings than the factive fan favourite \emph{know} (\citealt{white-rawlins-nels2018}). 
+\item A good starting point for trying to find an explanation for the observed variability are the communicatives, precisely because their CC is not predicted to project and yet often does, with some of these predicates receiving even higher projection ratings than the cognitive \emph{know} (\citealt{white-rawlins-nels2018}), which is commonly considered factive. 
 \item As White and Rawlins’s (2018) participants provided their ratings based on “low-content items” without any context, it is reasonable to assume that the differences in projection ratings in the MegaVeridicality dataset are the result of differences in the lexical meaning of these communicative predicates. 
 \item Since the meaning of a clause embedding predicate can be defined as the set of its entailments, in order to better understand if and how the meaning of these predicates modulates projection, a closer examination of their entailments is required.
 To this end, I am going to collect ratings on the entailments of communicative predicates and the projection of their CC.
@@ -242,7 +242,7 @@ Amongst the communicatives, however, only the correlation of valence and project
 	\label{projvalfac}
 \end{figure}
 
-Although higher dominance ratings are not generally associated with higher projection ratings, as shown in \figref{projVADdir} above, for the communicatives with an emotion entailment, dominance seems to be a highly significant predictor of projection ratings:
+Although higher dominance ratings are not generally associated with higher projection ratings, as shown in \figref{projVADdir} above, for the communicatives with an emotion entailment, dominance seems to be a significant predictor of projection ratings:
 	
 \begin{figure}[H]
 	\centering
@@ -251,7 +251,7 @@ Although higher dominance ratings are not generally associated with higher proje
 	\label{projdomfac}
 \end{figure}
 
-Another correlation between projection and VAD ratings is the direction of valence: negative valence is associated with higher projection ratings compared to positive valence. A cumulative link mixed model fitted with the R package ``ordinal” predicting projection ratings from direction of valence with random intercepts for participant and entailment-cancelling environment identifies an effect of direction of valence on projection ratings at the 0.001 significance level.
+Another correlation between projection and VAD ratings is the direction of valence: negative valence is associated with higher projection ratings compared to positive valence. A cumulative link mixed model fitted with the R package \emph{ordinal} (\citealt{R-ordinal}) predicting projection ratings from direction of valence with random intercepts for participant and entailment-cancelling environment identifies an effect of direction of valence on projection ratings at the 0.001 significance level.
 
 \subsubsection{Sub-classification}
 
@@ -264,7 +264,9 @@ Although the presence of an emotion entailment in communicative predicates is po
 	\label{projemocomm}
 \end{figure}
 
-\noindent Further important entailments of communicative predicates are
+\subsection{Other entailments}
+
+Further important entailments of communicative predicates are
 \begin{itemize}
 	\item The communication entailment:
 	\begin{itemize}
@@ -272,7 +274,7 @@ Although the presence of an emotion entailment in communicative predicates is po
 		\item The CC is communicated in some way.
 		\item For many communicatives with an emotive component, this entailment seems to project when the predicate is stressed.
 	\end{itemize}
-	\item -	The belief entailment:
+	\item The belief entailment:
 	\begin{itemize}
 		\item Part only of some communicatives, including those with an emotion entailment.
 		\item If the subject truly has an emotion about the CC, then they must also believe it. 
@@ -282,14 +284,31 @@ Although the presence of an emotion entailment in communicative predicates is po
 		\item Part of some of the communicatives with an emotion entailment, roughly \citepos{levin1993} ``verbs of manner of speaking”, such as \emph{groan}, \emph{moan} and \emph{squeal}.
 		\item ``... distinguished from each other by the manner in which the sound is expressed.” (\citealt{levin1993}: 206)
 	\end{itemize}
-	\item The speaker attitude / evaluation (???) entailment:
+	\item The subject attitude entailment:
+\begin{itemize}
+	\item Part of some of the communicatives with an emotion entailment, roughly Grimshaw's (2015) ``\textsc{say}-with-attitude verbs", such as \emph{bitch}, but also \citepos{levin1993} ``complain verbs”, like \emph{boast}, \emph{brag} and \emph{complain}.
+	\item The subject's attitude as perceived by the speaker.
+\end{itemize}	
+	\item The speaker attitude entailment:
 	\begin{itemize}
-		\item Part of some of the communicatives with an emotion entailment, roughly \citepos{levin1993} ``complain verbs”, like \emph{boast}, \emph{brag} and \emph{complain}.
-		\item ``... specify the speaker’s attitude or feelings towards what is said.” (\citealt{levin1993}: 211)
+		\item Part of some of the communicatives with an emotion entailment, including some of \citepos{levin1993} ``complain verbs”, like \emph{boast} and \emph{brag}.
+		\item The speaker judges \emph{how} something is said.
+		\item It seems that these `the speaker dislikes how the subject says something' predicates have no positive counterparts.
+		\item It seems that neither of these two `attitude' entailments ever occurs without the other.
+	\end{itemize}
+	\item The speaker evaluation entailment:
+	\begin{itemize}
+		\item The speaker expresses uncertainty or disbelief about \emph{what} is said with predicates like \emph{allege} or \emph{lie}.
+		\item It seems that these `the speaker believes the CC is (possibly) not true' predicates have no positive counterparts.
 	\end{itemize}
 \end{itemize}
 
-There are of course many more subtypes of communicative predicates to be identified. \figref{projcommextr} shows that on both ends of the projection rating range some subtypes of communicatives can be identified: 
+There are many more entailments that can be part of subtypes of communicatives predicates. \figref{projcommextr} shows that on both ends of the mean projection rating range some such subtypes that may share certain entailments can be identified: 
+\begin{itemize}
+	\item High: disclose-reveal; fess up-admit; explain-detail; document-log; … 
+	\item Low: fake-lie; jest-joke; hint-imply; contend-debate, …
+\end{itemize}
+
 
 \begin{figure}[H]
 	\centering
@@ -300,25 +319,31 @@ There are of course many more subtypes of communicative predicates to be identif
 
 \noindent For this investigation, the next steps are the following:
 \begin{itemize}
-	\item Identify all members of these subtype-groups, including those that might not be on the end of the projection rating range where the group was identified.
+	\item Identify some subtypes of communicatives and all members of these groups included in the new dataset.
 	\item Define the set of the most important entailments for each group.
-	\item Select a few interesting groups.
+	\item Select a few interesting groups. Each should share one entailment (other than the communication entailment) with one other group.
 	\item Collect projection, acceptability and entailment ratings for some or all members of these groups.
 \end{itemize}
 
 
 \section{Experiments}
-\subsection{Experiment 1}
-\subsubsection{Projection ratings}
+\subsection{Experiment 1: projection ratings}
 A closer inspection of participants’ acceptability ratings in the MV dataset reveals that these seem highly subjective, which calls into question the reliability of their projection ratings:
 \begin{itemize}
 	\item Only four of the 544 predicates in the MV dataset have mean acceptability ratings of less than 3. 
 	\item Even for the least acceptable predicates, most individual ratings are somewhere in the middle and some even on the high end of the scale. This indicates that many participants considered a stimulus acceptable if it was interpretable (e.g. \emph{John was overheard that a particular thing happened.} $\approx$ \emph{John was overheard saying that a particular thing happened.}) 
 	\item It therefore seems plausible that some veridicality and projection ratings might be based on utterances that differ from the original stimulus in unpredictable ways. 
-	\item As a result, I have to collect my own projection ratings for the 201 communicatives investigated here.
+	\item As a result, I have to collect my own projection ratings for the communicatives investigated here.
 \end{itemize}
 
-The purpose of this experiment is to find possible additional evidence for the patterns in the MV dataset described above. Therefore, the stimuli used here are designed to be comparable to the MV stimuli, just with ‘a little bit more content’, i.e., the utterances are something that people would actually say or hear, unlike \citepos{white-rawlins-nels2018} rather artificial ``low context items”. The stimuli are like those in \cite{white-rawlins-nels2018} in that 
+\subsubsection{Methods}
+\paragraph{Participants and data exclusion}
+
+350 participants were recruited via Prolific. Due to unclear circumstances only 347 participants' responses were recorded on the server that hosted the experiment. Each participant was paid £0.39. Only the responses of participants who are self-declared native speakers of American English were included in the analysis. 28 participants who failed at least one of two attention checks in the experiment were excluded from analysis. Of the remaining 314 participants, 206 are female, 106 male and 2 non-binary.
+
+
+\paragraph{Materials}
+The purpose of this experiment is to find possible additional evidence for the patterns in the MV dataset described above. Therefore, the stimuli used here were designed to be comparable to the MV stimuli, just with ‘a little bit more content’, i.e., the utterances are something that people would actually say or hear, unlike \citepos{white-rawlins-nels2018} rather artificial ``low context items”. The stimuli are like those in \cite{white-rawlins-nels2018} in that 
 \begin{itemize}
 	\item The past tense is used both for the matrix clause and the complement.
 	\item The complement describes an event, not a state.
@@ -326,13 +351,13 @@ The purpose of this experiment is to find possible additional evidence for the p
 	\item The complement does not contain aspect or mood marking.
 \end{itemize}
 
-However, for some of the communicatives in the MV dataset considered here, applying these rules would result in ungrammatical utterances. The following 10 predicates are therefore not included in this experiment:
+However, for some of the communicatives in the MV dataset considered here, applying these rules would result in ungrammatical utterances. The following 10 predicates were therefore not included in this experiment:
 \begin{itemize}
 	\item \emph{decree}, \emph{demand}, \emph{dictate}, \emph{ordain}, \emph{request} and \emph{rule} require a subjunctive mood complement.
 	\item \emph{forecast}, \emph{foretell}, \emph{predict} and \emph{prophesy} do not combine with a past tense complement.
 \end{itemize}
 
-For most of the remaining communicatives, it seems that they combine reasonably well with complements based on the rules above. Therefore, the following 11 complement clauses are used for the collection of projection ratings for these communicative predicates:
+Most of the remaining communicatives combine reasonably well with complements based on the rules above. Therefore, the following 11 complement clauses are used for the collection of projection ratings for these communicative predicates:
 \begin{exe}
 	\ex
 	\begin{xlist}
@@ -350,9 +375,13 @@ For most of the remaining communicatives, it seems that they combine reasonably 
 	\end{xlist}
 \end{exe}
 
-These complement clauses are relatively neutral, i.e., not clearly positive or negative, to avoid mismatches with communicatives with an emotion entailment, as such unexpected combinations could affect whether the CC is perceived as projecting. At the same time, an emotional reaction to these CCs is still plausible. As the complement clause in \cite{white-rawlins-nels2018} describes an event, only complement clauses that cannot be interpreted as describing a state were used for this experiment. Sentences like, e.g., \emph{the fabric stretched}, which could also be interpreted as describing a property, in this case as \emph{the fabric was stretchable}, were therefore not used as complement clauses in this experiment. Since the predicate \emph{feign}, which refers to the subject's pretending to have a feeling or condition, is not compatible with the complement clauses above, this predicate is not included in the experiment, leaving 190 predicates to be investigated here. The cognitive predicates \emph{think} and \emph{know} are included in the experiment for reference. The total number of predicates is therefore 192.
+These complement clauses are relatively neutral, i.e., not clearly positive or negative, to avoid mismatches with communicatives with an emotion entailment, as such unexpected combinations could affect whether the CC is perceived as projecting. At the same time, an emotional reaction to these CCs is still plausible. As the complement clause in \cite{white-rawlins-nels2018} describes an event, only complement clauses that cannot be interpreted as describing a state were used for this experiment. Sentences like, e.g., \emph{the fabric stretched}, which could also be interpreted as describing a property, in this case as \emph{the fabric was stretchable}, were therefore not used as complement clauses in this experiment. Since the predicate \emph{feign}, which refers to the subject's pretending to have a feeling or condition, is not compatible with the complement clauses above, this predicate is not included in the experiment, leaving 190 predicates to be investigated here. The cognitive predicates \emph{think} and \emph{know} were included in the experiment for reference. The total number of predicates in this experiment was therefore 192. 
 
-The stimuli are created by randomly combining each of these complement clauses with a gender-neutral name and one of the predicates and then negating the resulting statement. For each of these utterances, participants are asked to judge whether the CC is true, as shown in (5a). 
+The stimuli were created by randomly combining each of the complement clauses above with a gender-neutral name and one of the predicates, and then negating the resulting statement. As native speakers of American English were recruited as participants, to ensure comparability with \citepos{white-rawlins-nels2018} results, American spelling conventions were used for the stimuli.
+
+\paragraph{Procedure}
+
+For each of the utterances created as described above, participants were asked to judge whether the CC is true, as shown in (5a). 
 
 \begin{exe}
 	\ex
@@ -366,7 +395,7 @@ The stimuli are created by randomly combining each of these complement clauses w
 	\end{xlist}
 \end{exe}
 
-In addition to the 11 trial items, each participant sees two control items, designed to elicit either a clear `yes' (5b) or a clear `no' (5c) response. For their responses participants use a slider marked 'no' at one end and 'yes' at the other, as shown in \figref{exquest} below.
+In addition to the 11 trial items, each participant saw two control items, designed to elicit either a clear `yes' (5b) or a clear `no' (5c) response. For their responses participants use a slider marked 'no' at one end and 'yes' at the other, as shown in \figref{exquest} below.
 
 \begin{figure}[H]
 	\centering
@@ -375,9 +404,73 @@ In addition to the 11 trial items, each participant sees two control items, desi
 	\label{exquest}
 \end{figure}
 
-American spelling conventions were used for the stimuli, as the participants are native speakers of American English. To ensure that at least ten ratings per predicate are obtained, 350 participants are recruited via Prolific (192 predicates \(\times\) 20 ratings (10 \(\times\) 2, to be on the safe side) \(\div\) 11 ratings per participant \(\approx\) 349 participants). Each participant is paid £0.39 for taking part in the experiment, which takes approximately 2.5 minutes to complete.
+After providing their ratings for the stimuli, participants filled in a demographics questionnaire. On average, it took participants 2 min 39 sec to complete the survey.
+
+
+\subsubsection{Results}
+
+\paragraph{Responses}
 
 ...
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{variances}
+	\caption{Histogram of the variance of participants' ratings with 100 bins.}
+	\label{variances}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{ratings-distribution}
+	\caption{The 11 ratings each participant provided, ordered by their numerical value, i.e. ratings closer to -1 (``no") are lower on the y-axis, and vice versa. Participants are ordered by the sum of the numerical values of their ratings, i.e. the more high ratings a participant gave, the further to the right they are in the plot.}
+	\label{ratdistr}
+\end{figure}
+
+
+
+\paragraph{Projection}
+
+...
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{projection-by-communicative-comparison-labels-SD}
+	\caption{Mean projection rating by communicative predicate with labels for predicates with mean projection ratings at least one standard deviation below or above the mean of these ratings. Mean projection ratings from the MV dataset include only ratings based on stimuli with a negation-only embedding environment. The cognitives \emph{think} and \emph{know} are included for reference.}
+	\label{projlabSD}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.35\textwidth]{ranking-difference}
+	\caption{Distribnution of ranking differences in mean projection ratings between the new data and the MV dataset.}
+	\label{rankdiff}
+\end{figure}
+
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{projection-by-communicative-emo-labels-comparison}
+	\caption{Mean projection rating by communicative predicate with labels for predicates with an emotion entailment. Mean projection ratings from the MV dataset include only ratings based on stimuli with a negation-only embedding environment. The cognitives \emph{think} and \emph{know} are included for reference.}
+	\label{projlabemo}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.35\textwidth]{ranking-difference-emo}
+	\caption{Distribnution of ranking differences in mean projection ratings between the new data and the MV dataset for predicates with an emotion entailment.}
+	\label{rankdiffemo}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{projection-by-communicative-emoComms-manner-attitude-comparison}
+	\caption{Mean projection rating by communicative predicate with labels for predicates with an emotion entailment. Predicates with a lighter green label also have a manner entailment, those with a darker label also have an attitude entailment. Mean projection ratings from the MV dataset include only ratings based on stimuli with a negation-only embedding environment. The cognitives \emph{think} and \emph{know} are included for reference.}
+	\label{projlabemotypes}
+\end{figure}
+
+
 
 \subsection{Experiment 2}
 \subsubsection{Entailment ratings}

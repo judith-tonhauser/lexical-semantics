@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.29)  10 SEP 2024 14:24
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdflatex 2024.6.29)  1 OCT 2024 13:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1368,7 +1368,7 @@ LaTeX Font Info:    Font shape `OT1/txr/b/n' in size <10.95> not available
 
 
 [2]
-<../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf, id=116,
+<../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf, id=123,
  722.7pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf Gra
 phic file (type pdf)
@@ -1376,7 +1376,7 @@ phic file (type pdf)
 Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-pr
 edicateType.pdf  used on input line 175.
 (pdftex.def)             Requested size: 469.75502pt x 187.90417pt.
-<../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf, id=118
+<../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf, id=125
 , 722.7pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf Gr
 aphic file (type pdf)
@@ -1388,7 +1388,7 @@ edicateType2.pdf  used on input line 195.
 
 [3 <../../results/MegaVeridicality/graphs/projection-by-predicateType.pdf>]
 <../../results/MegaVeridicality/graphs/valence-arousal-dominance-by-predicateTy
-pe2-2.pdf, id=140, 722.7pt x 433.62pt>
+pe2-2.pdf, id=147, 722.7pt x 433.62pt>
 File: ../../results/MegaVeridicality/graphs/valence-arousal-dominance-by-predic
 ateType2-2.pdf Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/valence-arousal-dominance-by-predica
@@ -1400,7 +1400,7 @@ dominance-by-predicateType2-2.pdf  used on input line 220.
 
 [4 <../../results/MegaVeridicality/graphs/projection-by-predicateType2.pdf>]
 <../../results/MegaVeridicality/graphs/projection-by-VAD-with-direction-of-vale
-nce.pdf, id=153, 867.24pt x 252.945pt>
+nce.pdf, id=160, 867.24pt x 252.945pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-VAD-with-direction-of
 -valence.pdf Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/projection-by-VAD-with-direction-of-
@@ -1409,7 +1409,7 @@ Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-VA
 D-with-direction-of-valence.pdf  used on input line 231.
 (pdftex.def)             Requested size: 469.75502pt x 137.01282pt.
 <../../results/MegaVeridicality/graphs/projection-by-valence-faceted2.pdf, id=1
-55, 650.43pt x 289.08pt>
+62, 650.43pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-valence-faceted2.pdf 
 Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/projection-by-valence-faceted2.pdf>
@@ -1422,7 +1422,7 @@ lence-faceted2.pdf  used on input line 240.
 eType2-2.pdf> <../../results/MegaVeridicality/graphs/projection-by-VAD-with-dir
 ection-of-valence.pdf>]
 <../../results/MegaVeridicality/graphs/projection-by-dominance-faceted2.pdf, id
-=179, 650.43pt x 289.08pt>
+=186, 650.43pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-dominance-faceted2.pd
 f Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/projection-by-dominance-faceted2.pdf
@@ -1435,7 +1435,7 @@ minance-faceted2.pdf  used on input line 249.
 [6 <../../results/MegaVeridicality/graphs/projection-by-valence-faceted2.pdf> <
 ../../results/MegaVeridicality/graphs/projection-by-dominance-faceted2.pdf>]
 <../../results/MegaVeridicality/graphs/projection-by-communicative-emoComms.pdf
-, id=206, 939.51pt x 289.08pt>
+, id=216, 939.51pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-communicative-emoComm
 s.pdf Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/projection-by-communicative-emoComms
@@ -1443,63 +1443,140 @@ s.pdf Graphic file (type pdf)
 Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-co
 mmunicative-emoComms.pdf  used on input line 262.
 (pdftex.def)             Requested size: 469.75502pt x 144.53964pt.
+
+
+[7 <../../results/MegaVeridicality/graphs/projection-by-communicative-emoComms.
+pdf>]
 <../../results/MegaVeridicality/graphs/projection-by-communicative-extremes-41-
-44.pdf, id=216, 939.51pt x 289.08pt>
+44.pdf, id=247, 939.51pt x 289.08pt>
 File: ../../results/MegaVeridicality/graphs/projection-by-communicative-extreme
 s-41-44.pdf Graphic file (type pdf)
 <use ../../results/MegaVeridicality/graphs/projection-by-communicative-extremes
 -41-44.pdf>
 Package pdftex.def Info: ../../results/MegaVeridicality/graphs/projection-by-co
-mmunicative-extremes-41-44.pdf  used on input line 296.
+mmunicative-extremes-41-44.pdf  used on input line 315.
 (pdftex.def)             Requested size: 469.75502pt x 144.53964pt.
 
-
-[7 <../../results/MegaVeridicality/graphs/projection-by-communicative-emoComms.
-pdf>]
 
 [8 <../../results/MegaVeridicality/graphs/projection-by-communicative-extremes-
 41-44.pdf>]
 
 [9]
-<../../results/MegaVeridicality/graphs/example-question.pdf, id=279, 845.1575pt
+<../../results/MegaVeridicality/graphs/example-question.pdf, id=281, 845.1575pt
  x 597.23125pt>
 File: ../../results/MegaVeridicality/graphs/example-question.pdf Graphic file (
 type pdf)
 <use ../../results/MegaVeridicality/graphs/example-question.pdf>
 Package pdftex.def Info: ../../results/MegaVeridicality/graphs/example-question
-.pdf  used on input line 373.
+.pdf  used on input line 402.
 (pdftex.def)             Requested size: 187.89914pt x 132.77644pt.
 
 
-[10 <../../results/MegaVeridicality/graphs/example-question.pdf>]
-(hypotheses.bbl)
+[10]
+<../../results/Experiment1/graphs/variances.pdf, id=304, 578.16pt x 578.16pt>
+File: ../../results/Experiment1/graphs/variances.pdf Graphic file (type pdf)
+<use ../../results/Experiment1/graphs/variances.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/variances.pdf  used o
+n input line 418.
+(pdftex.def)             Requested size: 234.8775pt x 234.87692pt.
+<../../results/Experiment1/graphs/ratings-distribution.pdf, id=305, 939.51pt x 
+289.08pt>
+File: ../../results/Experiment1/graphs/ratings-distribution.pdf Graphic file (t
+ype pdf)
+<use ../../results/Experiment1/graphs/ratings-distribution.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/ratings-distribution.
+pdf  used on input line 426.
+(pdftex.def)             Requested size: 469.75502pt x 144.53964pt.
 
-[11] (hypotheses.aux)
+
+[11 <../../results/MegaVeridicality/graphs/example-question.pdf> <../../results
+/Experiment1/graphs/variances.pdf>]
+<../../results/Experiment1/graphs/projection-by-communicative-comparison-labels
+-SD.pdf, id=328, 939.51pt x 505.89pt>
+File: ../../results/Experiment1/graphs/projection-by-communicative-comparison-l
+abels-SD.pdf Graphic file (type pdf)
+<use ../../results/Experiment1/graphs/projection-by-communicative-comparison-la
+bels-SD.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/projection-by-communi
+cative-comparison-labels-SD.pdf  used on input line 439.
+(pdftex.def)             Requested size: 469.75502pt x 252.94437pt.
+<../../results/Experiment1/graphs/ranking-difference.pdf, id=329, 505.89pt x 50
+5.89pt>
+File: ../../results/Experiment1/graphs/ranking-difference.pdf Graphic file (typ
+e pdf)
+<use ../../results/Experiment1/graphs/ranking-difference.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/ranking-difference.pd
+f  used on input line 446.
+(pdftex.def)             Requested size: 164.41711pt x 164.42001pt.
+
+
+[12 <../../results/Experiment1/graphs/ratings-distribution.pdf> <../../results/
+Experiment1/graphs/projection-by-communicative-comparison-labels-SD.pdf>]
+<../../results/Experiment1/graphs/projection-by-communicative-emo-labels-compar
+ison.pdf, id=356, 939.51pt x 505.89pt>
+File: ../../results/Experiment1/graphs/projection-by-communicative-emo-labels-c
+omparison.pdf Graphic file (type pdf)
+<use ../../results/Experiment1/graphs/projection-by-communicative-emo-labels-co
+mparison.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/projection-by-communi
+cative-emo-labels-comparison.pdf  used on input line 454.
+(pdftex.def)             Requested size: 469.75502pt x 252.94437pt.
+<../../results/Experiment1/graphs/ranking-difference-emo.pdf, id=357, 505.89pt 
+x 505.89pt>
+File: ../../results/Experiment1/graphs/ranking-difference-emo.pdf Graphic file 
+(type pdf)
+<use ../../results/Experiment1/graphs/ranking-difference-emo.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/ranking-difference-em
+o.pdf  used on input line 461.
+(pdftex.def)             Requested size: 164.41711pt x 164.42001pt.
+
+
+[13 <../../results/Experiment1/graphs/ranking-difference.pdf> <../../results/Ex
+periment1/graphs/projection-by-communicative-emo-labels-comparison.pdf>]
+<../../results/Experiment1/graphs/projection-by-communicative-emoComms-manner-a
+ttitude-comparison.pdf, id=379, 939.51pt x 505.89pt>
+File: ../../results/Experiment1/graphs/projection-by-communicative-emoComms-man
+ner-attitude-comparison.pdf Graphic file (type pdf)
+<use ../../results/Experiment1/graphs/projection-by-communicative-emoComms-mann
+er-attitude-comparison.pdf>
+Package pdftex.def Info: ../../results/Experiment1/graphs/projection-by-communi
+cative-emoComms-manner-attitude-comparison.pdf  used on input line 468.
+(pdftex.def)             Requested size: 469.75502pt x 252.94437pt.
+
+
+[14 <../../results/Experiment1/graphs/ranking-difference-emo.pdf> <../../result
+s/Experiment1/graphs/projection-by-communicative-emoComms-manner-attitude-compa
+rison.pdf>]
+
+[15] (hypotheses.bbl)
+
+[16] (hypotheses.aux)
  ***********
 LaTeX2e <2024-06-01> patch level 1
 L3 programming layer <2024-05-27>
  ***********
 Package rerunfilecheck Info: File `hypotheses.out' has not changed.
-(rerunfilecheck)             Checksum: 43696DF3FAB853A4E05B159F03CD1158;2225.
+(rerunfilecheck)             Checksum: 10021379B8ED799CD1E423B39942F77A;2522.
  ) 
 Here is how much of TeX's memory you used:
- 30138 strings out of 473920
- 534164 string characters out of 5726974
+ 30245 strings out of 473920
+ 539448 string characters out of 5726974
  1940908 words of memory out of 5000000
- 52337 multiletter control sequences out of 15000+600000
- 587202 words of font info for 107 fonts, out of 8000000 for 9000
+ 52422 multiletter control sequences out of 15000+600000
+ 588256 words of font info for 109 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 102i,6n,107p,3244b,664s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,6n,107p,3244b,665s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/rtcx
 r.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfonts/
 rtxr.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/txfon
-ts/txsy.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmb8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmr8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times
-/utmri8a.pfb>
-Output written on hypotheses.pdf (11 pages, 356278 bytes).
+ts/rtxsc.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/public/t
+xfonts/txsy.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
+imes/utmb8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
+imes/utmr8a.pfb><C:/Users/kilia/AppData/Local/Programs/MiKTeX/fonts/type1/urw/t
+imes/utmri8a.pfb>
+Output written on hypotheses.pdf (16 pages, 587295 bytes).
 PDF statistics:
- 339 PDF objects out of 1000 (max. 8388607)
- 68 named destinations out of 1000 (max. 500000)
- 178 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 461 PDF objects out of 1000 (max. 8388607)
+ 88 named destinations out of 1000 (max. 500000)
+ 229 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -5,44 +5,44 @@ Reallocating 'name_of_file' (item size: 1) to 19 items.
 The style file: ../cslipubs-natbib.bst
 Reallocating 'name_of_file' (item size: 1) to 16 items.
 Database file #1: ../bibliography.bib
-You've used 6 entries,
+You've used 7 entries,
             2811 wiz_defined-function locations,
-            664 strings with 5707 characters,
-and the built_in function-call counts, 3169 in all, are:
-= -- 292
-> -- 146
-< -- 8
-+ -- 48
-- -- 40
-* -- 250
-:= -- 539
-add.period$ -- 26
-call.type$ -- 6
-change.case$ -- 47
-chr.to.int$ -- 6
-cite$ -- 6
-duplicate$ -- 141
-empty$ -- 244
-format.name$ -- 54
-if$ -- 668
+            670 strings with 5822 characters,
+and the built_in function-call counts, 3482 in all, are:
+= -- 322
+> -- 157
+< -- 9
++ -- 52
+- -- 43
+* -- 267
+:= -- 602
+add.period$ -- 30
+call.type$ -- 7
+change.case$ -- 52
+chr.to.int$ -- 7
+cite$ -- 7
+duplicate$ -- 158
+empty$ -- 267
+format.name$ -- 58
+if$ -- 727
 int.to.chr$ -- 1
 int.to.str$ -- 1
 missing$ -- 7
-newline$ -- 35
-num.names$ -- 28
-pop$ -- 49
+newline$ -- 40
+num.names$ -- 32
+pop$ -- 54
 preamble$ -- 2
-purify$ -- 36
+purify$ -- 41
 quote$ -- 0
-skip$ -- 114
+skip$ -- 127
 stack$ -- 0
-substring$ -- 168
-swap$ -- 43
+substring$ -- 179
+swap$ -- 45
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 51
+type$ -- 60
 warning$ -- 0
-while$ -- 27
+while$ -- 30
 width$ -- 0
-write$ -- 83
+write$ -- 95
