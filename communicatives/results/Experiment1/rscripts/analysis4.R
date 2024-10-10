@@ -1,4 +1,4 @@
-# Testing hypotheses based on experiment 1
+# Testing hypotheses based on results of experiment 1
 
 # set working directory to directory of script
 this.dir <- dirname(rstudioapi::getSourceEditorContext()$path)
@@ -22,28 +22,77 @@ nrow(e1) # 3454
 names(e1)
 length(unique(e1$participant_id)) # 314
 
-# add predicate type (communicative with/without emotion entailment distinction) and type of emoComm
-emoComms <- c("bitch", "boast", "brag", "cheer", "complain", "cry", "exclaim", "fuss", "gloat", 
-                 "groan", "grumble", "grunt", "howl", "moan", "mutter", "pout", "quarrel", "rant", 
-                 "rave", "scream", "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")
-emo_comm_attitude <- c("bitch", "boast", "brag", "cheer", "complain", "fuss", "gloat", "pout", "quarrel",
-                       "rant", "rave")   
-emo_comm_manner <- c("cry", "exclaim", "groan", "grumble", "grunt", "howl", "moan", "mutter", "scream",
-                     "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")  
+# load predicate coding
+y <- read.csv("../../MegaVeridicality/data/predicate-coding.csv")
+nrow(y) # 544
+names(y)
+
+y1 <- y %>% filter(verb_renamed %in% e1$predicate)
+nrow(y) # 192
+
+e1 <- left_join(e1, y1, by = c("predicate" = "verb_renamed"))
+nrow(e1) # 3454
+
+# specify colours and names for predicate types
+cols2 <- c(cognitive = "coral",
+           emoComm = "green3",
+           nonEmoComm = "deepskyblue2")
+
+predicateType2_names <- c( "cognitive" = "cognitive", 
+                           "emoComm" = "communicative with\nemotion entailment", 
+                           "nonEmoComm" = "communicative without\nemotion entailment")
+
+# # add predicate type (communicative with/without emotion entailment distinction) and type of emoComm
+# emoComms <- c("bitch", "boast", "brag", "cheer", "complain", "cry", "exclaim", "fuss", "gloat", 
+#                  "groan", "grumble", "grunt", "howl", "moan", "mutter", "pout", "quarrel", "rant", 
+#                  "rave", "scream", "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")
+# emo_comm_attitude <- c("bitch", "boast", "brag", "cheer", "complain", "fuss", "gloat", "pout", "quarrel",
+#                        "rant", "rave")   
+# emo_comm_manner <- c("cry", "exclaim", "groan", "grumble", "grunt", "howl", "moan", "mutter", "scream",
+#                      "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")  
 
 e1 <- e1 %>% 
-  mutate(predicateType2 = case_when(predicate %in% c("know", "think") ~ "cognitive",
-                                    predicate %in% emoComms ~ "emoComm",
-                                    TRUE ~ "nonEmoComm"),
-         emoCommType = case_when(predicate %in% emo_comm_attitude ~ "attitude",
-                                 predicate %in% emo_comm_manner ~ "manner"))
+  # mutate(predicateType2 = case_when(predicate %in% c("know", "think") ~ "cognitive",
+  #                                   predicate %in% emoComms ~ "emoComm",
+  #                                   TRUE ~ "nonEmoComm"),
+  #        emoCommType = case_when(predicate %in% emo_comm_attitude ~ "attitude",
+  #                                predicate %in% emo_comm_manner ~ "manner"))
+  mutate(predicateType = case_when(communicative == "yes" ~ "communicative",   
+                                   cognitive == "yes" ~ "cognitive"),         
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         volition = case_when(volitional == "yes" ~ "volitional",
+                              TRUE ~ "non-volitional"),
+         predicateType2 = case_when(predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "cognitive" ~ "cognitive"),
+         commType = case_when(pure_comm == "yes" ~ "pure",
+                              discourse_participation_comm == "yes" ~ "discourse participation",
+                              state_changing_comm == "yes" ~ "state changing"),
+         emoCommType = case_when(emo_comm_manner == "yes" ~ "manner",
+                                 emo_comm_attitude == "yes" ~ "attitude"),
+         changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
+                                   TRUE ~ "no"),
+         sayVerb = case_when(say_verb == "yes" ~ "yes",
+                             TRUE ~ "no"),
+         sayVerbType = case_when(discourse_role_verb == "yes" ~ "discourse role verb",
+                                 mode_verb == "yes" ~ "mode verb", 
+                                 predicate == "say" ~ "say"),
+         modeVerbType = case_when(say_by_means == "yes" ~ "say-by-means",
+                                  say_with_attitude == "yes" ~ "say-with-attitude"),
+         sayByMeansVerbType = case_when(say_by_means_manner == "yes" ~ "manner",
+                                        say_by_means_sound == "yes" ~ "sound",
+                                        say_by_means_form == "yes" ~ "form"))
 
 # add the number of ratings each predicate has received
 e1 <- e1 %>%
   group_by(predicate) %>%
-  mutate(ratings_count = n()) %>%
+  mutate(ratingsCount = n()) %>%
   ungroup()
 
+# how many of which type of predicate?
 e1 %>%
   group_by(predicateType2) %>%
   distinct(predicate) %>%
@@ -65,10 +114,15 @@ mean.proj.e1 <- e1 %>%
          predicate = fct_reorder(as.factor(predicate), Mean.Proj)) %>% 
   ungroup()
 nrow(mean.proj.e1) # 192
+# cat(as.character(mean.proj.e1$predicate), sep = "\n")
 
 tmp <- e1 %>%
-  select(predicate, predicateType2, emoCommType, ratings_count) %>%
-  distinct(predicate, predicateType2, emoCommType, ratings_count)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType, ratingsCount)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType, ratingsCount)
 nrow(tmp) # 192
 
 mean.proj.e1 <- left_join(mean.proj.e1, tmp, by = c("predicate")) %>%
@@ -80,49 +134,83 @@ nrow(mean.proj.e1) # 192
 d <- read.csv("../../MegaVeridicality/data/d.csv")
 nrow(d) # 21692
 
+d <- left_join(d, y, by = c("verb", "voice"))
+nrow(d) # 21692
+
+### overall ----
 # create dataset for projection inferences
 d.proj <- droplevels(subset(d, d$polarity == "negative" | d$conditional == "True"))
 nrow(d.proj) # 16291
-
-# replace underscores in multi-word predicates in the MV with spaces (for comparison with new data)
-d.proj$verb <- gsub("_", " ", d.proj$verb)
-
-# only include active voice predicates
-# when a predicate also occurs in the passive voice in the MV dataset (e.g., 'radio'), we consider
-# it a different predicate type (e.g. 'was radioed' = reportative evidential) and it is therefore 
-# not relevant to this investigation of communicative predicates.
-d.proj <- d.proj %>% filter(voice == "active")
-nrow(d.proj) # 11231
+# 
+# # replace underscores in multi-word predicates in the MV with spaces (for comparison with new data)
+# d.proj$verb <- gsub("_", " ", d.proj$verb)
+# 
+# # only include active voice predicates
+# # when a predicate also occurs in the passive voice in the MV dataset (e.g., 'radio'), we consider
+# # it a different predicate type (e.g. 'was radioed' = reportative evidential) and it is therefore 
+# # not relevant to this investigation of communicative predicates.
+# d.proj <- d.proj %>% filter(voice == "active")
+# nrow(d.proj) # 11231
 
 # only the predicates investigated here
-d.proj <- d.proj %>% filter(verb %in% mean.proj.e1$predicate)
+d.proj <- d.proj %>% filter(verb_renamed %in% mean.proj.e1$predicate)
 d.proj %>% nrow() # 5753
-length(unique(d.proj$verb)) # 192
+length(unique(d.proj$verb_renamed)) # 192
 
 d.proj <- d.proj %>% 
-  mutate(predicate = verb,
-         predicateType2 = case_when(verb %in% c("know", "think") ~ "cognitive",
-                                    verb %in% emoComms ~ "emoComm",
-                                    TRUE ~ "nonEmoComm"),
-         emoCommType = case_when(verb %in% emo_comm_attitude ~ "attitude",
-                                 verb %in% emo_comm_manner ~ "manner"))
+  mutate(predicate = verb_renamed,
+    predicateType = case_when(communicative == "yes" ~ "communicative",   
+                                   cognitive == "yes" ~ "cognitive"),         
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         volition = case_when(volitional == "yes" ~ "volitional",
+                              TRUE ~ "non-volitional"),
+         predicateType2 = case_when(predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "cognitive" ~ "cognitive"),
+         commType = case_when(pure_comm == "yes" ~ "pure",
+                              discourse_participation_comm == "yes" ~ "discourse participation",
+                              state_changing_comm == "yes" ~ "state changing"),
+         emoCommType = case_when(emo_comm_manner == "yes" ~ "manner",
+                                 emo_comm_attitude == "yes" ~ "attitude"),
+         changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
+                                   TRUE ~ "no"),
+         environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
+                                 polarity == "positive" & conditional == "True" ~ "qcond",
+                                 polarity == "negative" & conditional == "True" ~ "qcondneg"),
+         sayVerb = case_when(say_verb == "yes" ~ "yes",
+                             TRUE ~ "no"),
+         sayVerbType = case_when(discourse_role_verb == "yes" ~ "discourse role verb",
+                                 mode_verb == "yes" ~ "mode verb", 
+                                 verb_renamed == "say" ~ "say"),
+         modeVerbType = case_when(say_by_means == "yes" ~ "say-by-means",
+                                  say_with_attitude == "yes" ~ "say-with-attitude"),
+         sayByMeansVerbType = case_when(say_by_means_manner == "yes" ~ "manner",
+                                        say_by_means_sound == "yes" ~ "sound",
+                                        say_by_means_form == "yes" ~ "form"))
 
 # calculate by-predicate projection means for MV data
 mean.proj.MV <- d.proj %>%
-  group_by(verb, voice) %>%
+  group_by(predicate) %>%
   summarize(Mean.Proj = mean(veridicality_num), 
             CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num),
             Mean.Acc = mean(acceptability)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, 
          YMax.Proj = Mean.Proj + CIHigh, 
-         predicate = fct_reorder(as.factor(verb), Mean.Proj)) %>% 
+         predicate = fct_reorder(as.factor(predicate), Mean.Proj)) %>% 
   ungroup()
 nrow(mean.proj.MV) # 192
 
 tmp <- d.proj %>%
-  select(predicate, predicateType2, emoCommType) %>%
-  distinct(predicate, predicateType2, emoCommType)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)
 nrow(tmp) # 192
 
 mean.proj.MV <- left_join(mean.proj.MV, tmp, by = c("predicate")) %>%
@@ -130,60 +218,163 @@ mean.proj.MV <- left_join(mean.proj.MV, tmp, by = c("predicate")) %>%
   mutate(predicate = fct_reorder(as.factor(predicate), Mean.Proj))
 nrow(mean.proj.MV) # 192
 
-# create dataset for projection from under negation only
-d.proj.neg <- droplevels(subset(d, d$polarity == "negative" & d$conditional == "False"))
-nrow(d.proj.neg) # 5411
-
-d.proj.neg$verb <- gsub("_", " ", d.proj.neg$verb)
-
-# only include active voice predicates
-d.proj.neg <- d.proj.neg %>% filter(voice == "active")
-nrow(d.proj.neg) # 3731
-
-# only the predicates investigated here
-d.proj.neg <- d.proj.neg %>% filter(verb %in% mean.proj.e1$predicate)
-d.proj.neg %>% nrow() # 1913
-length(unique(d.proj.neg$verb)) # 192
-
-d.proj.neg <- d.proj.neg %>% 
-  mutate(predicate = verb,
-         predicateType2 = case_when(verb %in% c("know", "think") ~ "cognitive",
-                                    verb %in% emoComms ~ "emoComm",
-                                    TRUE ~ "nonEmoComm"),
-         emoCommType = case_when(verb %in% emo_comm_attitude ~ "attitude",
-                                 verb %in% emo_comm_manner ~ "manner"))
-
-# calculate by-predicate projection means
-mean.proj.MV.neg <- d.proj.neg %>%
-  group_by(verb, voice) %>%
+#### by embedding environment ----
+# calculate by-predicate projection means for MV data
+mean.proj.MV.env <- d.proj %>%
+  group_by(predicate, environment) %>%
   summarize(Mean.Proj = mean(veridicality_num), 
             CILow = ci.low(veridicality_num), 
             CIHigh = ci.high(veridicality_num),
             Mean.Acc = mean(acceptability)) %>%
   mutate(YMin.Proj = Mean.Proj - CILow, 
          YMax.Proj = Mean.Proj + CIHigh, 
-         predicate = fct_reorder(as.factor(verb), Mean.Proj)) %>% 
+         predicate = fct_reorder(as.factor(predicate), Mean.Proj)) %>% 
+  ungroup()
+nrow(mean.proj.MV.env) # 576
+
+tmp <- d.proj %>%
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType, environment)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType, environment)
+nrow(tmp) # 576
+
+mean.proj.MV.env <- left_join(mean.proj.MV.env, tmp, by = c("predicate", "environment")) %>%
+  distinct() %>%
+  mutate(predicate = fct_reorder(as.factor(predicate), Mean.Proj))
+nrow(mean.proj.MV.env) # 576
+
+# how many predicates in which environment?
+mean.proj.MV.env %>%
+  select(environment, predicate) %>% 
+  unique() %>% 
+  group_by(environment) %>% 
+  summarize(count = n())
+#   environment count
+#   <chr>       <int>
+# 1 neg           192
+# 2 qcond         192
+# 3 qcondneg      192
+
+
+### negation only ----
+# create dataset for projection from under negation only
+d.proj.neg <- droplevels(subset(d, d$polarity == "negative" & d$conditional == "False"))
+nrow(d.proj.neg) # 5411
+
+# only the predicates investigated here
+d.proj.neg <- d.proj.neg %>% filter(verb_renamed %in% mean.proj.e1$predicate)
+d.proj.neg %>% nrow() # 1913
+length(unique(d.proj.neg$verb_renamed)) # 192
+
+d.proj.neg <- d.proj.neg %>% 
+  mutate(predicate = verb_renamed,
+         predicateType = case_when(communicative == "yes" ~ "communicative",   
+                                   cognitive == "yes" ~ "cognitive"),         
+         emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
+                                      TRUE ~ "no"),
+         volition = case_when(volitional == "yes" ~ "volitional",
+                              TRUE ~ "non-volitional"),
+         predicateType2 = case_when(predicateType == "communicative" & 
+                                      emotiveComponent == "yes" ~ "emoComm",
+                                    predicateType == "communicative" & 
+                                      emotiveComponent == "no" ~ "nonEmoComm",
+                                    predicateType == "cognitive" ~ "cognitive"),
+         commType = case_when(pure_comm == "yes" ~ "pure",
+                              discourse_participation_comm == "yes" ~ "discourse participation",
+                              state_changing_comm == "yes" ~ "state changing"),
+         emoCommType = case_when(emo_comm_manner == "yes" ~ "manner",
+                                 emo_comm_attitude == "yes" ~ "attitude"),
+         changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
+                                   TRUE ~ "no"),
+         sayVerb = case_when(say_verb == "yes" ~ "yes",
+                             TRUE ~ "no"),
+         sayVerbType = case_when(discourse_role_verb == "yes" ~ "discourse role verb",
+                                 mode_verb == "yes" ~ "mode verb", 
+                                 verb_renamed == "say" ~ "say"),
+         modeVerbType = case_when(say_by_means == "yes" ~ "say-by-means",
+                                  say_with_attitude == "yes" ~ "say-with-attitude"),
+         sayByMeansVerbType = case_when(say_by_means_manner == "yes" ~ "manner",
+                                        say_by_means_sound == "yes" ~ "sound",
+                                        say_by_means_form == "yes" ~ "form"))
+
+
+# calculate by-predicate projection means
+mean.proj.MV.neg <- d.proj.neg %>%
+  group_by(predicate) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num),
+            Mean.Acc = mean(acceptability)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicate = fct_reorder(as.factor(predicate), Mean.Proj)) %>% 
   ungroup()
 nrow(mean.proj.MV.neg) # 192
+
+tmp <- d.proj %>%
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
+           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+           modeVerbType, sayByMeansVerbType)
+nrow(tmp) # 192
 
 mean.proj.MV.neg <- left_join(mean.proj.MV.neg, tmp, by = c("predicate")) %>%
   distinct() %>%
   mutate(predicate = fct_reorder(as.factor(predicate), Mean.Proj))
 nrow(mean.proj.MV.neg) # 192
 
+# low acceptability under negation only
+# mean.proj.MV.neg %>% filter(Mean.Acc <= 4) %>% distinct(predicate, Mean.Acc) %>% print(n = Inf)
+# predicate  Mean.Acc
+#   <fct>         <dbl>
+# 1 add            3.7 
+# 2 chant          3.7 
+# 3 chatter        4   
+# 4 depict         4   
+# 5 gab            3.1 
+# 6 grunt          3.5 
+# 7 howl           3.9 
+# 8 jest           3.7 
+# 9 lecture        3.8 
+# 10 lie            3.7 
+# 11 maintain       3.5 
+# 12 mumble         3.9 
+# 13 mutter         3.8 
+# 14 quip           3.1 
+# 15 rant           4   
+# 16 reply          4   
+# 17 scribble       3.2 
+# 18 shriek         3.8 
+# 19 sing           3.11
+# 20 sketch         4   
+# 21 snitch         3.9 
+# 22 spout          3.6 
+# 23 submit         4   
+# 24 summarize      3.9 
+# 25 underline      3.5 
+# 26 underscore     3.4 
+# 27 whimper        3.6 
+# 28 yell           3.6 
+
+
 ## combine data ----
 # add mean acceptability ratings from MV dataset to new data
 e1 <- e1 %>%
   left_join(
     mean.proj.MV %>%
-      filter(predicate %in% e1$predicate) %>%
+     # filter(predicate %in% e1$predicate) %>%
       select(predicate, Mean.Acc) %>%
       rename_with(~ paste0(., ".MV"), "Mean.Acc"),
     by = "predicate"
   ) %>%
   left_join(
     mean.proj.MV.neg %>%
-      filter(predicate %in% e1$predicate) %>%
+      #filter(predicate %in% e1$predicate) %>%
       select(predicate, Mean.Acc) %>%
       rename_with(~ paste0(., ".MV.neg"), "Mean.Acc"),
     by = "predicate"
@@ -193,18 +384,24 @@ e1 <- e1 %>%
 mean.proj.e1.plus <- mean.proj.e1 %>%
   left_join(
     mean.proj.MV %>%
-      filter(predicate %in% mean.proj.e1$predicate) %>%
+      #filter(predicate %in% mean.proj.e1$predicate) %>%
       select(predicate, Mean.Proj, Mean.Acc, YMin.Proj, YMax.Proj) %>%
       rename_with(~ paste0(., ".MV"), starts_with(c("Mean", "Y"))),
     by = "predicate") %>%
   left_join(
     mean.proj.MV.neg %>%
-      filter(predicate %in% mean.proj.e1$predicate) %>%
+     # filter(predicate %in% mean.proj.e1$predicate) %>%
       select(predicate, Mean.Proj, Mean.Acc, YMin.Proj, YMax.Proj) %>%
       rename_with(~ paste0(., ".MV.neg"), starts_with(c("Mean", "Y"))),
     by = "predicate") %>% 
   mutate(Mean.Proj.diff = Mean.Proj - Mean.Proj.MV,
          Mean.Proj.diff.neg = Mean.Proj - Mean.Proj.MV.neg)
+
+# add rankings of projection ratings for both datasets
+mean.proj.e1.plus <- mean.proj.e1.plus %>% 
+  mutate(rankingNew = rank(Mean.Proj),
+         rankingMVneg = rank(Mean.Proj.MV.neg),
+         ranking_difference = abs(rankingNew - rankingMVneg))
 
 
 # new data ----
@@ -518,15 +715,15 @@ ggsave("../graphs/projection-by-communicative-labels-45pos-45.pdf", height = 4, 
 ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
-  geom_point(data = mean.proj.e1 %>% filter(predicate %in% emoComms), 
-             aes(x = predicate, y = Mean.Proj, colour = "emoComms")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
              aes(x = predicate, y = Mean.Proj, colour = "say")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
              aes(x = predicate, y = Mean.Proj, colour = "think")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
              aes(x = predicate, y = Mean.Proj, colour = "know")) +
-  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% emoComms),
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"),
                    aes(label = paste0(predicate, ": ", round(Mean.Proj, 2))), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = -0.6,
@@ -553,7 +750,7 @@ ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
   labs(x = "Predicate",
        y = "Mean projection rating") +
   scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
-  scale_colour_manual(limits = c("communicative predicate", "emoComms", "say", "think", "know"),
+  scale_colour_manual(limits = c("communicative predicate", "emoComm", "say", "think", "know"),
                       values = c("deepskyblue2", "green4", "blue", "deeppink", "orangered3"))
 ggsave("../graphs/projection-by-communicative-emo-labels.pdf", height = 4, width = 13)
 
@@ -939,11 +1136,23 @@ ggsave("../graphs/projection-by-communicative-comparison-alphabetical-neg.pdf", 
 #### overall ----
 # new data vs MV data with all embedding environments
 
+# mean difference in projection ratings:
+mean(mean.proj.e1.plus$Mean.Proj.diff) # 0.07843124
+
+mean.proj.e1.plus %>% count(Mean.Proj.diff > 0)
+#   `Mean.Proj.diff > 0`     n
+#   <lgl>                <int>
+# 1 FALSE                   74
+# 2 TRUE                   118
+# 118 (61%) of the predicates investigated here have a higher projection rating in the new dataset
+# than in the MV dataset across embedding environments.
+
+##### plots ----
 # with ratings count
 mean.proj.e1.plus %>%  
   arrange(Mean.Proj.diff) %>%
   mutate(group = cut_number(row_number(), n = 3, labels = c("Group 1", "Group 2", "Group 3"))) %>%
-ggplot(aes(x = reorder(predicate, Mean.Proj.diff), y = Mean.Proj.diff, fill = ratings_count)) +
+ggplot(aes(x = reorder(predicate, Mean.Proj.diff), y = Mean.Proj.diff, fill = ratingsCount)) +
   geom_bar(stat = "identity") +
   theme(legend.position = "right",
         legend.title = element_text(size = 12),
@@ -990,11 +1199,24 @@ ggsave("../graphs/projection-by-communicative-differences-emo.pdf", height = 7, 
 
 #### negation only ----
 # new data vs MV data with negation as embedding environment only
+
+# mean difference in projection ratings:
+mean(mean.proj.e1.plus$Mean.Proj.diff.neg) # 0.1772898
+
+mean.proj.e1.plus %>% count(Mean.Proj.diff.neg > 0)
+#   `Mean.Proj.diff.neg > 0`     n
+#   <lgl>                    <int>
+# 1 FALSE                       41
+# 2 TRUE                       151
+# 151 (79%) of the predicates investigated here have a higher projection rating in the new dataset
+# than in the MV dataset within the negation-only embedding environments.
+
+##### plots ----
 # with ratings count
 mean.proj.e1.plus %>%  
   arrange(Mean.Proj.diff.neg) %>%
   mutate(group = cut_number(row_number(), n = 3, labels = c("Group 1", "Group 2", "Group 3"))) %>%
-  ggplot(aes(x = reorder(predicate, Mean.Proj.diff.neg), y = Mean.Proj.diff.neg, fill = ratings_count)) +
+  ggplot(aes(x = reorder(predicate, Mean.Proj.diff.neg), y = Mean.Proj.diff.neg, fill = ratingsCount)) +
   geom_bar(stat = "identity") +
   scale_fill_gradient(low = "lightblue", high = "darkblue") + 
   theme(legend.position = "right",
@@ -1039,17 +1261,38 @@ mean.proj.e1.plus %>%
   facet_wrap(~ group, scales = "free_x", ncol = 1)
 ggsave("../graphs/projection-by-communicative-differences-emo-neg.pdf", height = 7, width = 13)
 
-## Spearman rank correlation ----
+
+## Spearman rank correlations ----
+# new data - MV overall
 mean.proj.e1.plus %>%
   summarise(correlation = cor(Mean.Proj, Mean.Proj.MV, method = "spearman")) # 0.497
+# new data - MV negation only
 mean.proj.e1.plus %>%
   summarise(correlation = cor(Mean.Proj, Mean.Proj.MV.neg, method = "spearman")) # 0.674
+# communicatives with emotion entailment
 mean.proj.e1.plus %>%
   filter(predicateType2 == "emoComm") %>% 
   summarise(correlation = cor(Mean.Proj, Mean.Proj.MV, method = "spearman")) # 0.397
 mean.proj.e1.plus %>%
   filter(predicateType2 == "emoComm") %>% 
   summarise(correlation = cor(Mean.Proj, Mean.Proj.MV.neg, method = "spearman")) # 0.592
+
+# between the different embedding environments in the MV dataset
+# negation vs question + conditional
+mean.proj.MV.env %>% 
+  pivot_wider(id_cols = predicate, names_from = environment, values_from = Mean.Proj) %>% 
+  summarise(correlation = cor(neg, qcond, method = "spearman")) # 0.163
+
+# negation vs question + conditional + negation
+mean.proj.MV.env %>% 
+  pivot_wider(id_cols = predicate, names_from = environment, values_from = Mean.Proj) %>% 
+  summarise(correlation = cor(neg, qcondneg, method = "spearman")) # 0.508
+
+# question + conditional vs question + conditional + negation
+mean.proj.MV.env %>% 
+  pivot_wider(id_cols = predicate, names_from = environment, values_from = Mean.Proj) %>% 
+  summarise(correlation = cor(qcond, qcondneg, method = "spearman")) # -0.0290
+
 
 # rating patterns ----
 e1 %>%
@@ -1429,15 +1672,15 @@ projNewEmo <-
 ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
-  geom_point(data = mean.proj.e1 %>% filter(predicate %in% emoComms), 
-             aes(x = predicate, y = Mean.Proj, colour = "emoComms")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
              aes(x = predicate, y = Mean.Proj, colour = "say")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
              aes(x = predicate, y = Mean.Proj, colour = "think")) +
   geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
              aes(x = predicate, y = Mean.Proj, colour = "know")) +
-  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% emoComms),
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"),
                    aes(label = predicate), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = -0.6,
@@ -1467,22 +1710,22 @@ ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
        x = "Predicate",
        y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
-  scale_colour_manual(limits = c("communicative predicate", "emoComms", "say", "think", "know"),
+  scale_colour_manual(limits = c("communicative predicate", "emoComm", "say", "think", "know"),
                       values = c("deepskyblue2", "green4", "blue", "deeppink", "orangered3"))
 
 projMVnegEmo <-   
   ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
-  geom_point(data = mean.proj.MV.neg %>% filter(predicate %in% emoComms), 
-             aes(x = predicate, y = Mean.Proj, colour = "emoComms")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
   geom_point(data = mean.proj.MV.neg %>% filter(predicate == "say"), 
              aes(x = predicate, y = Mean.Proj, colour = "say")) +
   geom_point(data = mean.proj.MV.neg %>% filter(predicate == "think"), 
              aes(x = predicate, y = Mean.Proj, colour = "think")) +
   geom_point(data = mean.proj.MV.neg %>% filter(predicate == "know"), 
              aes(x = predicate, y = Mean.Proj, colour = "know")) +
-  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate %in% emoComms),
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"),
                    aes(label = predicate), 
                    min.segment.length = 0,
                    nudge_x = 0.2, nudge_y = -0.6,
@@ -1512,7 +1755,7 @@ projMVnegEmo <-
          x = "Predicate",
          y = "Mean projection rating") + 
   scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
-  scale_colour_manual(limits = c("communicative predicate", "emoComms", "say", "think", "know"),
+  scale_colour_manual(limits = c("communicative predicate", "emoComm", "say", "think", "know"),
                       values = c("deepskyblue2", "green4", "blue", "deeppink", "orangered3"))
 
 projNewEmo / projMVnegEmo + plot_layout(axis_titles = "collect")
@@ -1671,33 +1914,11 @@ mean.proj.e1.plus %>%
   select(predicate, rankingNew, rankingMVneg, ranking_difference, predicateType2) %>% 
   print(n = Inf)
 
-## groups
-# dividing the data into three groups based on the cumulative sum of their ranking differences.
-# this approach is chosen because of the skewed distribution of ranking differences.
-rankingDist <- rankingDist %>%
-  mutate(
-    cum_sum = cumsum(ranking_difference),
-    total_sum = sum(ranking_difference),
-    cum_sum_fraction = cum_sum / total_sum,
-    group = case_when(
-      cum_sum_fraction <= 1/3 ~ "group1",
-      cum_sum_fraction <= 2/3 ~ "group2",
-      TRUE ~ "group3"
-    )
-  ) %>% print(n = Inf)
-
-rankingDist %>% 
-  count(group)
-#   group      n
-#   <chr>  <int>
-# 1 group1   125
-# 2 group2    43
-# 3 group3    24
 
 ### plot ----
 # densitiy plot of the differences in ranking show that low differences are much more common than
 # high ones.
-rankingDist %>% 
+mean.proj.e1.plus %>% 
   ggplot(aes(ranking_difference)) + 
   geom_density() +
   theme(axis.title = element_text(size = 14),
@@ -1707,7 +1928,7 @@ rankingDist %>%
        y = "Density") 
 ggsave("../graphs/ranking-difference.pdf", height = 7, width = 7)
 
-mean(rankingDist$ranking_difference) # 34.30729
+mean(mean.proj.e1.plus$ranking_difference) # 34.30729
 
 ## emoComms only ----
 # table of lowest to highest difference in ranking in the two datasets. 
@@ -1722,28 +1943,6 @@ rankingDistEmo <-
   select(predicate, rankingNew, rankingMVneg, ranking_difference, predicateType2) %>% 
   print(n = Inf)
 
-# dividing the data into three groups based on the cumulative sum of their ranking differences.
-rankingDistEmo <- rankingDistEmo %>%
-  filter(predicateType2 == "emoComm") %>% 
-  mutate(
-    cum_sum = cumsum(ranking_difference),
-    total_sum = sum(ranking_difference),
-    cum_sum_fraction = cum_sum / total_sum,
-    group = case_when(
-      cum_sum_fraction <= 1/3 ~ "group1",
-      cum_sum_fraction <= 2/3 ~ "group2",
-      TRUE ~ "group3"
-    )
-  ) %>% print(n = Inf)
-
-rankingDistEmo %>% 
-  count(group)
-#   group      n
-#   <chr>  <int>
-# 1 group1    16
-# 2 group2     7
-# 3 group3     4
-
 ### plot ----
 rankingDistEmo %>% 
   ggplot(aes(ranking_difference)) + 
@@ -1754,3 +1953,526 @@ rankingDistEmo %>%
   labs(x = "Ranking difference",
        y = "Density") 
 ggsave("../graphs/ranking-difference-emo.pdf", height = 7, width = 7)
+
+
+# closer inspection ----
+# Which predicates are in the top 20 in both datasets?
+mean.proj.e1.plus %>% 
+  filter(predicate != "know" & rankingNew > 172 & rankingMVneg > 172) %>% 
+  arrange(ranking_difference) %>% 
+  select(predicate, Mean.Proj, Mean.Proj.MV.neg, ranking_difference)
+#   predicate Mean.Proj Mean.Proj.MV.neg ranking_difference
+#   <fct>         <dbl>            <dbl>              <dbl>
+# 1 divulge       0.789              0.6                0.5
+# 2 flaunt        0.846              0.7                1  
+# 3 apologize     0.885              1                  4  
+# 4 weep          0.791              0.7                7  
+# 5 disclose      0.822              0.8                9  
+# 6 whine         0.78               0.7               10  
+# 7 question      0.905              0.6               14.5
+
+# Which predicates are in the top 30 in both datasets?
+mean.proj.e1.plus %>% 
+  filter(predicate != "know" & rankingNew > 162 & rankingMVneg > 162) %>% 
+  arrange(ranking_difference) %>% 
+  select(predicate, Mean.Proj, Mean.Proj.MV.neg, ranking_difference)
+#   predicate Mean.Proj Mean.Proj.MV.neg ranking_difference
+#   <fct>         <dbl>            <dbl>              <dbl>
+# 1 divulge       0.789            0.6                  0.5
+# 2 flaunt        0.846            0.7                  1  
+# 3 dispute       0.748            0.5                  3.5
+# 4 apologize     0.885            1                    4  
+# 5 fuss          0.753            0.5                  4.5
+# 6 weep          0.791            0.7                  7  
+# 7 disclose      0.822            0.8                  9  
+# 8 whine         0.78             0.7                 10  
+# 9 publicize     0.747            0.667               12  
+# 10 question      0.905            0.6                 14.5
+# 11 bitch         0.823            0.5                 15.5
+# 12 complain      0.833            0.5                 18.5
+# 13 point out     0.73             0.7                 19  
+# 14 stress        0.891            0.5                 23.5
+# 15 grumble       0.908            0.5                 25.5
+
+# acceptability ----
+# overall 
+ggplot(mean.proj.e1.plus, aes(x = Mean.Acc.MV, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean acceptability rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 7), breaks = c(0:7)) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/projection-by-acceptability-line.pdf", height = 6, width = 8)
+
+lm(Mean.Proj ~ Mean.Acc.MV, data = mean.proj.e1.plus) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)  0.49507    0.18945   2.613  0.00969 **
+# Mean.Acc.MV -0.01994    0.03549  -0.562  0.57486   
+
+# MV ratings under negation only
+ggplot(mean.proj.e1.plus, aes(x = Mean.Acc.MV.neg, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean acceptability rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 7), breaks = c(0:7)) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/projection-by-acceptability-line-NO.pdf", height = 6, width = 8)
+
+lm(Mean.Proj ~ Mean.Acc.MV.neg, data = mean.proj.e1.plus) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)      0.25946    0.14088   1.842   0.0671 .
+# Mean.Acc.MV.neg  0.02666    0.02857   0.933   0.3520  
+
+
+## C.3 say verbs (Grimshaw 2015) ----
+### C.3.1 types of communicatives ----
+#### distribution ----
+e1 %>% 
+  filter(predicateType == "communicative") %>% 
+  group_by(sayVerb) %>% 
+  distinct(predicate) %>% 
+  count()
+#   sayVerb     n
+#   <chr>   <int>
+# 1 no         84
+# 2 yes       106
+# Of the 190 communicatives included in this investigation, 106 are say-predicates.
+
+#### plot ----
+e1 %>%
+  filter(predicateType == "communicative") %>% 
+  group_by(sayVerb) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = sayVerb, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") + 
+  scale_x_discrete(labels = c("non-say verb", "say verb")) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-communication-type-new.pdf", height = 4, width = 10)
+
+#### linear model ----
+lm(rating ~ sayVerb, data = e1) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.44026    0.01785  24.663  < 2e-16 ***
+# sayVerbyes  -0.09535    0.02392  -3.987 6.84e-05 ***
+
+lm(Mean.Proj ~ sayVerb, data = mean.proj.e1) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.45246    0.03223  14.041  < 2e-16 ***
+# sayVerbyes  -0.11329    0.04317  -2.624  0.00938 ** 
+
+### C.3.2 types of say verbs ----
+#### distribution ----
+e1 %>% 
+  filter(predicateType == "communicative" & sayVerb == "yes") %>%  
+  group_by(sayVerbType) %>% 
+  distinct(predicate) %>% 
+  count()
+#   sayVerbType             n
+#   <chr>               <int>
+# 1 discourse role verb    51
+# 2 mode verb              54
+# 3 say                     1
+
+#### plots ----
+e1 %>%
+  filter(predicateType == "communicative" & sayVerb == "yes") %>%  
+  group_by(sayVerbType) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = sayVerbType, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Say verb type",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-0.1, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-sayverb-type-new.pdf", height = 4, width = 10)
+
+e1 %>%
+  filter(predicateType == "communicative") %>%  
+  group_by(sayVerb, sayVerbType) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = sayVerb, y = Mean.Proj, colour = sayVerbType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Communicative type",
+       y = "Mean projection rating",
+       colour = "Say verb type") + 
+  scale_x_discrete(labels = c("non-say verb", "say verb")) +
+  scale_y_continuous(limits = c(-0.1, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("purple","deeppink", "orange3", "grey50"))
+ggsave("../graphs/projection-by-sayverb-type2-new.pdf", height = 4, width = 10)
+
+
+#### linear model ----
+lm(rating ~ fct_relevel(sayVerbType, "discourse role verb"), data = e1) %>% 
+  summary()
+# sayVerbType           significance
+# discourse role verb   ***
+# mode verb             ***
+# say                   n.s.
+
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+
+### C.3.3 types of mode verbs ----
+#### distribution ----
+e1 %>% 
+  filter(mode_verb == "yes") %>%   
+  group_by(modeVerbType) %>% 
+  distinct(predicate) %>% 
+  count()
+#   modeVerbType          n
+# #   <chr>             <int>
+# 1 say-by-means         41
+# 2 say-with-attitude    13
+
+#### plot ----
+e1 %>%
+  filter(predicateType == "communicative" & sayVerb == "yes") %>%  
+  group_by(sayVerbType, modeVerbType) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = sayVerbType, y = Mean.Proj, colour = modeVerbType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Say verb type",
+       y = "Mean projection rating",
+       colour = "Mode verb type") + 
+  scale_y_continuous(limits = c(-0.1, 1), breaks = c(0, 0.5, 1)) + 
+  scale_colour_manual(values = c("green3","blue", "grey50"))
+ggsave("../graphs/projection-by-modeverb-type-new.pdf", height = 4, width = 10)
+
+#### linear model ----
+lm(rating ~ modeVerbType, data = e1) %>% 
+  summary()
+# (Intercept)                    0.42715    0.02442  17.494  < 2e-16 ***
+# modeVerbTypesay-with-attitude  0.17734    0.04792   3.701 0.000227 ***
+
+
+### C.3.4 types of say-by-means verbs ----
+#### distribution ----
+e1 %>% 
+  filter(modeVerbType == "say-by-means") %>%  
+  group_by(sayByMeansVerbType) %>% 
+  distinct(predicate) %>% 
+  count()
+#   sayByMeansVerbType     n
+#   <chr>              <int>
+# 1 form                  14
+# 2 manner                22
+# 3 sound                  5
+
+#### plot ----
+e1 %>%
+  filter(sayVerbType == "mode verb" | predicate == "say") %>%  
+  group_by(modeVerbType, sayByMeansVerbType) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = modeVerbType, y = Mean.Proj, colour = sayByMeansVerbType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(hjust = 0.31, vjust = -0.5),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Mode verb type",
+       y = "Mean projection rating",
+       colour = "Say-by-means verb type") + 
+  scale_x_discrete(labels = c("say-by-means", "say-with-attitude", "say")) +
+  scale_y_continuous(limits = c(-0.1, 1), breaks = c(0, 0.5, 1)) + 
+  scale_colour_manual(values = c("red", "cyan3", "darkgoldenrod2", "grey50"))
+ggsave("../graphs/projection-by-saybymeansverb-type-new.pdf", height = 4, width = 10)
+
+#### linear model ----
+lm(rating ~ fct_relevel(sayByMeansVerbType, "form"), data = e1) %>% 
+  summary()
+# Coefficients:
+#                                               Estimate Std. Error z value Pr(>|z|)  
+# (Intercept)                                    0.35449    0.04447   7.972 6.26e-15 ***
+# fct_relevel(sayByMeansVerbType, "form")manner  0.10984    0.05613   1.957   0.0508 .  
+# fct_relevel(sayByMeansVerbType, "form")sound   0.09400    0.07858   1.196   0.2320 
+
+# (Intercept)                                     0.46433    0.03426  13.553   <2e-16 ***
+# fct_relevel(sayByMeansVerbType, "manner")form  -0.10984    0.05613  -1.957   0.0508 .  
+# fct_relevel(sayByMeansVerbType, "manner")sound -0.01584    0.07328  -0.216   0.8290  
+
+# (Intercept)                                     0.44849    0.06478   6.923 9.94e-12 ***
+# fct_relevel(sayByMeansVerbType, "sound")form   -0.09400    0.07858  -1.196    0.232    
+# fct_relevel(sayByMeansVerbType, "sound")manner  0.01584    0.07328   0.216    0.829    
+
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+### C.3.5 overall ----
+#### distribution ----
+mean.proj.e1 %>% 
+  group_by(predicateType2, commType, sayVerbType, modeVerbType) %>% 
+  count()
+# predicateType2 commType                sayVerbType         modeVerbType          n
+# <chr>          <chr>                   <chr>               <chr>             <int>
+# 1 cognitive      NA                      NA                  NA                    2
+# 2 emoComm        discourse participation mode verb           say-with-attitude     4
+# 3 emoComm        discourse participation NA                  NA                    2
+# 4 emoComm        pure                    mode verb           say-by-means         16
+# 5 emoComm        pure                    mode verb           say-with-attitude     3
+# 6 emoComm        pure                    NA                  NA                    2
+# 7 nonEmoComm     discourse participation discourse role verb NA                   41
+# 8 nonEmoComm     discourse participation mode verb           say-with-attitude     1
+# 9 nonEmoComm     discourse participation NA                  NA                   47
+# 10 nonEmoComm     pure                    discourse role verb NA                    5
+# 11 nonEmoComm     pure                    mode verb           say-by-means         25
+# 12 nonEmoComm     pure                    mode verb           say-with-attitude     5
+# 13 nonEmoComm     pure                    say                 NA                    1
+# 14 nonEmoComm     pure                    NA                  NA                   19
+# 15 nonEmoComm     state changing          discourse role verb NA                    5
+# 16 nonEmoComm     state changing          NA                  NA                   14
+
+#### plot ----
+e1 %>%
+  filter(predicateType == "communicative" & sayVerb == "yes") %>%  
+  group_by(sayVerbType, modeVerbType, sayByMeansVerbType) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>% 
+ggplot(aes(x = sayVerbType, y = Mean.Proj, colour = modeVerbType, 
+                              shape = ifelse(is.na(sayByMeansVerbType), "NA", sayByMeansVerbType))) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.3), size = 2) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.3)) +
+  theme(legend.position = "top",
+        legend.box = "vertical",
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 11),
+        legend.spacing.y = unit(-0.2, "cm"),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        panel.grid.major.x = element_blank(),
+        plot.margin = unit(c(5.5, 5.5, 22, 5.5), "pt")) +
+  labs(x = "Say verb type",
+       y = "Mean projection rating",
+       colour = "Mode verb type",
+       shape = "Say-by-means verb type") + 
+  scale_y_continuous(limits = c(-0.1, 1), breaks = c(0, 0.5, 1)) + 
+  scale_colour_manual(values = c("green3", "blue", "grey50")) + 
+  scale_shape_manual(breaks = c("form", "manner", "sound", "NA"),
+                     values = c(15, 19, 17, 18))  
+ggsave("../graphs/projection-by-saybymeansverb-type2-new.pdf", height = 4, width = 10)
+
+# say that not ----
+## plots ----
+e1 %>% 
+  mutate(that_not = case_when(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                               "dispute", "question") ~ "say that not", 
+                              TRUE ~ "other")) %>% 
+  filter(predicateType == "communicative") %>% 
+  group_by(that_not) %>% 
+  summarize(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh) %>%
+ggplot(aes(x = that_not, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") + 
+#  scale_x_discrete(labels = c("other", "say that not")) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-say-that-not.pdf", height = 4, width = 10)
+
+# "say that not" predicates project significantly more than others in the new data as well as MV-neg-only
+# data. In the overall MV data, no such pattern is observed. 
+
+ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                                             "dispute", "question")), 
+             aes(x = predicate, y = Mean.Proj, colour = "say that not")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                                                   "dispute", "question")),
+                   aes(label = paste0(predicate, ": ", round(Mean.Proj, 2))), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.4,
+                   colour = "black") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "say"),
+                   aes(label = paste0(predicate, ": ", round(Mean.Proj, 2))), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "think"),
+                   aes(label = paste0(predicate, ": ", round(Mean.Proj, 2))), 
+                   min.segment.length = 0,
+                   nudge_x = -0.2, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "know"),
+                   aes(label = paste0(predicate, ": ", round(Mean.Proj, 2))), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say that not", "say", "think", "know"),
+                      values = c("deepskyblue2", "black", "blue", "deeppink", "orangered3"))
+ggsave("../graphs/projection-by-communicative-say-that-not-labels.pdf", height = 4, width = 13)
+
+
+## linear models ----
+# new data
+lm(rating ~ that_not, data = e1 %>% 
+     mutate(that_not = case_when(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                                  "dispute", "question") ~ "say that not", 
+                                 TRUE ~ "other")) %>% 
+     filter(predicateType == "communicative") ) %>% 
+  summary()
+# Coefficients:
+#                      Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)           0.37517    0.01215  30.879  < 2e-16 ***
+# that_notsay that not  0.33816    0.06238   5.421 6.35e-08 ***
+
+# MV overall
+lm(veridicality_num ~ that_not, data = d.proj %>% 
+     mutate(that_not = case_when(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                                  "dispute", "question") ~ "say that not", 
+                                 TRUE ~ "other")) %>% 
+     filter(predicateType == "communicative") ) %>% 
+  summary()
+# Coefficients:
+#                       Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)           0.312785   0.007928  39.454   <2e-16 ***
+# that_notsay that not -0.050880   0.041278  -1.233    0.218  
+
+# MV neg-only
+lm(veridicality_num ~ that_not, data = d.proj.neg %>% 
+     mutate(that_not = case_when(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                                                  "dispute", "question") ~ "say that not", 
+                                 TRUE ~ "other")) %>% 
+     filter(predicateType == "communicative") ) %>% 
+  summary()
+# Coefficients:
+#                      Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)           0.20351    0.01346  15.123  < 2e-16 ***
+# that_notsay that not  0.19649    0.06998   2.808  0.00504 ** 
+
+## correlations ----
+mean.proj.e1.plus %>%
+  filter(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                          "dispute", "question")) %>% 
+  summarise(correlation = cor(Mean.Proj, Mean.Proj.MV, method = "spearman")) # -0.414
+mean.proj.e1.plus %>%
+  filter(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
+                          "dispute", "question")) %>% 
+  summarise(correlation = cor(Mean.Proj, Mean.Proj.MV.neg, method = "spearman")) # 0.655
