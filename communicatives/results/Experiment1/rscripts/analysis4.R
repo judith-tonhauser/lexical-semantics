@@ -42,21 +42,7 @@ predicateType2_names <- c( "cognitive" = "cognitive",
                            "emoComm" = "communicative with\nemotion entailment", 
                            "nonEmoComm" = "communicative without\nemotion entailment")
 
-# # add predicate type (communicative with/without emotion entailment distinction) and type of emoComm
-# emoComms <- c("bitch", "boast", "brag", "cheer", "complain", "cry", "exclaim", "fuss", "gloat", 
-#                  "groan", "grumble", "grunt", "howl", "moan", "mutter", "pout", "quarrel", "rant", 
-#                  "rave", "scream", "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")
-# emo_comm_attitude <- c("bitch", "boast", "brag", "cheer", "complain", "fuss", "gloat", "pout", "quarrel",
-#                        "rant", "rave")   
-# emo_comm_manner <- c("cry", "exclaim", "groan", "grumble", "grunt", "howl", "moan", "mutter", "scream",
-#                      "shriek", "sigh", "sob", "squeal", "weep", "whimper", "whine")  
-
 e1 <- e1 %>% 
-  # mutate(predicateType2 = case_when(predicate %in% c("know", "think") ~ "cognitive",
-  #                                   predicate %in% emoComms ~ "emoComm",
-  #                                   TRUE ~ "nonEmoComm"),
-  #        emoCommType = case_when(predicate %in% emo_comm_attitude ~ "attitude",
-  #                                predicate %in% emo_comm_manner ~ "manner"))
   mutate(predicateType = case_when(communicative == "yes" ~ "communicative",   
                                    cognitive == "yes" ~ "cognitive"),         
          emotiveComponent = case_when(emotive_component == "yes" ~ "yes",
@@ -141,16 +127,6 @@ nrow(d) # 21692
 # create dataset for projection inferences
 d.proj <- droplevels(subset(d, d$polarity == "negative" | d$conditional == "True"))
 nrow(d.proj) # 16291
-# 
-# # replace underscores in multi-word predicates in the MV with spaces (for comparison with new data)
-# d.proj$verb <- gsub("_", " ", d.proj$verb)
-# 
-# # only include active voice predicates
-# # when a predicate also occurs in the passive voice in the MV dataset (e.g., 'radio'), we consider
-# # it a different predicate type (e.g. 'was radioed' = reportative evidential) and it is therefore 
-# # not relevant to this investigation of communicative predicates.
-# d.proj <- d.proj %>% filter(voice == "active")
-# nrow(d.proj) # 11231
 
 # only the predicates investigated here
 d.proj <- d.proj %>% filter(verb_renamed %in% mean.proj.e1$predicate)
@@ -367,14 +343,12 @@ nrow(mean.proj.MV.neg) # 192
 e1 <- e1 %>%
   left_join(
     mean.proj.MV %>%
-     # filter(predicate %in% e1$predicate) %>%
       select(predicate, Mean.Acc) %>%
       rename_with(~ paste0(., ".MV"), "Mean.Acc"),
     by = "predicate"
   ) %>%
   left_join(
     mean.proj.MV.neg %>%
-      #filter(predicate %in% e1$predicate) %>%
       select(predicate, Mean.Acc) %>%
       rename_with(~ paste0(., ".MV.neg"), "Mean.Acc"),
     by = "predicate"
@@ -384,13 +358,11 @@ e1 <- e1 %>%
 mean.proj.e1.plus <- mean.proj.e1 %>%
   left_join(
     mean.proj.MV %>%
-      #filter(predicate %in% mean.proj.e1$predicate) %>%
       select(predicate, Mean.Proj, Mean.Acc, YMin.Proj, YMax.Proj) %>%
       rename_with(~ paste0(., ".MV"), starts_with(c("Mean", "Y"))),
     by = "predicate") %>%
   left_join(
     mean.proj.MV.neg %>%
-     # filter(predicate %in% mean.proj.e1$predicate) %>%
       select(predicate, Mean.Proj, Mean.Acc, YMin.Proj, YMax.Proj) %>%
       rename_with(~ paste0(., ".MV.neg"), starts_with(c("Mean", "Y"))),
     by = "predicate") %>% 
@@ -402,6 +374,63 @@ mean.proj.e1.plus <- mean.proj.e1.plus %>%
   mutate(rankingNew = rank(Mean.Proj),
          rankingMVneg = rank(Mean.Proj.MV.neg),
          ranking_difference = abs(rankingNew - rankingMVneg))
+
+
+## valence and arousal data (Warriner et al. 2013) ----
+# load data
+w <-  read.csv("../../MegaVeridicality/data/BRM-emot-submit.csv")
+nrow(w) # 13915
+
+# combine projection and valence/arousal/dominance ratings in one data frame
+e1.VAD <-  w %>%
+  filter(Word %in% e1$predicate) %>%
+  rename(predicate = Word) %>%
+  select(predicate, V.Mean.Sum, A.Mean.Sum, D.Mean.Sum) %>% 
+  left_join(e1, by = "predicate")
+nrow(e1.VAD) # 3083
+n_distinct(e1.VAD$predicate) # 171
+# of the 192 predicates in the new dataset, 171 are also in Warriner et al.'s (2013) dataset.
+
+table(e1.VAD$predicateType2)
+#  cognitive    emoComm nonEmoComm 
+#         53        469       2561 
+
+# combine mean projection and valence/arousal/dominance ratings in one data frame
+mean.proj.e1.plus.VAD <- w %>% 
+  filter(Word %in% e1$predicate) %>%
+  rename(predicate = Word) %>%
+  select(predicate, V.Mean.Sum, A.Mean.Sum, D.Mean.Sum) %>% 
+  left_join(mean.proj.e1.plus, by = "predicate")
+nrow(mean.proj.e1.plus.VAD) # 171
+
+table(mean.proj.e1.plus.VAD$predicateType2)
+# cognitive    emoComm nonEmoComm 
+#         2         25        144 
+
+### rescale V + A + D ratings
+# Valence and dominance have extremes (unhappy - happy, controlled - controlling)
+# and a neutral state in between. The neutral state of arousal is not in the middle 
+# of the "calm - aroused" scale, but at the lower end: calmness is the absence of
+# arousal; there is no such thing as "negative" arousal. 
+# The ratings for valence and arousal are rescaled to range from 0 to 1. 
+e1.VAD <- e1.VAD %>% 
+  mutate(V.Mean.Sum2 = abs(V.Mean.Sum - 5)/4,
+         V.Mean.Sum2.direction = case_when(V.Mean.Sum >= 5 ~ "positive",
+                                           V.Mean.Sum < 5 ~ "negative"),
+         A.Mean.Sum2 = (A.Mean.Sum - 1)/8,
+         D.Mean.Sum2 = abs(D.Mean.Sum - 5)/4,
+         D.Mean.Sum2.direction = case_when(D.Mean.Sum >= 5 ~ "positive",
+                                           D.Mean.Sum < 5 ~ "negative"))
+
+mean.proj.e1.plus.VAD <- mean.proj.e1.plus.VAD %>% 
+  mutate(V.Mean.Sum2 = abs(V.Mean.Sum - 5)/4,
+         V.Mean.Sum2.direction = case_when(V.Mean.Sum >= 5 ~ "positive",
+                                           V.Mean.Sum < 5 ~ "negative"),
+         A.Mean.Sum2 = (A.Mean.Sum - 1)/8,
+         D.Mean.Sum2 = abs(D.Mean.Sum - 5)/4,
+         D.Mean.Sum2.direction = case_when(D.Mean.Sum >= 5 ~ "positive",
+                                           D.Mean.Sum < 5 ~ "negative"))
+
 
 
 # new data ----
@@ -1956,43 +1985,58 @@ ggsave("../graphs/ranking-difference-emo.pdf", height = 7, width = 7)
 
 
 # closer inspection ----
-# Which predicates are in the top 20 in both datasets?
-mean.proj.e1.plus %>% 
-  filter(predicate != "know" & rankingNew > 172 & rankingMVneg > 172) %>% 
-  arrange(ranking_difference) %>% 
-  select(predicate, Mean.Proj, Mean.Proj.MV.neg, ranking_difference)
-#   predicate Mean.Proj Mean.Proj.MV.neg ranking_difference
-#   <fct>         <dbl>            <dbl>              <dbl>
-# 1 divulge       0.789              0.6                0.5
-# 2 flaunt        0.846              0.7                1  
-# 3 apologize     0.885              1                  4  
-# 4 weep          0.791              0.7                7  
-# 5 disclose      0.822              0.8                9  
-# 6 whine         0.78               0.7               10  
-# 7 question      0.905              0.6               14.5
 
-# Which predicates are in the top 30 in both datasets?
+# Select a set number of predicates such that they occur in the smallest possible subset of highest 
+# ranking predicates both in the MV dataset (negation only) and the new data.
+
+for (x in 1:nrow(mean.proj.e1.plus %>% filter(predicate != "know"))) {
+
+  top_ranking_new <- mean.proj.e1.plus %>%
+    filter(predicate != "know") %>%   
+    slice_max(order_by = rankingNew, n = x) %>% 
+    pull(predicate)
+  top_ranking_MV_neg <- mean.proj.e1.plus %>%
+    filter(predicate != "know") %>%    
+    slice_max(order_by = rankingMVneg, n = x) %>% 
+    pull(predicate)
+
+  common_predicates <- intersect(top_ranking_new, top_ranking_MV_neg)
+
+  if (length(common_predicates) >= 15) {
+    break  
+  }
+}
 mean.proj.e1.plus %>% 
-  filter(predicate != "know" & rankingNew > 162 & rankingMVneg > 162) %>% 
+  filter(predicate %in% common_predicates) %>% 
   arrange(ranking_difference) %>% 
-  select(predicate, Mean.Proj, Mean.Proj.MV.neg, ranking_difference)
-#   predicate Mean.Proj Mean.Proj.MV.neg ranking_difference
-#   <fct>         <dbl>            <dbl>              <dbl>
-# 1 divulge       0.789            0.6                  0.5
-# 2 flaunt        0.846            0.7                  1  
-# 3 dispute       0.748            0.5                  3.5
-# 4 apologize     0.885            1                    4  
-# 5 fuss          0.753            0.5                  4.5
-# 6 weep          0.791            0.7                  7  
-# 7 disclose      0.822            0.8                  9  
-# 8 whine         0.78             0.7                 10  
-# 9 publicize     0.747            0.667               12  
-# 10 question      0.905            0.6                 14.5
-# 11 bitch         0.823            0.5                 15.5
-# 12 complain      0.833            0.5                 18.5
-# 13 point out     0.73             0.7                 19  
-# 14 stress        0.891            0.5                 23.5
-# 15 grumble       0.908            0.5                 25.5
+  select(predicate, Mean.Proj, Mean.Proj.MV.neg, rankingNew, rankingMVneg, ranking_difference) %>% 
+  print()
+print(x)
+
+# The 15 predicates that occur in the top 26 of both datasets (excluding 'know'):
+#   predicate Mean.Proj Mean.Proj.MV.neg rankingNew rankingMVneg ranking_difference
+#   <fct>         <dbl>            <dbl>      <dbl>        <dbl>              <dbl>
+# 1 divulge       0.789            0.6          177         176.                0.5
+# 2 flaunt        0.846            0.7          186         185                 1  
+# 3 dispute       0.748            0.5          170         166.                3.5
+# 4 apologize     0.885            1            188         192                 4  
+# 5 fuss          0.753            0.5          171         166.                4.5
+# 6 weep          0.791            0.7          178         185                 7  
+# 7 disclose      0.822            0.8          181         190                 9  
+# 8 whine         0.78             0.7          175         185                10  
+# 9 publicize     0.747            0.667        169         181                12  
+# 10 question      0.905            0.6          191         176.               14.5
+# 11 bitch         0.823            0.5          182         166.               15.5
+# 12 complain      0.833            0.5          185         166.               18.5
+# 13 point out     0.73             0.7          166         185                19  
+# 14 stress        0.891            0.5          190         166.               23.5
+# 15 grumble       0.908            0.5          192         166.               25.5
+# > print(x)
+# [1] 26
+# NOTE: In some cases, the number of predicates in the output is larger than the selected value.
+# This is due to the large number of ties in the MV dataset (neg-only).
+
+
 
 # acceptability ----
 # overall 
@@ -2476,3 +2520,2119 @@ mean.proj.e1.plus %>%
   filter(predicate %in% c("challenge", "contest", "debate", "deny", "dismiss", 
                           "dispute", "question")) %>% 
   summarise(correlation = cor(Mean.Proj, Mean.Proj.MV.neg, method = "spearman")) # 0.655
+
+
+# VAD ratings ----
+## H2.1 valence ----
+### by predicate ----
+#### plot ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = reorder(predicate, V.Mean.Sum2), y = V.Mean.Sum2, colour = predicateType2)) +
+  geom_point() +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate", 
+       y = "Mean valence rating", 
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/valence-by-predicate2-new.pdf", height = 4, width = 13)
+
+### by predicate type ----
+#### plot ----
+# calculate valence by predicateType means
+mean.valence = mean.proj.e1.plus.VAD %>%
+  filter(predicateType == "communicative") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Valence = mean(V.Mean.Sum2), 
+            CILow = ci.low(V.Mean.Sum2), 
+            CIHigh = ci.high(V.Mean.Sum2)) %>%
+  mutate(YMin.Valence = Mean.Valence - CILow, 
+         YMax.Valence = Mean.Valence + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Valence))
+mean.valence
+
+ggplot(mean.valence, aes(x = predicateType2, y = Mean.Valence, colour = predicateType2)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Valence, ymax = YMax.Valence), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean valence rating") +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/valence-by-predicateType2-new.pdf", height = 8, width = 10)
+
+#### linear model ----
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.35410    0.03214  11.018  < 2e-16 ***
+# fct_relevel(predicateType2, "emoComm")nonEmoComm -0.14828    0.03482  -4.259 3.42e-05 ***
+
+# Both predicate types predict arousal ratings.
+
+### with direction ----
+# calculate valence by predicateType2 means and direction of valence
+mean.valence2 = mean.proj.e1.plus.VAD %>%
+  filter(predicateType == "communicative") %>% 
+  group_by(predicateType2, V.Mean.Sum2.direction) %>%
+  summarize(Mean.Valence = mean(V.Mean.Sum2), 
+            CILow = ci.low(V.Mean.Sum2), 
+            CIHigh = ci.high(V.Mean.Sum2)) %>%
+  mutate(YMin.Valence = Mean.Valence - CILow, 
+         YMax.Valence = Mean.Valence + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Valence))
+mean.valence2
+
+# valence by predicate type and direction of valence
+#### plot ----
+ggplot(mean.valence2, aes(x = predicateType2, y = Mean.Valence, 
+                          colour = V.Mean.Sum2.direction)) +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Valence, ymax = YMax.Valence), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y ="Mean valence rating",
+       colour = "Direction of valence") +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = c("negative" = "orangered", "positive" = "seagreen3"))
+ggsave("../graphs/valence-by-predicateType-and-direction-new.pdf", height = 8, width = 10)
+
+#### linear model ----
+lm(V.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm") * fct_relevel(V.Mean.Sum2.direction, "positive"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                                                                         Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                                                              0.38333    0.03480  11.015  < 2e-16 ***
+# fct_relevel(predicateType2, "emoComm")nonEmoComm                                                        -0.17139    0.04101  -4.179 4.74e-05 ***
+# fct_relevel(V.Mean.Sum2.direction, "negative")positive                                                  -0.18271    0.08700  -2.100   0.0372 *  
+# fct_relevel(predicateType2, "emoComm")nonEmoComm:fct_relevel(V.Mean.Sum2.direction, "negative")positive  0.17290    0.09123   1.895   0.0598 . 
+
+# Considering an interaction with negative valence, both predicate types predict valence ratings.
+# With positive valence, only the nonEmoComm predicate type predicts valence ratings. Note that only
+# 4 of 25 emoComms have positive valence.
+
+#### distribution ----
+mean.proj.e1.plus.VAD %>% 
+  count(predicateType2, V.Mean.Sum2.direction)
+#   predicateType2 V.Mean.Sum2.direction  n
+# 1      cognitive              positive  2
+# 2        emoComm              negative 21 (84% of emoComms)
+# 3        emoComm              positive  4
+# 4     nonEmoComm              negative 54 (38% of nonEmoComms)
+# 5     nonEmoComm              positive 90
+
+## H2.2 arousal ----
+### by predicate ----
+#### plot ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = reorder(predicate, A.Mean.Sum2), y = A.Mean.Sum2, 
+                      colour = predicateType2)) +
+  geom_point() +
+  theme(legend.position="top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate", 
+       y = "Mean arousal rating", 
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/arousal-by-predicate2-new.pdf", height = 4, width = 13)
+
+### by predicate type ----
+#### plot ----
+# calculate arousal by predicateType means
+mean.arousal = mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Arousal = mean(A.Mean.Sum2), 
+            CILow = ci.low(A.Mean.Sum2), 
+            CIHigh = ci.high(A.Mean.Sum2)) %>%
+  mutate(YMin.Arousal = Mean.Arousal - CILow, 
+         YMax.Arousal = Mean.Arousal + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Arousal))
+mean.arousal
+
+mean.arousal %>% 
+  filter(predicateType2 != "cognitive") %>% 
+ggplot(aes(x = predicateType2, y = Mean.Arousal, colour = predicateType2)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Arousal, ymax = YMax.Arousal), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean arousal rating") +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/arousal-by-predicateType2-new.pdf", height = 8, width = 10)
+
+#### linear model ----
+lm(A.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                          Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)               0.46455    0.02067  22.480  < 2e-16 ***
+# predicateType2nonEmoComm -0.07885    0.02239  -3.522 0.000552 ***
+
+# Both predicate types predict arousal ratings.
+
+## H2.3 dominance ---- 
+### by predicate ----
+#### plot ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = reorder(predicate, D.Mean.Sum2), y = D.Mean.Sum2, colour = predicateType2)) +
+  geom_point() +
+  theme(legend.position = "top",
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate", 
+       y = "Mean dominance rating", 
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names)
+ggsave("../graphs/valence-by-predicate2-new.pdf", height = 4, width = 13)
+
+### by predicate type ----
+#### plot ----
+# calculate dominance by predicateType2 means
+mean.dominance = mean.proj.e1.plus.VAD %>%
+  filter(predicateType == "communicative") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Dominance = mean(D.Mean.Sum2), 
+            CILow = ci.low(D.Mean.Sum2), 
+            CIHigh = ci.high(D.Mean.Sum2)) %>%
+  mutate(YMin.Dominance = Mean.Dominance - CILow, 
+         YMax.Dominance = Mean.Dominance + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Dominance))
+mean.dominance
+
+ggplot(mean.dominance, aes(x = predicateType2, y = Mean.Dominance, colour = predicateType2)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Dominance, ymax = YMax.Dominance), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean dominance rating") +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/dominance-by-predicateType2-new.pdf", height = 8, width = 10)
+
+#### linear model ----
+lm(D.Mean.Sum2 ~ fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.19140    0.02535   7.550  2.7e-12 ***
+# fct_relevel(predicateType2, "emoComm")nonEmoComm  0.01992    0.02746   0.725    0.469  
+
+# Neither predicate type predicts dominance ratings.
+
+## H2.4 ratings correlated? ----
+### valence - dominance ----
+#### models ----
+lm(V.Mean.Sum2 ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.18264    0.02479   7.368 7.59e-12 ***
+# D.Mean.Sum2  0.21651    0.10175   2.128   0.0348 * 
+
+lm(V.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of D.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      .
+
+lm(D.Mean.Sum2 ~ V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.18061    0.01622  11.134   <2e-16 ***
+# V.Mean.Sum2  0.12192    0.05730   2.128   0.0348 *
+
+lm(D.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         .
+# nonEmoComm      .
+
+#### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = D.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating (unhappy - happy)", 
+       y = "Mean dominance rating (controlled - in control)",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/dominance-by-valence-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = D.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating (unhappy - happy)", 
+       y = "Mean dominance rating (controlled - in control)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/dominance-by-valence-faceted-new.pdf", height = 6, width = 8)
+
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = V.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating (controlled - in control)",
+       y = "Mean valence rating (unhappy - happy)", 
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/valence-by-dominance-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = V.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating (controlled - in control)",
+       y = "Mean valence rating (unhappy - happy)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/valence-by-dominance-faceted-new.pdf", height = 6, width = 8)
+
+
+### arousal - dominance ----
+##### models ----
+lm(A.Mean.Sum2 ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.40045    0.01590  25.187   <2e-16 ***
+# D.Mean.Sum2 -0.01480    0.06526  -0.227    0.821   
+
+lm(A.Mean.Sum2 ~ D.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of D.Mean.Sum2
+# emoComm         .
+# nonEmoComm      n.s.
+
+lm(D.Mean.Sum2 ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.21664    0.03773   5.741 4.33e-08 ***
+# A.Mean.Sum2 -0.02080    0.09172  -0.227    0.821 
+
+lm(D.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of A.Mean.Sum2
+# emoComm         .
+# nonEmoComm      n.s.
+
+##### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = D.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating (calm - excited)", 
+       y = "Mean dominance rating (controlled - in control)",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/dominance-by-arousal-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = D.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating (calm - excited)", 
+       y = "Mean dominance rating (controlled - in control)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/dominance-by-arousal-faceted-new.pdf", height = 6, width = 8)
+
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = A.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating (controlled - in control)",
+       y = "Mean arousal rating (calm - excited)", 
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/arousal-by-dominance-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = A.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating (controlled - in control)",
+       y = "Mean arousal rating (calm - excited)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/arousal-by-dominance-faceted-new.pdf", height = 6, width = 8)
+
+### valence - arousal ----
+#### models ----
+lm(V.Mean.Sum2 ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.02671    0.04764   0.561    0.576    
+# A.Mean.Sum2  0.50593    0.11581   4.369 2.19e-05 ***
+
+lm(V.Mean.Sum2 ~ A.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of A.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      **
+
+lm(A.Mean.Sum2 ~ V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.35120    0.01314  26.733  < 2e-16 ***
+# V.Mean.Sum2  0.20271    0.04640   4.369 2.19e-05 ***
+
+lm(A.Mean.Sum2 ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      **
+
+#### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = A.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating (unhappy - happy)", 
+       y = "Mean arousal rating (calm - excited)",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/arousal-by-valence-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = A.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating (unhappy - happy)", 
+       y = "Mean arousal rating (calm - excited)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/arousal-by-valence-faceted-new.pdf", height = 6, width = 8)
+
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = V.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating (calm - excited)",
+       y = "Mean valence rating (unhappy - happy)", 
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/valence-by-arousal-new.pdf", height = 6, width = 8)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = V.Mean.Sum2)) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.grid.minor = element_blank(), 
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating (calm - excited)",
+       y = "Mean valence rating (unhappy - happy)") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_colour_manual(values = cols2) + 
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/valence-by-arousal-faceted-new.pdf", height = 6, width = 8)
+
+## H2.5 directions ----
+#### correlation ----
+contingency_table <- table(mean.proj.e1.plus.VAD$V.Mean.Sum2.direction, mean.proj.e1.plus.VAD$D.Mean.Sum2.direction)
+print(contingency_table)
+#          negative positive
+# negative       40       35
+# positive       10       86
+
+# Chi-square test
+chisq.test(contingency_table) %>% 
+  print()
+# Pearson's Chi-squared test with Yates' continuity correction
+# 
+# data:  contingency_table
+# X-squared = 35.437, df = 1, p-value = 2.635e-09
+
+# The direction of dominance and valence seem highly correlated.
+
+### distributions ----
+# distributions of direction within predicate types
+mean.proj.e1.plus.VAD %>% 
+  count(predicateType2, D.Mean.Sum2.direction)
+#   predicateType2 D.Mean.Sum2.direction   n
+# 1      cognitive              positive   2
+# 2        emoComm              negative  13 (52%)
+# 3        emoComm              positive  12
+# 4     nonEmoComm              negative  37 (26%)
+# 5     nonEmoComm              positive 107
+
+mean.proj.e1.plus.VAD %>% 
+  count(predicateType2, V.Mean.Sum2.direction)
+#    predicateType2 V.Mean.Sum2.direction n
+# 1      cognitive              positive  2
+# 2        emoComm              negative 21 (84%)
+# 3        emoComm              positive  4
+# 4     nonEmoComm              negative 54 (38%)
+# 5     nonEmoComm              positive 90
+
+# distribution of directions
+mean.proj.e1.plus.VAD %>% group_by(V.Mean.Sum2.direction, D.Mean.Sum2.direction) %>% count()
+#   V.Mean.Sum2.direction D.Mean.Sum2.direction     n
+#   <chr>                 <chr>                 <int>
+# 1 negative              negative                 40
+# 2 negative              positive                 35
+# 3 positive              negative                 10
+# 4 positive              positive                 86
+
+# distribution of directions by predicate types
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  group_by(predicateType2, V.Mean.Sum2.direction, D.Mean.Sum2.direction) %>% 
+  distinct(predicate) %>% 
+  count()
+#   predicateType2 V.Mean.Sum2.direction D.Mean.Sum2.direction     n
+#   <chr>          <chr>                 <chr>                 <int>
+# 1 emoComm        negative              negative                 12 (57% of emoComms with neg. valence)
+# 2 emoComm        negative              positive                  9
+# 3 emoComm        positive              negative                  1 (25% of emoComms with pos. valence)
+# 4 emoComm        positive              positive                  3
+# 5 nonEmoComm     negative              negative                 28 (52% of nonEmoComms with neg. valence)
+# 6 nonEmoComm     negative              positive                 26
+# 7 nonEmoComm     positive              negative                  9 (10% of nonEmoComms with pos. valence)
+# 8 nonEmoComm     positive              positive                 81 
+
+# For both emoComms and nonEmoComms with negative valence, the numbers of predicates with negative 
+# and positive dominance are roughly equal. Amongst emoComms and nonEmoComms with positive valence, 
+# significantly more predicates have positive dominance.
+
+## H2.6 projection: valence and arousal against projection ratings ----
+### H2.6.1 valence ----
+#### H2.6.1.1 overall ----
+##### plots ----
+# projection by valence
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(panel.grid.minor.y = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/projection-by-valence2-new.pdf", height = 3.5, width = 6)
+
+# projection by valence faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.spacing.x = unit(0.3, "cm"),
+        panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/projection-by-valence-faceted2-new.pdf", height = 4, width = 9)
+
+##### linear models ----
+lm(Mean.Proj ~ V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.29544    0.03761   7.854 4.65e-13 ***
+# V.Mean.Sum2  0.39919    0.13286   3.005  0.00307 ** 
+
+lm(rating ~ V.Mean.Sum2, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.29590    0.02111  14.016  < 2e-16 ***
+# V.Mean.Sum2  0.38663    0.07534   5.132 3.05e-07 ***
+
+lm(Mean.Proj ~ V.Mean.Sum2 + fct_relevel(predicateType2, "emoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.48799    0.07463   6.539 7.31e-10 ***
+# V.Mean.Sum2                                       0.27228    0.13673   1.991  0.04809 *  
+# fct_relevel(predicateType2, "emoComm")nonEmoComm -0.19206    0.06477  -2.965  0.00347 ** 
+
+lm(rating ~ V.Mean.Sum2 + fct_relevel(predicateType2, "emoComm"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                       0.49387    0.04276  11.551  < 2e-16 ***
+# V.Mean.Sum2                                       0.24432    0.07964   3.068  0.00217 ** 
+# fct_relevel(predicateType2, "emoComm")nonEmoComm -0.19644    0.03695  -5.317 1.13e-07 ***
+
+lm(Mean.Proj ~ V.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      n.s.
+
+lm(rating ~ V.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         *
+# nonEmoComm      *
+
+# by predicate type (= the faceted plot)
+lm(Mean.Proj ~ V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.42185    0.06877   6.134 2.94e-06 ***
+# V.Mean.Sum2  0.45909    0.17647   2.602    0.016 *  
+lm(Mean.Proj ~ V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.30290    0.04102   7.384 1.19e-11 ***
+# V.Mean.Sum2  0.23842    0.15764   1.512    0.133  
+
+#### H2.6.1.2 with direction ----
+# projection by valence with direction
+##### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+ggsave("../graphs/projection-by-valence-with-direction-new.pdf", height = 3.5, width = 6)
+
+# projection by valence faceted with emotive component
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-valence-and-direction-of-valence-faceted2-new.pdf", 
+       height = 6, width = 10)
+
+##### linear models ----
+lm(Mean.Proj ~ V.Mean.Sum2.direction, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                               Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                    0.47849    0.03308  14.463  < 2e-16 ***
+# V.Mean.Sum2.directionpositive -0.16564    0.04436  -3.734 0.000258 ***
+
+lm(rating ~ V.Mean.Sum2.direction, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                               Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                    0.47339    0.01886   25.10  < 2e-16 ***
+# V.Mean.Sum2.directionpositive -0.16411    0.02536   -6.47 1.14e-10 ***
+
+lm(Mean.Proj ~ V.Mean.Sum2 * fct_relevel(V.Mean.Sum2.direction, "negative"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                         0.34025    0.05430   6.266  3.1e-09 ***
+# V.Mean.Sum2                                                         0.53182    0.16788   3.168  0.00183 ** 
+# fct_relevel(V.Mean.Sum2.direction, "negative")positive             -0.03073    0.07416  -0.414  0.67909    
+# V.Mean.Sum2:fct_relevel(V.Mean.Sum2.direction, "negative")positive -0.51535    0.26504  -1.944  0.05354 .   
+
+# Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                         0.30952    0.05050   6.129  6.3e-09 ***
+# V.Mean.Sum2                                                         0.01646    0.20509   0.080   0.9361    
+# fct_relevel(V.Mean.Sum2.direction, "positive")negative              0.03073    0.07416   0.414   0.6791    
+# V.Mean.Sum2:fct_relevel(V.Mean.Sum2.direction, "positive")negative  0.51535    0.26504   1.944   0.0535 .  
+
+lm(rating ~ V.Mean.Sum2 * fct_relevel(V.Mean.Sum2.direction, "positive"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                         0.33720    0.03090  10.912  < 2e-16 ***
+# V.Mean.Sum2                                                         0.53940    0.09724   5.547 3.15e-08 ***
+# fct_relevel(V.Mean.Sum2.direction, "negative")positive             -0.02494    0.04278  -0.583 0.560012    
+# V.Mean.Sum2:fct_relevel(V.Mean.Sum2.direction, "negative")positive -0.55420    0.15480  -3.580 0.000349 ***
+
+#                                                                    Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                         0.31226    0.02958  10.555  < 2e-16 ***
+# V.Mean.Sum2                                                        -0.01480    0.12045  -0.123 0.902217    
+# fct_relevel(V.Mean.Sum2.direction, "positive")negative              0.02494    0.04278   0.583 0.560012    
+# V.Mean.Sum2:fct_relevel(V.Mean.Sum2.direction, "positive")negative  0.55420    0.15480   3.580 0.000349 ***
+
+# by predicate type and direction of valence (= the faceted plot)
+lm(Mean.Proj ~ V.Mean.Sum2,
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.43266    0.09277   4.664 0.000169 ***
+# V.Mean.Sum2  0.47039    0.22772   2.066 0.052778 .  
+
+lm(Mean.Proj ~ V.Mean.Sum2,
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.33793    0.06482   5.213 3.25e-06 ***
+# V.Mean.Sum2  0.41642    0.22809   1.826   0.0736 .  
+
+lm(Mean.Proj ~ V.Mean.Sum2,
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  0.42609    0.07878   5.408   0.0325 *
+# V.Mean.Sum2  0.04152    0.28254   0.147   0.8966  
+
+lm(Mean.Proj ~ V.Mean.Sum2,
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.30447    0.05291   5.755 1.24e-07 ***
+# V.Mean.Sum2  0.01470    0.21620   0.068    0.946 
+
+### H2.6.2 arousal ----
+# projection by arousal
+#### H2.6.2.1 overall ----
+##### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(panel.grid.minor.y = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+ggsave("../graphs/projection-by-arousal2-new.pdf", height = 3.5, width = 6)
+
+# projection by arousal faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank(), 
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/projection-by-arousal-faceted2-new.pdf", height = 6, width = 10)
+
+##### linear models ----
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  0.22591    0.08771   2.576   0.0109 *
+# A.Mean.Sum2  0.40378    0.21321   1.894   0.0600 .
+
+lm(rating ~ A.Mean.Sum2, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.21115    0.04822   4.379 1.23e-05 ***
+# A.Mean.Sum2  0.43129    0.11699   3.687 0.000231 ***
+
+lm(Mean.Proj ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                              Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                                                    0.7749     0.2439   3.176  0.00178 **
+# A.Mean.Sum2                                                   -0.4100     0.5105  -0.803  0.42309   
+# fct_relevel(predicateType2, "emoComm")nonEmoComm              -0.5571     0.2614  -2.131  0.03456 * 
+# A.Mean.Sum2:fct_relevel(predicateType2, "emoComm")nonEmoComm   0.7580     0.5623   1.348  0.17950 
+# 
+# Coefficients:
+#                                                              Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)                                                   0.21775    0.09398   2.317   0.0217 *
+# A.Mean.Sum2                                                   0.34800    0.23570   1.476   0.1417  
+# fct_relevel(predicateType2, "nonEmoComm")emoComm              0.55710    0.26141   2.131   0.0346 *
+# A.Mean.Sum2:fct_relevel(predicateType2, "nonEmoComm")emoComm -0.75795    0.56227  -1.348   0.1795  
+
+lm(rating ~ A.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                                              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                    0.7485     0.1367   5.476  4.7e-08 ***
+# A.Mean.Sum2                                                   -0.3591     0.2847  -1.261 0.207290    
+# fct_relevel(predicateType2, "emoComm")nonEmoComm              -0.5429     0.1467  -3.701 0.000218 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "emoComm")nonEmoComm   0.7245     0.3144   2.304 0.021269 *  
+
+# Coefficients:
+#                                                              Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                   0.20566    0.05318   3.867 0.000112 ***
+# A.Mean.Sum2                                                   0.36544    0.13346   2.738 0.006213 ** 
+# fct_relevel(predicateType2, "nonEmoComm")emoComm              0.54285    0.14667   3.701 0.000218 ***
+# A.Mean.Sum2:fct_relevel(predicateType2, "nonEmoComm")emoComm -0.72451    0.31440  -2.304 0.021269 * 
+
+# by predicate type (= the faceted plot)
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)   0.7749     0.1333   5.813 6.37e-06 ***
+# A.Mean.Sum2  -0.4100     0.2790  -1.470    0.155 
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  0.21775    0.09917   2.196   0.0297 *
+# A.Mean.Sum2  0.34800    0.24873   1.399   0.1640  
+
+#### H2.6.2.2 with direction of valence ----
+##### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+ggsave("../graphs/projection-by-arousal-with-direction-new.pdf", height = 3.5, width = 6)
+
+# projection by arousal faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-arousal-and-direction-of-valence-faceted2-new.pdf", 
+       height = 6, width = 10)
+
+##### linear models ----
+lm(Mean.Proj ~ A.Mean.Sum2 * V.Mean.Sum2.direction, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)                                0.33525    0.13591   2.467   0.0147 *
+# A.Mean.Sum2                                0.32801    0.30183   1.087   0.2787  
+# V.Mean.Sum2.directionpositive             -0.01689    0.18204  -0.093   0.9262  
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive -0.34308    0.44049  -0.779   0.4372 
+
+lm(rating ~ A.Mean.Sum2 * V.Mean.Sum2.direction, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                0.32560    0.07431   4.382 1.22e-05 ***
+# A.Mean.Sum2                                0.34240    0.16653   2.056   0.0399 *  
+# V.Mean.Sum2.directionpositive             -0.06057    0.10054  -0.602   0.5469    
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive -0.22288    0.24309  -0.917   0.3593  
+  
+lm(Mean.Proj ~ A.Mean.Sum2 * V.Mean.Sum2.direction * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# n.s.
+
+lm(rating ~ A.Mean.Sum * V.Mean.Sum2.direction * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# Coefficients:
+#                                                                                            Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)                                                                                 0.21170    0.08782   2.411  0.01598 * 
+# A.Mean.Sum2                                                                                 0.48675    0.20033   2.430  0.01517 * 
+# V.Mean.Sum2.directionpositive                                                               0.10113    0.11374   0.889  0.37401   
+# fct_relevel(predicateType2, "nonEmoComm")emoComm                                            0.51195    0.16547   3.094  0.00199 **
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive                                                  -0.51617    0.27913  -1.849  0.06452 . 
+# A.Mean.Sum2:fct_relevel(predicateType2, "nonEmoComm")emoComm                               -0.72786    0.36165  -2.013  0.04424 * 
+# V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "nonEmoComm")emoComm             -1.37178    1.02925  -1.333  0.18270   
+# A.Mean.Sum2:V.Mean.Sum2.directionpositive:fct_relevel(predicateType2, "nonEmoComm")emoComm  2.59063    1.93043   1.342  0.17970  
+
+# by predicate type and direction of valence (= the faceted plot)
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)   0.7543     0.1354   5.571 2.26e-05 ***
+# A.Mean.Sum2  -0.3133     0.2907  -1.078    0.295   
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)
+# (Intercept)   0.1957     0.1822   1.074    0.288
+# A.Mean.Sum2   0.5346     0.4102   1.303    0.198
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  -0.5390     0.3033  -1.777   0.2175  
+# A.Mean.Sum2   1.8162     0.5643   3.218   0.0845 .
+lm(Mean.Proj ~ A.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)   
+# (Intercept)   0.3657     0.1268   2.883  0.00495 **
+# A.Mean.Sum2  -0.1624     0.3440  -0.472  0.63801   
+
+### H2.6.3 valence + arousal ----
+#### linear models ----
+lm(Mean.Proj ~ A.Mean.Sum2 + V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  0.21646    0.08642   2.505   0.0132 *
+# A.Mean.Sum2  0.22488    0.22154   1.015   0.3115  
+# V.Mean.Sum2  0.35361    0.14023   2.522   0.0126 *
+
+lm(rating ~ A.Mean.Sum2 + V.Mean.Sum2, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.20180    0.04814   4.192 2.85e-05 ***
+# A.Mean.Sum2  0.26767    0.12308   2.175   0.0297 *  
+# V.Mean.Sum2  0.33162    0.07943   4.175 3.06e-05 ***
+
+lm(Mean.Proj ~ A.Mean.Sum2 * V.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# Coefficients:
+#                         Estimate Std. Error t value Pr(>|t|)
+# (Intercept)               0.2436     0.1557   1.565    0.120
+# A.Mean.Sum2               0.1607     0.3784   0.425    0.672
+# V.Mean.Sum2               0.2333     0.5910   0.395    0.694
+# A.Mean.Sum2:V.Mean.Sum2   0.2682     1.2793   0.210    0.834
+
+lm(rating ~ A.Mean.Sum2 * V.Mean.Sum2, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()  
+# Coefficients:
+#                         Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)              0.20908    0.08503   2.459    0.014 *
+# A.Mean.Sum2              0.25059    0.20537   1.220    0.222  
+# V.Mean.Sum2              0.29895    0.32443   0.921    0.357  
+# A.Mean.Sum2:V.Mean.Sum2  0.07200    0.69327   0.104    0.917  
+
+
+### H2.6.4 dominance ----
+# projection by dominance
+#### H2.6.4.1 overall ----
+##### plots ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(panel.grid.minor.y = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1,1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+ggsave("../graphs/projection-by-dominance2-new.pdf", height = 3.5, width = 6)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        panel.spacing.x = unit(0.3, "cm"),
+        panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 10),
+        plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
+ggsave("../graphs/projection-by-dominance-faceted2-new.pdf", height = 4, width = 9)
+
+##### linear models ----
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.43687    0.04405   9.918   <2e-16 ***
+# D.Mean.Sum2 -0.24239    0.18080  -1.341    0.182 
+
+lm(rating ~ D.Mean.Sum2, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.44015    0.02452  17.951  < 2e-16 ***
+# D.Mean.Sum2 -0.27384    0.09997  -2.739  0.00619 ** 
+
+lm(Mean.Proj ~ D.Mean.Sum2 * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      n.s.
+
+lm(rating ~ D.Mean.Sum2 * fct_relevel(predicateType2, "emoComm"), 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# predicateType2  significance of V.Mean.Sum2
+# emoComm         n.s.
+# nonEmoComm      *
+
+#### H2.6.4.2 with direction ----
+# projection by dominance with direction
+##### tables ----
+# What does the "direction" of dominance mean?
+mean.proj.e1.plus.VAD %>% 
+  filter(D.Mean.Sum2.direction == "positive") %>% 
+  slice_max(D.Mean.Sum2, n = 10) %>% 
+  select(predicate, D.Mean.Sum2, predicateType2)
+#      predicate D.Mean.Sum2 predicateType2
+# 1       detail      0.5350     nonEmoComm
+# 2       signal      0.5125     nonEmoComm
+# 3   articulate      0.4725     nonEmoComm
+# 4          say      0.4700     nonEmoComm
+# 5  communicate      0.4500     nonEmoComm
+# 6          add      0.4475     nonEmoComm
+# 7        reply      0.4475     nonEmoComm
+# 8         sing      0.4175     nonEmoComm
+# 9      express      0.3925     nonEmoComm
+# 10      praise      0.3925     nonEmoComm
+
+mean.proj.e1.plus.VAD %>% 
+  filter(D.Mean.Sum2.direction == "negative") %>% 
+  slice_max(D.Mean.Sum2, n = 10) %>% 
+  select(predicate, D.Mean.Sum2)
+#    predicate D.Mean.Sum2
+# 1        cry      0.6100
+# 2        sob      0.4275
+# 3     reject      0.3850
+# 4       fuss      0.3750
+# 5      bitch      0.3375
+# 6     mumble      0.3300
+# 7     stress      0.2875
+# 8     gossip      0.2650
+# 9   denounce      0.2500
+# 10    shriek      0.2500
+
+##### plots ----
+###### with direction of valence: happy vs unhappy ----
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+ggsave("../graphs/projection-by-domiance-with-direction-of-valence-new.pdf", height = 3.5, width = 6)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-dominance-and-direction-of-valence-faceted2-new.pdf", 
+       height = 6, width = 10)
+
+###### with "direction" of dominance ----
+# controlled/submissive/guided/... vs in control/ autonomous/controlling/... 
+# i.e., somebody else's vs one's own dominance
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = D.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of dominance") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+ggsave("../graphs/projection-by-domiance-with-direction-of-dominance-new.pdf", height = 3.5, width = 6)
+
+# faceted
+mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 12),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(D.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative dominance", 
+                                                       "positive" = "positive dominance")), 
+                                 .cols = predicateType2_names)) 
+ggsave("../graphs/projection-by-dominance-and-direction-of-dominance-faceted2-new.pdf", 
+       height = 6, width = 10)
+
+##### linear models ----
+lm(Mean.Proj ~ D.Mean.Sum2.direction, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                               Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                    0.50896    0.04063  12.526  < 2e-16 ***
+# D.Mean.Sum2.directionpositive -0.17412    0.04842  -3.596 0.000425 ***
+
+lm(rating ~ D.Mean.Sum2.direction, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                               Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                    0.50528    0.02343  21.569  < 2e-16 ***
+# D.Mean.Sum2.directionpositive -0.17272    0.02780  -6.212 5.94e-10 ***
+
+lm(Mean.Proj ~ D.Mean.Sum2 * D.Mean.Sum2.direction, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                0.43925    0.06634   6.621 4.79e-10 ***
+# D.Mean.Sum2                                0.43911    0.33142   1.325   0.1870    
+# D.Mean.Sum2.directionpositive             -0.03373    0.08664  -0.389   0.6976    
+# D.Mean.Sum2:D.Mean.Sum2.directionpositive -0.74748    0.39482  -1.893   0.0601 .   
+
+lm(rating ~ D.Mean.Sum2 * D.Mean.Sum2.direction, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                0.44059    0.03827  11.513  < 2e-16 ***
+# D.Mean.Sum2                                0.40623    0.19023   2.136 0.032797 *  
+# D.Mean.Sum2.directionpositive             -0.02908    0.04980  -0.584 0.559275    
+# D.Mean.Sum2:D.Mean.Sum2.directionpositive -0.74857    0.22599  -3.312 0.000936 ***
+
+lm(Mean.Proj ~ D.Mean.Sum2 * V.Mean.Sum2.direction, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                0.47517    0.05872   8.092 1.21e-13 ***
+# D.Mean.Sum2                                0.01924    0.28083   0.068    0.945    
+# V.Mean.Sum2.directionpositive             -0.12588    0.08664  -1.453    0.148    
+# D.Mean.Sum2:V.Mean.Sum2.directionpositive -0.17294    0.36795  -0.470    0.639   
+
+lm(rating ~ D.Mean.Sum2 * V.Mean.Sum2.direction, 
+   data = e1.VAD %>% filter(predicateType == "communicative")) %>% 
+  summary()
+# Coefficients:
+#                                           Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                0.48351    0.03321  14.558  < 2e-16 ***
+# D.Mean.Sum2                               -0.05774    0.15591  -0.370  0.71113    
+# V.Mean.Sum2.directionpositive             -0.13285    0.04939  -2.690  0.00718 ** 
+# D.Mean.Sum2:V.Mean.Sum2.directionpositive -0.11623    0.20696  -0.562  0.57443  
+
+# by predicate type and direction of valence (= the faceted plots)
+# with direction of valence
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.63208    0.05570  11.349 6.61e-10 ***
+# D.Mean.Sum2 -0.09883    0.22594  -0.437    0.667     
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.43008    0.08531   5.042 5.95e-06 ***
+# D.Mean.Sum2 -0.02368    0.44293  -0.053    0.958  
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)  
+# (Intercept)  0.44790    0.10909   4.106   0.0545 .
+# D.Mean.Sum2 -0.07409    0.51888  -0.143   0.8995 
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & V.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.34043    0.06429   5.295 8.65e-07 ***
+# D.Mean.Sum2 -0.13770    0.23787  -0.579    0.564 
+
+# with direction of dominance
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & D.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.57840    0.07791   7.424 1.32e-05 ***
+# D.Mean.Sum2  0.08516    0.28464   0.299     0.77   
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & D.Mean.Sum2.direction == "negative")) %>% 
+  summary()
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.38631    0.08676   4.453 8.27e-05 ***
+# D.Mean.Sum2  0.66067    0.52010   1.270    0.212  
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "emoComm" & D.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.66549    0.07782   8.552 6.53e-06 ***
+# D.Mean.Sum2 -0.56924    0.38953  -1.461    0.175 
+lm(Mean.Proj ~ D.Mean.Sum2, 
+   data = mean.proj.e1.plus.VAD %>% filter(predicateType2 == "nonEmoComm" & D.Mean.Sum2.direction == "positive")) %>% 
+  summary()
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)   0.3478     0.0625   5.565 2.02e-07 ***
+# D.Mean.Sum2  -0.1669     0.2353  -0.709     0.48   
+
+### H2.6.5 combined plots ----
+#### new data ----
+##### two lines ----
+# combined plot of projection by VAD with two fitted lines
+# valence
+vplot <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+
+# arousal
+aplot <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names)
+
+# dominance
+dplot <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+
+vplot + aplot + dplot + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-new.pdf", height = 3.5, width = 12)
+
+##### faceted ----
+vfac <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"), 
+        aspect.ratio = 1) + 
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+afac <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(), 
+        plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"),
+        aspect.ratio = 1/2) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ predicateType2, ncol = 5, labeller = as_labeller(predicateType2_names)) 
+
+dfac <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(D.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative dominance", 
+                                                       "positive" = "positive dominance")), 
+                                 .cols = predicateType2_names)) 
+layout <- "
+AABB
+AABB
+CCCC
+"
+vfac + dfac + afac + plot_layout(guides = "collect", axis_titles = "collect", design = layout) 
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-new.pdf", height = 8, width = 10)
+
+###### by predicate type ----
+vfac_emo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "emoComm") %>% 
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        #plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"), 
+        aspect.ratio = 1) + 
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ V.Mean.Sum2.direction, ncol = 2, labeller = as_labeller(c("negative" = "negative valence",
+                                                                         "positive" = "positive valence")))
+
+
+afac_emo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "emoComm") %>% 
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(), 
+        #plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"),
+        aspect.ratio = 1/2) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2)
+
+dfac_emo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "emoComm") %>% 
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        #plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ D.Mean.Sum2.direction, ncol = 2, labeller = as_labeller(c("negative" = "negative dominance",
+                                                                       "positive" = "positive dominance")))
+layout <- "
+AABBCC
+"
+VAD_emo <- vfac_emo + dfac_emo + afac_emo + 
+  plot_layout(axis_titles = "collect", design = layout, widths = c(4.5, 4.5, 4.5)) + 
+  plot_annotation(title = "Communicatives with emotion entailment")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-test.pdf", height = 4.5, width = 12.5)
+
+vfac_nonEmo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "nonEmoComm") %>% 
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        #plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"), 
+        aspect.ratio = 1) + 
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ V.Mean.Sum2.direction, ncol = 2, labeller = as_labeller(c("negative" = "negative valence",
+                                                                         "positive" = "positive valence")))
+
+
+afac_nonEmo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "nonEmoComm") %>% 
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(), 
+        #plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"),
+        aspect.ratio = 1/2) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2)
+
+dfac_nonEmo <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType2 == "nonEmoComm") %>% 
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        #axis.title.x = element_text(vjust = -1),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank(),
+        #plot.margin = margin(0.5, 0.5, 1, 0.5, "cm"),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_wrap(~ D.Mean.Sum2.direction, ncol = 2, labeller = as_labeller(c("negative" = "negative dominance",
+                                                                         "positive" = "positive dominance")))
+layout <- "
+AABBCC
+"
+VAD_nonEmo <- vfac_nonEmo + dfac_nonEmo + afac_nonEmo + 
+  plot_layout(axis_titles = "collect", design = layout, widths = c(4.5, 4.5, 4.5)) + 
+  plot_annotation(title = "Communicatives without emotion entailment")
+
+VAD_emo / VAD_nonEmo + plot_layout(axis_titles = "collect")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-test.pdf", height = 6, width = 12.5)
+
+#### MV ----
+##### neg only ----
+###### two lines ----
+# combined plot of projection by VAD with two fitted lines
+# valence
+vplotMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+
+# arousal
+aplotMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names)
+
+# dominance
+dplotMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+
+vplotMVneg + aplotMVneg + dplotMVneg + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-NO.pdf", height = 3.5, width = 12)
+
+###### faceted ----
+vfacMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+afacMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names))
+
+dfacMVneg <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj.MV.neg)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  # plot.margin = margin(0.5, 1, 0.5, 0.5, "cm")) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+vfacMVneg + afacMVneg + dfacMVneg + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-NO.pdf", height = 4.5, width = 12.5)
+
+
+##### all embedding environments ----
+###### two lines ----
+# combined plot of projection by VAD with two fitted lines
+# valence
+vplotMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names) 
+
+# arousal
+aplotMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names)
+
+# dominance
+dplotMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>%   
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5, 
+              aes(linetype = V.Mean.Sum2.direction)) +
+  theme(panel.grid.minor.y = element_blank(), 
+        axis.title = element_text(size = 14),
+        axis.title.y = element_blank(),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1) +
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type", 
+       linetype = "Direction of valence") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2, 
+                      labels = predicateType2_names) 
+
+vplotMV + aplotMV + dplotMV + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-MV.pdf", height = 3.5, width = 12)
+
+###### faceted ----
+vfacMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = V.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+afacMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = A.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/8)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names))
+
+dfacMV <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = D.Mean.Sum2, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(0, 1), breaks = c(0, 1), minor_breaks = seq(0, 1, 1/4)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+vfacMV + afacMV + dfacMV + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-MV.pdf", height = 4.5, width = 12.5)
+
+###### original VAD ratings ----
+vfacMVorig <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = V.Mean.Sum, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean valence rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(1, 9), breaks = c(1:9)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+afacMVorig <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = A.Mean.Sum, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean arousal rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(1, 9), breaks = c(1:9)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names))
+
+dfacMVorig <- mean.proj.e1.plus.VAD %>% 
+  filter(predicateType == "communicative") %>% 
+  ggplot(aes(x = D.Mean.Sum, y = Mean.Proj.MV)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.8) +
+  geom_smooth(method = "lm", colour = "grey30", linewidth = 0.5) +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11),
+        panel.grid.minor.y = element_blank()) + 
+  labs(x = "Mean dominance rating", 
+       y = "Mean projection rating") +
+  scale_x_continuous(limits = c(1, 9), breaks = c(1:9)) +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols2) +
+  facet_grid(V.Mean.Sum2.direction ~ predicateType2, 
+             labeller = labeller(.rows = as_labeller(c("negative" = "negative valence", 
+                                                       "positive" = "positive valence")), 
+                                 .cols = predicateType2_names)) 
+
+vfacMVorig + afacMVorig + dfacMVorig + plot_layout(guides = "collect", axis_titles = "collect") # & theme(legend.position = "top")
+ggsave("../graphs/projection-by-VAD-with-direction-of-valence-faceted-MV-orig.pdf", height = 4.5, width = 12.5)

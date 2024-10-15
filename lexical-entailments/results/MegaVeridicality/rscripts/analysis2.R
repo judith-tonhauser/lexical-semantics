@@ -1126,7 +1126,7 @@ d.proj.vv %>%
 # With only one communicative with an emotive component, the VV dataset is of 
 # limited use for investigating the 'emotive component' property.
 
-# With only three projectino ratings per item, the dataset is overall ill-suited 
+# With only three projection ratings per item, the dataset is overall ill-suited 
 # for a more fine-grained investigation of communication predicates, 
 
 #### plots ----
