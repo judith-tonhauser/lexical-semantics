@@ -175,7 +175,7 @@ nrow(e1) # 3454 (no. of participants x 11 stimuli)
 # variance ----
 variances <- e1 %>%
   group_by(participant_id) %>% 
-  summarize(variance = var(response),
+  summarise(variance = var(response),
             mean_response = mean(response)) %>%
   mutate(mean_variance = mean(variance),
          sd_variance = sd(variance),
