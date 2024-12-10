@@ -3068,9 +3068,7 @@ similar_ranking <- function(number){
     select(predicate, Mean.Proj, Mean.Proj.MV.neg, rankingNew, rankingMVneg, ranking_difference)
   
   print(a, n = Inf)
-  
-  #cat("selected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x)
-  
+
   if (nrow(a) > number) {
     cat("\nselected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x,"\n\nThe number of predicates in the output is larger than the selected number because of the\nties in the MV dataset (negation-only) and the fact that the for-loop can add multiple\npredicates to the list in one iteration.")
   } else {
@@ -8088,3 +8086,880 @@ mean.proj.Ddir.both %>%
                               "negative.positive" = "subject: negative\npredicate: positive", 
                               "positive.positive" = "subject: positive\npredicate: positive")) 
 ggsave("../graphs/projection-by-CC-Ddir-both.pdf", height = 5, width = 7.5)
+
+# presentation plots ----
+## by predicate type MV neg only vs new data ----
+comms.MV.neg <- d.proj.neg %>%
+  filter(predicateType == "communicative") %>%
+  group_by(predicateType2) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>%
+  ggplot(aes(x = predicateType2, 
+             y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+
+comms.new.blank <- 
+  e1 %>%
+  filter(predicateType == "communicative") %>%
+  group_by(predicateType2) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>%
+  ggplot(aes(x = predicateType2, 
+             y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = c("white", "white"))
+
+comms.new <- e1 %>%
+  filter(predicateType == "communicative") %>%
+  group_by(predicateType2) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>%
+  ggplot(aes(x = predicateType2, 
+             y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+
+# MV
+(comms.MV.neg + labs(title = "MegaVeridicality data") + plot_spacer()) + 
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.01),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 12))
+ggsave("../graphs/projection-by-predicateType2-MV.jpeg", height = 4, width = 9)
+
+# combine MV and new data blank
+(comms.MV.neg + labs(title = "MegaVeridicality data") + comms.new.blank + labs(title = "New data")) + 
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.01),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 12))
+ggsave("../graphs/projection-by-predicateType2-comparison-blank.jpeg", height = 4, width = 9)
+
+# combine MV and new data
+(comms.MV.neg + labs(title = "MegaVeridicality data") + comms.new + labs(title = "New data")) + 
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.01),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 12))
+ggsave("../graphs/projection-by-predicateType2-comparison.jpeg", height = 4, width = 9)
+
+## by predicate ----
+### MV neg only vs new ----
+commProjMVneg <- 
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "think"),
+                   aes(label = predicate),  
+                   min.segment.length = 0,
+                   nudge_x = 0.1, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "orangered3"))
+
+
+projNewBlank <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1))
+
+projNew <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "think"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.1, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "orangered3"))
+
+# combine MV and new data blank plots 
+(commProjMVneg / projNewBlank) + 
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.01),
+        axis.title = element_text(size = 18),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12))
+ggsave("../graphs/projection-by-communicative-comparison-neg-blank.jpeg", height = 6, width = 10)
+
+# combine MV and new data plots 
+(commProjMVneg / projNew) + 
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.01),
+        axis.title = element_text(size = 18),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12))
+ggsave("../graphs/projection-by-communicative-comparison-neg.jpeg", height = 6, width = 10)
+
+### with emoComms ---- 
+#### legend plot ----
+legend_plot <- 
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  theme(legend.position = "top",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating",
+       colour = "Type of communicative") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("#009A00", "deepskyblue2"), limits = c("emoComm", "nonEmoComm"), 
+                      labels = c("with emotion entailment", "without emotion entailment"))
+
+#### with points MV neg only vs new ----  
+emoPointsMVneg <- 
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "nonEmoComm"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"),
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.3,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "think"),
+                   aes(label = predicate),  
+                   min.segment.length = 0,
+                   nudge_x = 0.1, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("nonEmoComm", "emoComm", "say", "think", "know"),
+                      values = c("deepskyblue2", "#009A00", "blue", "deeppink", "orangered3"))
+
+
+emoPointsBlank <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1))
+
+emoPointsNew <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "nonEmoComm"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"),
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.3,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "think"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.1, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.3,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("nonEmoComm", "emoComm", "say", "think", "know"),
+                      values = c("deepskyblue2", "#009A00", "blue", "deeppink", "orangered3"))
+
+# combine MV and new data blank plots 
+wrap_elements(get_legend(legend_plot)) / ((emoPointsMVneg / emoPointsBlank) + 
+                           plot_layout(axis_titles = "collect") &
+                           theme(plot.title = element_text(hjust = 0.01),
+                                 axis.title = element_text(size = 18),
+                                 axis.title.x = element_text(vjust = -.5),
+                                 axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-point-comparison-blank.jpeg", height = 6, width = 10)
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((emoPointsMVneg / emoPointsNew) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-point-comparison.jpeg", height = 6, width = 10)
+
+
+#### with labels MV neg only vs new ----
+projMVnegEmo <-   
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "#009A00") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.3,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "think"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = -0.2, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = -0.2, nudge_y = 0.3,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm", "say", "think", "know"),
+                      values = c("deepskyblue2", "#009A00", "blue", "deeppink", "orangered3"))
+
+projNewEmo <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "say"), 
+             aes(x = predicate, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "think"), 
+             aes(x = predicate, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.e1 %>% filter(predicate == "know"), 
+             aes(x = predicate, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -0.6,
+                   colour = "#009A00") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "say"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.3,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "think"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = -0.2, nudge_y = 0.3,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate == "know"),
+                   aes(label = predicate), 
+                   min.segment.length = 0,
+                   nudge_x = -7, nudge_y = 0.2,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm", "say", "think", "know"),
+                      values = c("deepskyblue2", "#009A00", "blue", "deeppink", "orangered3"))
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((projMVnegEmo / projNewEmo) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-labels-comparison.jpeg", height = 6, width = 10)
+
+
+### emoComm ranking differences ----
+mean.proj.emoComm.rankings <- 
+  mean.proj.e1.plus %>%
+  filter(predicateType2 == "emoComm") %>%  
+    mutate(rankingNew = rank(Mean.Proj),
+         rankingMVneg = rank(Mean.Proj.MV.neg),
+         ranking_difference = abs(rankingNew - rankingMVneg))
+
+# highest rankings
+similar_high_ranking_emo <- function(number){
+  for (x in 1:nrow(mean.proj.emoComm.rankings %>% filter(predicateType2 == "emoComm"))) {
+    
+    top_ranking_new <- mean.proj.emoComm.rankings %>%
+      filter(predicateType2 == "emoComm") %>%   
+      slice_max(order_by = rankingNew, n = x) %>% 
+      pull(predicate)
+    top_ranking_MV_neg <- mean.proj.emoComm.rankings %>%
+      filter(predicateType2 == "emoComm") %>%    
+      slice_max(order_by = rankingMVneg, n = x) %>% 
+      pull(predicate)
+    
+    common_predicates <- intersect(top_ranking_new, top_ranking_MV_neg)
+    
+    if (length(common_predicates) >= number) {
+      break  
+    }
+  }
+  a <- mean.proj.emoComm.rankings %>% 
+    filter(predicate %in% common_predicates) %>% 
+    arrange(ranking_difference) %>% 
+    select(predicate, Mean.Proj, Mean.Proj.MV.neg, rankingNew, rankingMVneg, ranking_difference)
+  
+  print(a, n = Inf)
+  
+  cat("\n", paste0('"', as.character(a$predicate), '",'))
+
+  if (nrow(a) > number) {
+    cat("\n\nselected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x,"\n\nThe number of predicates in the output is larger than the selected number because of the\nties in the MV dataset (negation-only) and the fact that the for-loop can add multiple\npredicates to the list in one iteration.")
+  } else {
+    cat("\n\nselected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x)
+  }
+}
+
+similar_high_ranking_emo(9)
+
+top_similar_nine <- c("fuss", "weep", "whine", "gloat", "bitch", "complain", "pout", "groan", "grumble")
+
+# lowest rankings
+similar_low_ranking_emo <- function(number){
+  for (x in 1:nrow(mean.proj.emoComm.rankings %>% filter(predicateType2 == "emoComm"))) {
+    
+    bottom_ranking_new <- mean.proj.emoComm.rankings %>%
+      filter(predicateType2 == "emoComm") %>%   
+      slice_min(order_by = rankingNew, n = x) %>% 
+      pull(predicate)
+    bottom_ranking_MV_neg <- mean.proj.emoComm.rankings %>%
+      filter(predicateType2 == "emoComm") %>%    
+      slice_min(order_by = rankingMVneg, n = x) %>% 
+      pull(predicate)
+    
+    common_predicates <- intersect(bottom_ranking_new, bottom_ranking_MV_neg)
+    
+    if (length(common_predicates) >= number) {
+      break  
+    }
+  }
+  a <- mean.proj.emoComm.rankings %>% 
+    filter(predicate %in% common_predicates) %>% 
+    arrange(ranking_difference) %>% 
+    select(predicate, Mean.Proj, Mean.Proj.MV.neg, rankingNew, rankingMVneg, ranking_difference)
+  
+  print(a, n = Inf)
+  
+  cat("\n", paste0('"', as.character(a$predicate), '",'))
+  
+  if (nrow(a) > number) {
+    cat("\n\nselected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x,"\n\nThe number of predicates in the output is larger than the selected number because of the\nties in the MV dataset (negation-only) and the fact that the for-loop can add multiple\npredicates to the list in one iteration.")
+  } else {
+    cat("\n\nselected number:", number, "; number of predicates:", nrow(a), "; size of subset:", x)
+  }
+}
+
+similar_low_ranking_emo(9)
+
+bottom_similar_nine <- c("exclaim", "scream", "boast", "mutter", "shriek", "squeal", "howl", "rave", "whimper")
+
+least_similar <- 
+  mean.proj.emoComm.rankings %>% 
+    filter(predicateType2 == "emoComm" & ranking_difference >= 9) %>% 
+    arrange(ranking_difference) %>% 
+    select(predicate) %>%
+    unlist() %>% 
+    as.vector() %>% print()
+
+least_similar10 <- 
+  mean.proj.emoComm.rankings %>% 
+  filter(predicateType2 == "emoComm" & ranking_difference >= 10) %>% 
+  arrange(ranking_difference) %>% 
+  select(predicate) %>%
+  unlist() %>% 
+  as.vector() %>% print()
+
+most_similar2 <- 
+  mean.proj.emoComm.rankings %>% 
+  filter(predicateType2 == "emoComm" & ranking_difference <= 2) %>% 
+  arrange(ranking_difference) %>% 
+  select(predicate) %>%
+  unlist() %>% 
+  as.vector() 
+
+most_similar4 <- 
+  mean.proj.emoComm.rankings %>% 
+  filter(predicateType2 == "emoComm" & ranking_difference <= 4) %>% 
+  arrange(ranking_difference) %>% 
+  select(predicate) %>%
+  unlist() %>% 
+  as.vector() 
+
+#### with labels most similar 2 only ----
+projMVnegEmo_mostSim2 <-   
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate %in% most_similar2),
+                   aes(label = predicate), 
+                   fill = "khaki2",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.MV.neg %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+projNewEmo_mostSim2 <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% most_similar2),
+                   aes(label = predicate), 
+                   fill = "khaki2",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.e1 %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((projMVnegEmo_mostSim2 / projNewEmo_mostSim2) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-labels-comparison-most-similar2.jpeg", height = 6, width = 10)
+
+
+#### with labels most similar 4 only ----
+projMVnegEmo_mostSim4 <-   
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate %in% most_similar4),
+                   aes(label = predicate), 
+                   fill = "khaki2",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.4,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.MV.neg %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+projNewEmo_mostSim4 <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% most_similar4),
+                   aes(label = predicate), 
+                   fill = "khaki2",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.4,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.e1 %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((projMVnegEmo_mostSim4 / projNewEmo_mostSim4) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-labels-comparison-most-similar4.jpeg", height = 6, width = 10)
+
+
+#### with labels least similar 9 only----
+projMVnegEmo_leastSim <-   
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate %in% least_similar),
+                   aes(label = predicate), 
+                   fill = "pink",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.MV.neg %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+projNewEmo_leastSim <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% least_similar),
+                   aes(label = predicate), 
+                   fill = "pink",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.e1 %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((projMVnegEmo_leastSim / projNewEmo_leastSim) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-labels-comparison-least-similar.jpeg", height = 6, width = 10)
+
+
+#### with labels least similar 10 only----
+projMVnegEmo_leastSim10 <-   
+  ggplot(mean.proj.MV.neg, aes(x = fct_reorder(as.factor(predicate), Mean.Proj), y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.MV.neg %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.MV.neg %>% filter(predicate %in% least_similar10),
+                   aes(label = predicate), 
+                   fill = "pink",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.MV.neg %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "MegaVeridicality data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+projNewEmo_leastSim10 <- 
+  ggplot(mean.proj.e1, aes(x = predicate, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate"), alpha = 0.5) +
+  geom_point(data = mean.proj.e1 %>% filter(predicateType2 == "emoComm"), 
+             aes(x = predicate, y = Mean.Proj, colour = "emoComm")) +
+  geom_label_repel(data = mean.proj.e1 %>% filter(predicate %in% least_similar10),
+                   aes(label = predicate), 
+                   fill = "pink",
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = -.3,
+                   colour = "#009A00") +
+  # geom_label_repel(data = mean.proj.e1 %>% 
+  #                    filter(predicateType2 == "emoComm" & ! predicate %in% least_similar),
+  #                  aes(label = predicate), 
+  #                  min.segment.length = 0,
+  #                  nudge_x = 0.2, nudge_y = -0.6,
+  #                  colour = "#009A00") +
+  theme(legend.position = "none",
+        plot.title = element_text(size = 12, hjust = 0.5),
+        axis.title = element_text(size = 14),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(title = "New data",
+       x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1.1, 1.1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "emoComm"),
+                      values = c("deepskyblue2", "#009A00"))
+
+# combine MV and new data plots 
+wrap_elements(get_legend(legend_plot)) / ((projMVnegEmo_leastSim10 / projNewEmo_leastSim10) + 
+                                            plot_layout(axis_titles = "collect") &
+                                            theme(plot.title = element_text(hjust = 0.01),
+                                                  axis.title = element_text(size = 18),
+                                                  axis.title.x = element_text(vjust = -.5),
+                                                  axis.text = element_text(size = 12))) + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emo-labels-comparison-least-similar10.jpeg", height = 6, width = 10)

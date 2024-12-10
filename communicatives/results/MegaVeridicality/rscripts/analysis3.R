@@ -135,7 +135,7 @@ mean.proj.all <- left_join(mean.proj.all, tmp, by = c("verb_renamed")) %>%
 nrow(mean.proj.all) # 544
 
 mean.proj.all %>%
-  group_by(predicateType2) %>%
+  group_by(predicateType) %>%
   distinct(verb_renamed) %>%
   count()
 # predicateType2     n
@@ -777,22 +777,22 @@ mean.proj.bt <- d.proj.acc %>%
          predicateType = fct_reorder(as.factor(predicateType), Mean.Proj))
 nrow(mean.proj.bt) # 4
 
-ggplot(mean.proj.bt, aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+Tall <- 
+  ggplot(mean.proj.bt, aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
   theme(legend.position = "none",
         axis.ticks.x = element_blank(),
         axis.title = element_text(size = 14),
-        axis.title.x = element_text(vjust = -1),
+        axis.title.x = element_text(vjust = -.5),
         axis.text = element_text(size = 12),
-        plot.margin = margin(5.5, 5.5, 22, 5.5, "pt"),
         panel.grid.major.x = element_blank()) +
   ylab("Mean projection rating") +
   xlab("Predicate type") +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
   scale_colour_manual(values = cols)
-ggsave("../graphs/projection-by-predicateType.pdf", height = 4, width = 10)
+ggsave("../graphs/projection-by-predicateType.pdf", height = 4, width = 6)
 
 # calculate by-predicateType2 means
 mean.proj.bt2 <- d.proj.acc %>%
@@ -814,7 +814,7 @@ ggplot(mean.proj.bt2,
         axis.ticks.x = element_blank(),
         axis.title = element_text(size = 14),
         axis.text = element_text(size = 12),
-        axis.title.x = element_text(vjust = -1),
+        axis.title.x = element_text(vjust = -.5),
         legend.title = element_text(size = 14),
         legend.text = element_text(size = 12),
         panel.grid.major.x = element_blank()) +
@@ -825,7 +825,7 @@ ggplot(mean.proj.bt2,
                               "communicative without\nemotion entailment", 
                               "communicative with\nemotion entailment", "emotive")) +
   scale_colour_manual(values = cols2)
-ggsave("../graphs/projection-by-predicateType2.pdf", height = 4, width = 10)
+ggsave("../graphs/projection-by-predicateType2.pdf", height = 4, width = 9.5)
 
 ### linear models ----
 lm(Mean.Proj ~ fct_relevel(predicateType, "communicative"), mean.proj.acc) %>% 
@@ -870,6 +870,233 @@ mean.proj.acc %>%
 # 3 emotive          144
 # 4 evidential        77
 # 5 nonEmoComm       174
+
+### by embedding environment ----
+#### by predicate type ----
+# negation
+Tneg <- 
+  d.proj.acc %>%
+  filter(environment == "neg") %>% 
+  group_by(predicateType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num),
+            Mean.Acc = mean(acceptability)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType), Mean.Proj)) %>% 
+ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = cols)
+
+# question + conditional
+Tqcond <- 
+  d.proj.acc %>%
+  filter(environment == "qcond") %>% 
+  group_by(predicateType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num),
+            Mean.Acc = mean(acceptability)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType), Mean.Proj)) %>% 
+  ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  ylab("Mean projection rating") +
+  xlab("Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = cols)
+ggsave("../graphs/projection-by-predicateType-qcond.pdf", height = 4, width = 6)
+
+# question + conditional + negation
+Tqcondneg <- 
+  d.proj.acc %>%
+  filter(environment == "qcondneg") %>% 
+  group_by(predicateType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num),
+            Mean.Acc = mean(acceptability)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType), Mean.Proj)) %>% 
+  ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  ylab("Mean projection rating") +
+  xlab("Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = cols)
+ggsave("../graphs/projection-by-predicateType-qcondneg.pdf", height = 4, width = 6)
+
+# comparison
+Tall + labs(title = "all embedding environments") + 
+  Tneg + labs(title = "negation") + 
+  Tqcond + labs(title = "question + conditional") +
+  Tqcondneg + labs(title = "question + conditional + negation") +
+  plot_layout(axis_titles = "collect", nrow = 2) &
+  theme(plot.title = element_text(size = 12),
+        axis.title = element_text(size = 16))
+ggsave("../graphs/projection-by-predicateType-comparison.pdf", height = 6, width = 10)
+
+#### by predicate type 2 ----
+# overall
+T2all <- 
+  d.proj.acc %>%
+  group_by(predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>% 
+ggplot(aes(x = predicateType2, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2, labels = predicateType2_names)
+
+# negation
+T2neg <- 
+  d.proj.acc %>%
+  filter(environment == "neg") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>% 
+  ggplot(aes(x = predicateType2, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/projection-by-predicateType2.pdf", height = 4, width = 9.5)
+
+# question + conditional
+T2qcond <- 
+  d.proj.acc %>%
+  filter(environment == "qcond") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>% 
+  ggplot(aes(x = predicateType2, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/projection-by-predicateType2-qcond.pdf", height = 4, width = 9.5)
+
+# question + conditional + negation
+T2qcondneg <- 
+  d.proj.acc %>%
+  filter(environment == "qcondneg") %>% 
+  group_by(predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj)) %>% 
+  ggplot(aes(x = predicateType2, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  # geom_label_repel(aes(label = predicateType2_names), 
+  #                  segment.colour = "transparent",
+  #                  nudge_x = 0.2, nudge_y = 0.2,
+  #                  colour = cols2) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -1),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_x_discrete(labels = predicateType2_names) +
+  scale_colour_manual(values = cols2)
+ggsave("../graphs/projection-by-predicateType2-qcondneg.pdf", height = 4, width = 9.5)
+
+# comparison
+wrap_elements(get_legend(T2all + 
+                           theme(legend.title = element_blank(),
+                                 legend.text = element_text(size = 12)))) /
+(T2all + labs(title = "all embedding environments") + 
+  T2neg + labs(title = "negation") + 
+  T2qcond + labs(title = "question + conditional") +
+  T2qcondneg + labs(title = "question + conditional + negation") +
+  plot_layout(axis_titles = "collect", nrow = 2) &
+  theme(plot.title = element_text(size = 13),
+        axis.title = element_text(size = 16), 
+        axis.text = element_text(size = 8),
+        axis.text.x = element_blank(),
+        legend.position = "none")) +
+  plot_layout(heights = c(.1, 1))
+ggsave("../graphs/projection-by-predicateType2-comparison.pdf", height = 6, width = 8)
 
 ## B.2 by predicate ----
 ### with communicatives ----
@@ -7739,3 +7966,377 @@ lm(Mean.Proj ~ fct_relevel(predicateType2, "emoComm") * sayByMeansVerbType, data
 # (160 observations deleted due to missingness)
 # Multiple R-squared:  0.1573,	Adjusted R-squared:  0.06362 
 # F-statistic: 1.679 on 4 and 36 DF,  p-value: 0.1761
+
+# presentation plots ----
+## by predicate ----
+### legend plots ----
+legend_plot <- ggplot(mean.proj.acc %>% 
+                        filter(predicateType == "communicative"), 
+                      aes(x = verb_renamed, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  theme(legend.position = "top",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       colour = "Predicate type") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = cols)
+
+legend_plot2 <- 
+  ggplot(mean.proj.acc %>% 
+                        filter(predicateType == "communicative"), 
+                      aes(x = verb_renamed, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  theme(legend.position = "top",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate",
+       y = "Mean projection rating",
+       colour = "Type of communicative") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(values = c("#009A00", "deepskyblue2"), limits = c("emoComm", "nonEmoComm"), 
+                      labels = c("with emotion entailment", "without emotion entailment"))
+
+### grey ----
+ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.margin = unit(c(44, 11, 11, 11), "pt"),
+        aspect.ratio = 1/4.2) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "know"),
+                      values = c("grey80", "blue", "deeppink", "orangered3"))
+ggsave("../graphs/projection-by-communicative-grey.jpeg", height = 4, width = 13)
+
+
+### grey all ----
+ggplot(mean.proj.acc,  
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "predicate")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.margin = unit(c(44, 11, 11, 11), "pt"),
+        aspect.ratio = 1/4.2) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("predicate", "say", "think", "know"),
+                      values = c("grey80", "blue", "deeppink", "orangered3"))
+ggsave("../graphs/projection-by-communicative-grey-all.jpeg", height = 4, width = 13)
+
+
+### with highlights ----
+
+
+
+# with random highlights
+sample_predicates <- function(data) {
+
+  data <- data %>% arrange(Mean.Proj)
+
+  n <- nrow(data)
+
+  bottom_indices <- seq_len(floor(n * 0.5))
+  middle_indices <- (floor(n * 0.5) + 1):floor(n * 0.7)
+  top_indices <- (floor(n * 0.7) + 1):n
+
+  total_to_sample <- floor(n * 0.42)
+  bottom_sample_size <- floor(total_to_sample * 0.57)
+  middle_sample_size <- floor(total_to_sample * 0.28)
+  top_sample_size <- total_to_sample - bottom_sample_size - middle_sample_size
+
+  bottom_sample <- data %>%
+    filter(row_number() %in% bottom_indices) %>%
+    sample_n(bottom_sample_size)
+
+  middle_sample <- data %>%
+    filter(row_number() %in% middle_indices) %>%
+    sample_n(middle_sample_size)
+
+  top_sample <- data %>%
+    filter(row_number() %in% top_indices) %>%
+    sample_n(top_sample_size)
+
+  selected_predicates <- bind_rows(bottom_sample, middle_sample, top_sample)
+
+  return(selected_predicates$verb_renamed)
+}
+
+selected_predicates <- sample_predicates(mean.proj.comm)
+
+highlights <- 
+  ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed %in% sample_predicates(mean.proj.comm)),
+             aes(x = verb_renamed, y = Mean.Proj, colour = "highlight")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   size = 5,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        aspect.ratio = 1/4.2) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "highlight", "say", "think", "know"),
+                      values = c("grey80", "deepskyblue2", "blue", "deeppink", "orangered3"))
+
+legend <- get_legend(legend_plot)
+wrap_elements(legend) / highlights + 
+  plot_layout( heights = c(0.1, 1))
+#ggsave("../graphs/projection-by-communicative-grey-with-say.jpeg", height = 4, width = 13)
+
+### all blue ----
+allcomms <- ggplot(mean.proj.acc %>% 
+         filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+       aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "communicative predicate")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   size = 5,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(), 
+        aspect.ratio = 1/4.2) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("communicative predicate", "say", "think", "know"),
+                      values = c("deepskyblue2", "blue", "deeppink", "orangered3"))
+
+legend <- get_legend(legend_plot)
+wrap_elements(legend) / allcomms + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative.jpeg", height = 4, width = 13)
+
+### with emoComm points ----
+emoCommPoints <- 
+  ggplot(mean.proj.acc %>% 
+                     filter(predicateType == "communicative" | verb_renamed %in% c("think", "know")), 
+                   aes(x = verb_renamed, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(aes(colour = "nonEmoComm"), alpha = 0.8) +
+  geom_point(data = mean.proj.acc %>% filter(predicateType2 == "emoComm"),
+             aes(x = verb_renamed, y = Mean.Proj, colour = "emoComm")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+             aes(x = verb_renamed, y = Mean.Proj, colour = "say")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "think"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "think")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_point(data = mean.proj.acc %>% filter(verb_renamed == "know"), 
+             aes(x = verb_renamed, y = Mean.Proj, colour = "know")) +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "say"),
+                   aes(label = verb_renamed),
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.2,
+                   size = 5,
+                   colour = "blue") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "think"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "deeppink") +
+  geom_label_repel(data = mean.proj.acc %>% filter(verb_renamed == "know"),
+                   aes(label = verb_renamed), 
+                   min.segment.length = 0,
+                   nudge_x = 0.2, nudge_y = 0.25,
+                   size = 5,
+                   colour = "orangered3") +
+  theme(legend.position = "none",
+        axis.title = element_text(size = 18),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        panel.grid.major.x = element_blank(), 
+        aspect.ratio = 1/4.2) +
+  labs(x = "Predicate",
+       y = "Mean projection rating") + 
+  scale_y_continuous(limits = c(-1, 1), breaks = c(-1, 0, 1)) +
+  scale_colour_manual(limits = c("nonEmoComm", "emoComm", "say", "think", "know"),
+                      values = c("deepskyblue2", "#009A00", "blue", "deeppink", "orangered3"))
+
+legend2 <- get_legend(legend_plot2)
+wrap_elements(legend2) / emoCommPoints + 
+  plot_layout( heights = c(0.1, 1))
+ggsave("../graphs/projection-by-communicative-emoComm-points.jpeg", height = 4, width = 13)
+
+## by predicate type ----
+d.proj.acc %>%
+  group_by(predicateType) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num),
+            Mean.Acc = mean(acceptability)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType), Mean.Proj)) %>% 
+ggplot(aes(x = predicateType, y = Mean.Proj, colour = predicateType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        aspect.ratio = 1/2.6,
+        plot.margin = unit(c(44, 5.5, 5.5, 5.5), "pt"),
+        panel.grid.major.x = element_blank()) +
+  ylab("Mean projection rating") +
+  xlab("Predicate type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = cols)
+ggsave("../graphs/projection-by-predicateType.jpeg", height = 4, width = 8)
+
+# predicate type2
+abc <- d.proj.acc %>%
+  group_by(predicateType, predicateType2) %>%
+  summarise(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = factor(predicateType, 
+                                levels = c("cognitive", "evidential", "communicative", "emotive")),
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj))
+abc %>% 
+ggplot(aes(x = predicateType, 
+                      y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(data = abc %>% filter(predicateType == "communicative"),
+             aes(colour = predicateType2), position = position_dodge(.3)) +
+  geom_point(data = abc %>% filter(predicateType != "communicative"),
+             aes(colour = predicateType), show.legend = FALSE) +
+  geom_errorbar(data = abc %>% filter(predicateType == "communicative"),
+                aes(
+                    ymin = YMin.Proj, ymax = YMax.Proj, colour = predicateType2), 
+                width = 0, position = position_dodge(.3)) +
+  geom_errorbar(data = abc %>% filter(predicateType != "communicative"),
+                aes(
+                    ymin = YMin.Proj, ymax = YMax.Proj, colour = predicateType), 
+                width = 0, show.legend = FALSE) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 16),
+        axis.text = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 12),
+        aspect.ratio = 1/2.6,
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating",
+       colour = "Type of communicative") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_color_manual(values = cols2,
+                     breaks = c("emoComm", "nonEmoComm"),
+                     labels = c("with emotion entailment", 
+                                "without emotion entailment")) +
+  scale_x_discrete(drop = FALSE)
+ggsave("../graphs/projection-by-predicateType2.jpeg", height = 4, width = 8)

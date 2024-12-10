@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdftex 2024.7.23)  29 SEP 2024 13:13
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (MiKTeX 24.4) (preloaded format=pdftex 2024.7.23)  7 DEC 2024 14:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -981,7 +981,7 @@ man-tis-che und konzeptuelle Repr^^?asentationen|
 
 [25] [26]
 ! Undefined control sequence.
-l.4196   note = {Republished in \citet
+l.4195   note = {Republished in \citet
                                       {jakobson85}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -990,7 +990,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.4252   title = 	 {The semantic form of {\em
+l.4251   title = 	 {The semantic form of {\em
                                               mit}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1004,7 +1004,7 @@ and I'll forget about whatever was undefined.
                    {16}
 \'#1->{\accent 19 #1
                     }
-l.4266 ...id and Luis Casillas Mart\'{\symbol{16}}
+l.4265 ...id and Luis Casillas Mart\'{\symbol{16}}
                                                   nez and Brady  Clark and S...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1017,13 +1017,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.4320 ...ttp://www.ling.ohio-state.edu/~tobi/ame_
+l.4319 ...ttp://www.ling.ohio-state.edu/~tobi/ame_
                                                   tobi/labelling_guide_v3.pdf}}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.4320 ...u/~tobi/ame_tobi/labelling_guide_v3.pdf}
+l.4319 ...u/~tobi/ame_tobi/labelling_guide_v3.pdf}
                                                   }
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -1032,7 +1032,7 @@ the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
 ! Extra }, or forgotten $.
-l.4320 .../~tobi/ame_tobi/labelling_guide_v3.pdf}}
+l.4319 .../~tobi/ame_tobi/labelling_guide_v3.pdf}}
                                                   
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -1045,13 +1045,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.4321 
+l.4320 
        
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Undefined control sequence.
-l.4334 ...	 {On the so-called thematic use of {\em
+l.4333 ...	 {On the so-called thematic use of {\em
                                                    wa}: {R}econsideration an...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1060,7 +1060,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.4404   title = 	 {Japanese {\em
+l.4403   title = 	 {Japanese {\em
                                   wa, ga}, and information structure},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1070,7 +1070,7 @@ and I'll forget about whatever was undefined.
 
 [28]
 ! Undefined control sequence.
-l.4462 ...tle = 	 {The {J}apanese contrastive {\em
+l.4461 ...tle = 	 {The {J}apanese contrastive {\em
                                                    Wa}: {A} mirror image of ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1084,13 +1084,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.4735 Perspectives_
+l.4734 Perspectives_
                     on_Aspect/ Proceedings/Svenonius.pdf",
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.4736   year = 	 2002}
+l.4735   year = 	 2002}
                        
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -1103,13 +1103,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.4737 
+l.4736 
        
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 [30]
-Overfull \hbox (296.55235pt too wide) in paragraph at lines 4810--4820
+Overfull \hbox (296.55235pt too wide) in paragraph at lines 4809--4819
 \tenrm jour-nal = "Stud-ies in Lan-guage", vol-ume = 27, year = 2003, pages = "
 469-503(35)", url = "http://www.ingentaconnect.com/content/jbp/sl/2003/00000027
 /00000003/art00001",|
@@ -1124,7 +1124,7 @@ Overfull \hbox (296.55235pt too wide) in paragraph at lines 4810--4820
 .etc.
 
 ! Undefined control sequence.
-l.4893 ...	 {The natural language conjunction {\em
+l.4892 ...	 {The natural language conjunction {\em
                                                    and}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1134,7 +1134,7 @@ and I'll forget about whatever was undefined.
 
 [31]
 ! Undefined control sequence.
-l.4994   title = 	 {What does bare {\em
+l.4993   title = 	 {What does bare {\em
                                         --ko} coordination say about post-ve...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1143,7 +1143,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5110 ...d conventional implicature: Tagalog {\em
+l.5109 ...d conventional implicature: Tagalog {\em
                                                    akala}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1153,7 +1153,7 @@ and I'll forget about whatever was undefined.
 
 [32]
 ! Undefined control sequence.
-l.5144   note = 	 {Online available at {\em
+l.5143   note = 	 {Online available at {\em
                                             http://www.linguistlist.org/issu...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1162,7 +1162,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5151 ...the 13th Texas Linguistics Society, \url
+l.5150 ...the 13th Texas Linguistics Society, \url
                                                   {https://web.stanford.edu/...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1174,7 +1174,7 @@ Missing character: There is no √ in font cmr10!
 Missing character: There is no ê in font cmr10!
 [33]
 ! Undefined control sequence.
-l.5300 ...., version of March 8, available at {\em
+l.5299 ...., version of March 8, available at {\em
                                                    http://ling.auf.net/lingB...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1183,7 +1183,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5306 ...aguayan {G}uaran\'i{} future marker {\em
+l.5305 ...aguayan {G}uaran\'i{} future marker {\em
                                                    --ta}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1192,7 +1192,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5307   note = 	 {Talk presented at the {\em
+l.5306   note = 	 {Talk presented at the {\em
                                               Tense across languages} worksh...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1201,7 +1201,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5344 ...al marker not a tense? {R}eply to \citet
+l.5343 ...al marker not a tense? {R}eply to \citet
                                                   {tonhauser-lang}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1210,7 +1210,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5416 ...case of nominal tense. {R}eply to \citet
+l.5415 ...case of nominal tense. {R}eply to \citet
                                                   {ns08}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1220,7 +1220,7 @@ and I'll forget about whatever was undefined.
 
 [34]
 ! Undefined control sequence.
-l.5491   note = 	 {To appear in {\em
+l.5490   note = 	 {To appear in {\em
                                      Proceedings of Semantics of Under-repre...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1230,7 +1230,7 @@ and I'll forget about whatever was undefined.
 
 [35]
 ! Undefined control sequence.
-l.5634                   marker {\em
+l.5633                   marker {\em
                                      wa} in {J}apanese},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1239,7 +1239,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.5787 ...o preliminar de ora\c{c}\~oes wajap\nasi
+l.5786 ...o preliminar de ora\c{c}\~oes wajap\nasi
                                                   },
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1249,7 +1249,7 @@ and I'll forget about whatever was undefined.
 
 [36]
 ! Undefined control sequence.
-l.5940   note = 	 {Manuscript, available at {\em
+l.5939   note = 	 {Manuscript, available at {\em
                                                  http://vivaldi.sfs.nphil.un...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1259,7 +1259,7 @@ and I'll forget about whatever was undefined.
 
 [37]
 ! Undefined control sequence.
-l.6060 ...= 	 {Intonation and Focus in {N}\textipa
+l.6059 ...= 	 {Intonation and Focus in {N}\textipa
                                                   {\textbeltl ePkepmxcin}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1268,7 +1268,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6060 ...tion and Focus in {N}\textipa{\textbeltl
+l.6059 ...tion and Focus in {N}\textipa{\textbeltl
                                                    ePkepmxcin}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1277,7 +1277,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6067 ...ematicity and {E}nglish infinitival {\em
+l.6066 ...ematicity and {E}nglish infinitival {\em
                                                    to}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1287,7 +1287,7 @@ and I'll forget about whatever was undefined.
 
 [38]
 ! Undefined control sequence.
-l.6282   title = 	 {Review of {\em
+l.6281   title = 	 {Review of {\em
                                    {S}yntactic {S}tructures} by {N}oam {C}ho...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1296,7 +1296,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6292 ...tle = 	 {Aspects of plurality in \hspace
+l.6291 ...tle = 	 {Aspects of plurality in \hspace
                                                   *{.05cm} \mbox{$|$\hspace*...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1305,7 +1305,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6292 ...ts of plurality in \hspace*{.05cm} \mbox
+l.6291 ...ts of plurality in \hspace*{.05cm} \mbox
                                                   {$|$\hspace*{-.15cm}={H}oa...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1314,7 +1314,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6292 ...lity in \hspace*{.05cm} \mbox{$|$\hspace
+l.6291 ...lity in \hspace*{.05cm} \mbox{$|$\hspace
                                                   *{-.15cm}={H}oan}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1324,7 +1324,7 @@ and I'll forget about whatever was undefined.
 
 [39] [40]
 ! Undefined control sequence.
-l.6602   note =	 {Reprinted in \citealt
+l.6601   note =	 {Reprinted in \citealt
                                        {montague74}, pp.108-221}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1333,7 +1333,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6647   note = {Available online at {\em
+l.6646   note = {Available online at {\em
                                          
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1342,7 +1342,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (22.44046pt too wide) in paragraph at lines 6643--6651
+Overfull \hbox (22.44046pt too wide) in paragraph at lines 6642--6650
 \tenrm Ed-u-caci^^Son y Cul-tura, year = 2004, note = Avail-able on-line at www
 .escuelaviva-mec.edu.py/investigaciones/60.pdf,|
 
@@ -1357,7 +1357,7 @@ Overfull \hbox (22.44046pt too wide) in paragraph at lines 6643--6651
 .etc.
 
 ! Undefined control sequence.
-l.6675   note = 	 {Poster presented at {\em
+l.6674   note = 	 {Poster presented at {\em
                                             Semantics and Linguistic Theory ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1366,7 +1366,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6681 ...= 	 {Sequence of tense and temporal {\em
+l.6680 ...= 	 {Sequence of tense and temporal {\em
                                                    de re}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1376,7 +1376,7 @@ and I'll forget about whatever was undefined.
 
 [41]
 ! Undefined control sequence.
-l.6773   title = 	 {Anaphoric {\em
+l.6772   title = 	 {Anaphoric {\em
                                    then}: {A}spectual, textual, and epistemi...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1385,7 +1385,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.6782 ...}ome evidence from the semantics of {\em
+l.6781 ...}ome evidence from the semantics of {\em
                                                    then}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1395,7 +1395,7 @@ and I'll forget about whatever was undefined.
 
 [42]
 ! Undefined control sequence.
-l.7040 ....\ Malchukov \& A.\ Spencer (eds.), {\em
+l.7039 ....\ Malchukov \& A.\ Spencer (eds.), {\em
                                                    Handbook of Case}, Oxford...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1404,7 +1404,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.7047   note =	 {Talk presented at {\em
+l.7046   note =	 {Talk presented at {\em
                                          Workshop on prosody of {S}outh {A}s...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1413,7 +1413,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.7054   note =	 {Talk presented at {\em
+l.7053   note =	 {Talk presented at {\em
                                          Celebration of the 250th birthday o...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1422,7 +1422,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.7088 ...iticization vs. Inflection: English {\em
+l.7087 ...iticization vs. Inflection: English {\em
                                                    n't}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1431,7 +1431,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 [43]
-Overfull \hbox (3.75874pt too wide) in paragraph at lines 7142--7147
+Overfull \hbox (3.75874pt too wide) in paragraph at lines 7141--7146
 []\tenrm @PhdThesiskim95, au-thor = Kim, Jong-Bok, ti-tle = The Gram-mar of Neg
 a-tion: A Lex-i-cal-ist, Constraint-|
 
@@ -1445,7 +1445,7 @@ a-tion: A Lex-i-cal-ist, Constraint-|
 
 [44] [45]
 ! Undefined control sequence.
-l.7538   author =	 {Kury\textipa
+l.7537   author =	 {Kury\textipa
                                 {\*l}owicz, Jercy},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1454,7 +1454,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (4.74603pt too wide) in paragraph at lines 7602--7611
+Overfull \hbox (4.74603pt too wide) in paragraph at lines 7601--7610
 []\tenrm @InCollectioniatridou-etal-perfect, au-thor = Ia-tri-dou, Sabine and E
 lena Anag-nos-topoulou and Roumyana|
 
@@ -1468,7 +1468,7 @@ lena Anag-nos-topoulou and Roumyana|
 
 [46]
 ! Undefined control sequence.
-l.7790 note = {Slides downloadable from \url
+l.7789 note = {Slides downloadable from \url
                                             {http://kvf.me/zas}}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1477,7 +1477,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.7804 note = {Keynote presentation at {\em
+l.7803 note = {Keynote presentation at {\em
                                             Semantics and Linguistic Theory}...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1487,7 +1487,7 @@ and I'll forget about whatever was undefined.
 
 [47] [48] [49] [50]
 ! Undefined control sequence.
-l.8390   title = 	 {{\em
+l.8389   title = 	 {{\em
                          {F}or-}adverbials, frequentative aspect and pluract...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1496,7 +1496,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.8411 ...en said in {T}agalog: {R}eportative {\em
+l.8410 ...en said in {T}agalog: {R}eportative {\em
                                                    daw}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1505,7 +1505,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.8464   title = 	 {Anaphoric {\em
+l.8463   title = 	 {Anaphoric {\em
                                    one} and its implications},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1515,7 +1515,7 @@ and I'll forget about whatever was undefined.
 
 [51]
 ! Undefined control sequence.
-l.8563 ...oral interpretation of the {K}orean {\em
+l.8562 ...oral interpretation of the {K}orean {\em
                                                    --ko} construction: {A}kt...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1524,7 +1524,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.8651 ...nese revisited: {A} response to \citealt
+l.8650 ...nese revisited: {A} response to \citealt
                                                   {sybesma07}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1534,7 +1534,7 @@ and I'll forget about whatever was undefined.
 
 [52]
 ! Undefined control sequence.
-l.8780 ...tion of nonagreement in existential {\em
+l.8779 ...tion of nonagreement in existential {\em
                                                    there} constructions},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1543,7 +1543,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.8813 ...ical persuasion: {V}ariation in the {\em
+l.8812 ...ical persuasion: {V}ariation in the {\em
                                                    {I}raq} vowels},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1553,7 +1553,7 @@ and I'll forget about whatever was undefined.
 
 [53]
 ! Undefined control sequence.
-l.8991   author = 	 {{\SortNoop
+l.8990   author = 	 {{\SortNoop
                                {Fintel}}von Fintel, Kai and {Anthony S.} Gil...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1562,7 +1562,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9000   author = {{\SortNoop
+l.8999   author = {{\SortNoop
                              {Fintel}}von Fintel, Kai},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1571,7 +1571,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9035   title = 	 {Aspects of {\em
+l.9034   title = 	 {Aspects of {\em
                                     too} and {\em enough} constructions},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1580,7 +1580,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9035   title = 	 {Aspects of {\em too} and {\em
+l.9034   title = 	 {Aspects of {\em too} and {\em
                                                   enough} constructions},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1589,7 +1589,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9043 ...{K}orean evidential utterances with {\em
+l.9042 ...{K}orean evidential utterances with {\em
                                                    --te}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1598,7 +1598,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 [54] [55]
-Overfull \hbox (3.57922pt too wide) in paragraph at lines 9310--9317
+Overfull \hbox (3.57922pt too wide) in paragraph at lines 9309--9316
 \tenrm Fer-nald, ti-tle = Tem-po-ral in-ter-pre-ta-tion in Navajo, book-ti-tle 
 = Pro-ceed-ings of Se-man-tics of Under-represented|
 
@@ -1612,7 +1612,7 @@ Overfull \hbox (3.57922pt too wide) in paragraph at lines 9310--9317
 .etc.
 
 ! Undefined control sequence.
-l.9374 ...e case of {P}araguayan {G}uaran\'i \mbox
+l.9373 ...e case of {P}araguayan {G}uaran\'i \mbox
                                                   {\em --mo'\~a}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1621,7 +1621,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9374 ...se of {P}araguayan {G}uaran\'i \mbox{\em
+l.9373 ...se of {P}araguayan {G}uaran\'i \mbox{\em
                                                    --mo'\~a}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1631,7 +1631,7 @@ and I'll forget about whatever was undefined.
 
 [56]
 ! Undefined control sequence.
-l.9484   booktitle = {Proceedings of {\em
+l.9483   booktitle = {Proceedings of {\em
                                           Semantics and Linguistic Theory} (...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1640,7 +1640,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9517   note = 	 {Guaran\'i translation of \citet
+l.9516   note = 	 {Guaran\'i translation of \citet
                                                   {exupery} by De Las Nieves...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1649,7 +1649,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9539   title = 	 {The semantics of {\em
+l.9538   title = 	 {The semantics of {\em
                                           together}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1658,7 +1658,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 [57]
-Overfull \hbox (35.6767pt too wide) in paragraph at lines 9585--9593
+Overfull \hbox (35.6767pt too wide) in paragraph at lines 9584--9592
 []\tenrm @Articlegiannakidou-mari2015, au-thor = Gi-an-naki-dou, Anas-ta-sia an
 d Alda Mari, ti-tle = Mixed (non)veridicality|
 
@@ -1671,7 +1671,7 @@ d Alda Mari, ti-tle = Mixed (non)veridicality|
 .etc.
 
 ! Undefined control sequence.
-l.9605 ...nline update: {T}emporal, modal and {\em
+l.9604 ...nline update: {T}emporal, modal and {\em
                                                    de se} anaphora in polysy...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1680,7 +1680,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (3.63483pt too wide) in paragraph at lines 9652--9659
+Overfull \hbox (3.63483pt too wide) in paragraph at lines 9651--9658
 []\tenrm @articlebarker2012, au-thor = Barker, Chris, ti-tle = Quan-tifi-ca-tio
 nal bind-ing does not re-quire c-command,|
 
@@ -1693,7 +1693,7 @@ nal bind-ing does not re-quire c-command,|
 .etc.
 
 ! Undefined control sequence.
-l.9718   note = 	 {Abstract for {\em
+l.9717   note = 	 {Abstract for {\em
                                      Association of Linguistic Typology. 6th...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1705,7 +1705,7 @@ Missing character: There is no ≈ in font cmr10!
 Missing character: There is no ∏ in font cmr10!
 [58]
 ! Undefined control sequence.
-l.9847   title = 	 {The ambiguity of the {\em
+l.9846   title = 	 {The ambiguity of the {\em
                                               --te iru} form in {J}apanese},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1714,7 +1714,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9885   note = 	 {\url
+l.9884   note = 	 {\url
                        {online.wsj.com/news/articles/SB100014240527487043220...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1724,7 +1724,7 @@ and I'll forget about whatever was undefined.
 
 [59]
 ! Undefined control sequence.
-l.9948 ...d at the 2006 Annual Meeting of the {\em
+l.9947 ...d at the 2006 Annual Meeting of the {\em
                                                    Society of the Study of I...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1733,7 +1733,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9956 ...d at the 2007 Annual Meeting of the {\em
+l.9955 ...d at the 2007 Annual Meeting of the {\em
                                                    Society of the Study of I...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1742,7 +1742,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (16.66266pt too wide) in paragraph at lines 9953--9959
+Overfull \hbox (16.66266pt too wide) in paragraph at lines 9952--9958
 []\tenrm @Unpublishedtonhauser-ssila07, au-thor = Ton-hauser, Ju-dith, ti-tle =
  Tem-po-ral in-ter-pre-ta-tion in Paraguayan|
 
@@ -1755,7 +1755,7 @@ Overfull \hbox (16.66266pt too wide) in paragraph at lines 9953--9959
 .etc.
 
 ! Undefined control sequence.
-l.9963 ...d at the 81st Annual Meeting of the {\em
+l.9962 ...d at the 81st Annual Meeting of the {\em
                                                    Linguistic Society of Ame...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1764,7 +1764,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.9970   note = 	 {Talk presented at the {\em
+l.9969   note = 	 {Talk presented at the {\em
                                               Texas Linguistics Forum 9}, Un...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1773,7 +1773,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (13.91264pt too wide) in paragraph at lines 9976--9983
+Overfull \hbox (13.91264pt too wide) in paragraph at lines 9975--9982
 []\tenrm @Articletonhauser-colijn10, au-thor = Ton-hauser, Ju-dith and Erika Co
 l-ijn, ti-tle = Word or-der in Paraguayan|
 
@@ -1786,7 +1786,7 @@ l-ijn, ti-tle = Word or-der in Paraguayan|
 .etc.
 
 ! Undefined control sequence.
-l.10067   title = 	 {A ``weaker version'' of {\em
+l.10066   title = 	 {A ``weaker version'' of {\em
                                                   also}? --- The {K}'iche' a...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1795,7 +1795,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10067 ...-- The {K}'iche' additive particle {\em
+l.10066 ...-- The {K}'iche' additive particle {\em
                                                    choqe'}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1805,31 +1805,31 @@ and I'll forget about whatever was undefined.
 
 [60]
 ! Too many }'s.
-l.10175 }
+l.10174 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 ! Too many }'s.
-l.10185 }
+l.10184 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 ! Too many }'s.
-l.10194 }
+l.10193 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 ! Too many }'s.
-l.10203 }
+l.10202 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 
-Overfull \hbox (30.63481pt too wide) in paragraph at lines 10217--10225
+Overfull \hbox (30.63481pt too wide) in paragraph at lines 10216--10224
 []\tenrm @articlekuznetsova-etal2017, ti-tle=lmerTest pack-age: Tests in lin-ea
 r mixed ef-fects mod-els, au-thor=Kuznetsova,|
 
@@ -1842,7 +1842,7 @@ r mixed ef-fects mod-els, au-thor=Kuznetsova,|
 .etc.
 
 ! Undefined control sequence.
-l.10228 ... 	 {A presuppositional analysis of {\em
+l.10227 ... 	 {A presuppositional analysis of {\em
                                                    only} and {\em even}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1851,7 +1851,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10228 ...itional analysis of {\em only} and {\em
+l.10227 ...itional analysis of {\em only} and {\em
                                                    even}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1860,20 +1860,20 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Too many }'s.
-l.10234 }
+l.10233 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 [61]
 ! Too many }'s.
-l.10244 }
+l.10243 }
          
 You've closed more groups than you opened.
 Such booboos are generally harmless, so keep going.
 
 ! Undefined control sequence.
-l.10269 title = {{\em
+l.10268 title = {{\em
                       Only}, presupposition and implicature},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1882,7 +1882,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10271 note = {Accepted with revisions for {\em
+l.10270 note = {Accepted with revisions for {\em
                                                  Journal of Semantics}}}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1891,7 +1891,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10283   title = 	 {{\noopsort
+l.10282   title = 	 {{\noopsort
                                {a}}{I}nvestigating properties of projective ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1900,7 +1900,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10284 ...e = 	 {Manuscript prepared for the {\em
+l.10283 ...e = 	 {Manuscript prepared for the {\em
                                                    Workshop on Projective Me...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1909,7 +1909,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10290   title = 	 {{\noopsort
+l.10289   title = 	 {{\noopsort
                                {b}}{A}ddendum: Investigating properties of p...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1918,7 +1918,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10291 ...e = 	 {Manuscript prepared for the {\em
+l.10290 ...e = 	 {Manuscript prepared for the {\em
                                                    Workshop on Presuppositio...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1928,7 +1928,7 @@ and I'll forget about whatever was undefined.
 
 [62]
 ! Undefined control sequence.
-l.10463   author =	 {{\SortNoop
+l.10462   author =	 {{\SortNoop
                                {Eijk}}van Eijk, Jan},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1937,7 +1937,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10530   author = 	 {{\SortNoop
+l.10529   author = 	 {{\SortNoop
                                 {Eijk}}van Eijk, Jan},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1947,7 +1947,7 @@ and I'll forget about whatever was undefined.
 
 [63]
 ! Undefined control sequence.
-l.10615   author = 	 {Westerst\r
+l.10614   author = 	 {Westerst\r
                                 {a}hl, Dag},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1956,7 +1956,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10626   author = 	 {Westerst\r
+l.10625   author = 	 {Westerst\r
                                 {a}hl, Dag},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1965,7 +1965,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10679   title = 	 {Why {\em
+l.10678   title = 	 {Why {\em
                               will} is not a modal},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1974,7 +1974,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.10687   author = 	 {{\SortNoop
+l.10686   author = 	 {{\SortNoop
                                 {Fintel}}von Fintel, Kai and Lisa Matthewson},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -1986,7 +1986,7 @@ and I'll forget about whatever was undefined.
 Missing character: There is no √ in font cmr10!
 Missing character: There is no ê in font cmr10!
  [65]
-Overfull \hbox (66.67973pt too wide) in paragraph at lines 10960--10966
+Overfull \hbox (66.67973pt too wide) in paragraph at lines 10959--10965
 \tenrm mim-ics nat-u-ral lan-guages and ap-pears pleas-ant to the ear. Happy Ap
 ril Fool's Day!, note = \tentt http://www.biroz.net/danan/\tenrm ,|
 
@@ -2000,7 +2000,7 @@ ril Fool's Day!, note = \tentt http://www.biroz.net/danan/\tenrm ,|
 .etc.
 
 
-Overfull \hbox (8.731pt too wide) in paragraph at lines 10994--11000
+Overfull \hbox (8.731pt too wide) in paragraph at lines 10993--10999
 []\tenrm @Bookevans95, au-thor = Evans, Nicholas D., ti-tle = A Gram-mar of Ka-
 yardild (with historical-comparative|
 
@@ -2013,7 +2013,7 @@ yardild (with historical-comparative|
 .etc.
 
 ! Undefined control sequence.
-l.11114   title = 	 {Nonevent {\em
+l.11113   title = 	 {Nonevent {\em
                                    --er} nominals: {A} probe into argument s...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2026,13 +2026,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.11120 @Book{levin_
+l.11119 @Book{levin_
                     rappaport95,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.11125 }
+l.11124 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2045,13 +2045,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.11126 
+l.11125 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (242.79225pt too wide) in paragraph at lines 11120--11126
+Overfull \hbox (242.79225pt too wide) in paragraph at lines 11119--11125
 []\tenrm @Booklevin$[]\teni appaport\tenrm 95\teni ; author \tenrm = []\teni ; 
 title \tenrm = []\teni ; publisher \tenrm =|
 
@@ -2065,7 +2065,7 @@ title \tenrm = []\teni ; publisher \tenrm =|
 
 [66]
 ! Undefined control sequence.
-l.11230 ... particles: {T}he case of {G}erman {\em
+l.11229 ... particles: {T}he case of {G}erman {\em
                                                    auch}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2074,7 +2074,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (33.71599pt too wide) in paragraph at lines 11302--11313
+Overfull \hbox (33.71599pt too wide) in paragraph at lines 11301--11312
 \tenrm PUB-LISHER = CLC Pub-li-ca-tions, ad-dress = Ithaca, NY, url = http://se
 manticsarchive.net/Archive/WZhMmY3N/|
 
@@ -2088,7 +2088,7 @@ manticsarchive.net/Archive/WZhMmY3N/|
 .etc.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 11302--11313
+Underfull \hbox (badness 10000) in paragraph at lines 11301--11312
 
 
 \hbox(0.0+0.0)x469.75499
@@ -2096,7 +2096,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 11302--11313
 
 [67]
 ! Undefined control sequence.
-l.11325   title = 	 {The {K}orean evidential {\em
+l.11324   title = 	 {The {K}orean evidential {\em
                                                   --te}: {A} modal analysis},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2105,7 +2105,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11389   title = 	 {The French {\em
+l.11388   title = 	 {The French {\em
                                      c'est}-cleft: Empirical studies of its ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2114,7 +2114,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (3.71822pt too wide) in paragraph at lines 11457--11464
+Overfull \hbox (3.71822pt too wide) in paragraph at lines 11456--11463
 []\tenrm @conferencebeaver1992kinematics, ti-tle=The kine-mat-ics of pre-sup-po
 -si-tion, au-thor=Beaver, David, book-|
 
@@ -2127,7 +2127,7 @@ Overfull \hbox (3.71822pt too wide) in paragraph at lines 11457--11464
 .etc.
 
 
-Overfull \hbox (8.27391pt too wide) in paragraph at lines 11483--11494
+Overfull \hbox (8.27391pt too wide) in paragraph at lines 11482--11493
 []\tenrm @articleabbott2000pn, ti-tle=Presuppositions as nonasser-tions, au-tho
 r=Abbott, Bar-bara, jour-nal=Journal|
 
@@ -2140,7 +2140,7 @@ r=Abbott, Bar-bara, jour-nal=Journal|
 .etc.
 
 
-Overfull \hbox (0.94063pt too wide) in paragraph at lines 11483--11494
+Overfull \hbox (0.94063pt too wide) in paragraph at lines 11482--11493
 \tenrm of Prag-mat-ics, vol-ume=32, num-ber=10, pages=1419--1437, year=2000, do
 i = https://doi.org/10.1016/S0378-|
 
@@ -2154,7 +2154,7 @@ i = https://doi.org/10.1016/S0378-|
 
 [68]
 ! Undefined control sequence.
-l.11578   title = 	 {{\em
+l.11577   title = 	 {{\em
                           only}: {A} case study in projective meaning},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2163,7 +2163,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11599   author = 	 {S\textipa
+l.11598   author = 	 {S\textipa
                                {\ae}b\textipa{\o}, Kjell Johan},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2172,7 +2172,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11599   author = 	 {S\textipa{\ae}b\textipa
+l.11598   author = 	 {S\textipa{\ae}b\textipa
                                              {\o}, Kjell Johan},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2181,7 +2181,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11608 ...ocus-sensitive operators in {N}\textipa
+l.11607 ...ocus-sensitive operators in {N}\textipa
                                                   {\textbeltl ePkepmxcin} ({...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2190,7 +2190,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11608 ...ive operators in {N}\textipa{\textbeltl
+l.11607 ...ive operators in {N}\textipa{\textbeltl
                                                    ePkepmxcin} ({Thompson Ri...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2200,7 +2200,7 @@ and I'll forget about whatever was undefined.
 
 [69]
 ! Undefined control sequence.
-l.11676 ...upposition and shared knowledge in {\em
+l.11675 ...upposition and shared knowledge in {\em
                                                    it}-clefts},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2210,7 +2210,7 @@ and I'll forget about whatever was undefined.
 
 [70]
 ! Undefined control sequence.
-l.11818   author = 	 {{\SortNoop
+l.11817   author = 	 {{\SortNoop
                                 {Fintel}}{von Fintel}, Kai},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2219,7 +2219,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.11893   note = 	 {{\em
+l.11892   note = 	 {{\em
                          http://www.romanistik.uni-mainz.de/cgi-bin/guarani/...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2229,7 +2229,7 @@ and I'll forget about whatever was undefined.
 
 [71] [72]
 ! Undefined control sequence.
-l.12182   title = 	 {Reply to \citealt
+l.12181   title = 	 {Reply to \citealt
                                       {everett05}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2238,7 +2238,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12192   title = 	 {Reply to replies to \citealt
+l.12191   title = 	 {Reply to replies to \citealt
                                                  {everett05}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2247,7 +2247,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12257   author = 	 {{\SortNoop
+l.12256   author = 	 {{\SortNoop
                                 {Fintel}}von Fintel, Kai},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2260,13 +2260,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.12299 @InCollection{davis_
+l.12298 @InCollection{davis_
                             saunders78,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.12307 }
+l.12306 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2279,13 +2279,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.12308 
+l.12307 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (15.17157pt too wide) in paragraph at lines 12299--12308
+Overfull \hbox (15.17157pt too wide) in paragraph at lines 12298--12307
 []\tenrm @InCollectiondavis$[]\teni aunders\tenrm 78\teni ; author \tenrm = []\
 teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -2298,7 +2298,7 @@ teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 
-Overfull \hbox (78.05328pt too wide) in paragraph at lines 12299--12308
+Overfull \hbox (78.05328pt too wide) in paragraph at lines 12298--12307
 []\teni ; pages \tenrm = []\teni ; publisher \tenrm = []\teni ; year \tenrm =|
 
 \hbox(6.94444+1.94444)x469.75499
@@ -2316,7 +2316,7 @@ Overfull \hbox (78.05328pt too wide) in paragraph at lines 12299--12308
 .etc.
 
 
-Overfull \hbox (2.55319pt too wide) in paragraph at lines 12326--12333
+Overfull \hbox (2.55319pt too wide) in paragraph at lines 12325--12332
 \tenrm ment in Cakquic-quel Mayan, note = avail-able at \tentt http://www.sfu.c
 a/$\tensy ^^X$\tentt hedberg/Cakchiquel[]Nov[]1988.pdf\tenrm ,|
 
@@ -2329,7 +2329,7 @@ a/$\tensy ^^X$\tentt hedberg/Cakchiquel[]Nov[]1988.pdf\tenrm ,|
 .etc.
 
 ! Undefined control sequence.
-l.12336 ...le = 	 {The {R}elationship between {\em
+l.12335 ...le = 	 {The {R}elationship between {\em
                                                    schon/already} and {\em n...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2338,7 +2338,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12336 ...ip between {\em schon/already} and {\em
+l.12335 ...ip between {\em schon/already} and {\em
                                                    noch/still}: {A} {R}eply ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2348,7 +2348,7 @@ and I'll forget about whatever was undefined.
 
 [73]
 ! Undefined control sequence.
-l.12357                   {\em
+l.12356                   {\em
                                mod-} (only) in {B}ole ({W}est {C}hadic)},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2357,7 +2357,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12419 ...ragmatics interface: {T}he case of {\em
+l.12418 ...ragmatics interface: {T}he case of {\em
                                                    already}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2366,7 +2366,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12428 ...tle = 	 {On the use and meaning of {\em
+l.12427 ...tle = 	 {On the use and meaning of {\em
                                                    already}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2375,7 +2375,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12437   title = 	 {Why {G}erman {\em
+l.12436   title = 	 {Why {G}erman {\em
                                        schon} and {\em noch}: are {S}till {D...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2384,7 +2384,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12437 ... = 	 {Why {G}erman {\em schon} and {\em
+l.12436 ... = 	 {Why {G}erman {\em schon} and {\em
                                                    noch}: are {S}till {D}uals},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2393,7 +2393,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12446   title = 	 {German {\em
+l.12445   title = 	 {German {\em
                                  schon} -- {\em erst} -- {\em noch}: {A}n {I...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2402,7 +2402,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12446   title = 	 {German {\em schon} -- {\em
+l.12445   title = 	 {German {\em schon} -- {\em
                                                 erst} -- {\em noch}: {A}n {I...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2411,7 +2411,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12446 ...erman {\em schon} -- {\em erst} -- {\em
+l.12445 ...erman {\em schon} -- {\em erst} -- {\em
                                                    noch}: {A}n {I}ntegrated ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2420,7 +2420,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12455   title = 	 {Unmarked {\em
+l.12454   title = 	 {Unmarked {\em
                                    already}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2429,7 +2429,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.12496 ...	 {Submitted to a special issue of {\em
+l.12495 ...	 {Submitted to a special issue of {\em
                                                    Functions of Language} on...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2439,7 +2439,7 @@ and I'll forget about whatever was undefined.
 
 [74]
 ! Undefined control sequence.
-l.12600   note =	 {Originally appeared in {\em
+l.12599   note =	 {Originally appeared in {\em
                                                Linguistics \& Philosophy} 2,...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2452,13 +2452,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.12635 @InCollection{koehn_
+l.12634 @InCollection{koehn_
                             koehn86,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.12644 }
+l.12643 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2471,13 +2471,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.12645 
+l.12644 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (180.75185pt too wide) in paragraph at lines 12635--12645
+Overfull \hbox (180.75185pt too wide) in paragraph at lines 12634--12644
 []\tenrm @InCollectionkoehn$[]\teni oehn\tenrm 86\teni ; author \tenrm = []\ten
 i ; title \tenrm = []\teni ; booktitle \tenrm = []\teni ; pages \tenrm =|
 
@@ -2490,7 +2490,7 @@ i ; title \tenrm = []\teni ; booktitle \tenrm = []\teni ; pages \tenrm =|
 .etc.
 
 
-Overfull \hbox (43.61343pt too wide) in paragraph at lines 12635--12645
+Overfull \hbox (43.61343pt too wide) in paragraph at lines 12634--12644
 []\teni ; publisher \tenrm = []\teni ; year \tenrm = 1986\teni ; editor \tenrm 
 = []\teni ; volume \tenrm =|
 
@@ -2514,7 +2514,7 @@ Overfull \hbox (43.61343pt too wide) in paragraph at lines 12635--12645
                    {16}
 \'#1->{\accent 19 #1
                     }
-l.12848   title = 	 {War\'{\symbol{16}}
+l.12847   title = 	 {War\'{\symbol{16}}
                                        '},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2528,7 +2528,7 @@ and I'll forget about whatever was undefined.
                    {16}
 \'#1->{\accent 19 #1
                     }
-l.13036 ...d and Luis Casillas Mart\'{\symbol{16}}
+l.13035 ...d and Luis Casillas Mart\'{\symbol{16}}
                                                   nez and Brady  Clark and S...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2542,13 +2542,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.13411 @InCollection{inagaki_
+l.13410 @InCollection{inagaki_
                               hatano03,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.13420 }
+l.13419 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2561,13 +2561,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.13421 
+l.13420 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (552.01382pt too wide) in paragraph at lines 13411--13421
+Overfull \hbox (552.01382pt too wide) in paragraph at lines 13410--13420
 []\tenrm @InCollectioninagaki$[]\teni atano\tenrm 03\teni ; author \tenrm = []\
 teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -2580,7 +2580,7 @@ teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 
-Overfull \hbox (17.68036pt too wide) in paragraph at lines 13411--13421
+Overfull \hbox (17.68036pt too wide) in paragraph at lines 13410--13420
 []\teni ; crossref \tenrm = []\teni ; pages \tenrm = []\teni ; publisher \tenrm
  = []\teni ; year \tenrm =|
 
@@ -2600,7 +2600,7 @@ Overfull \hbox (17.68036pt too wide) in paragraph at lines 13411--13421
 
 [79] [80]
 ! Undefined control sequence.
-l.13633 ...re tense and modality: The case of {\em
+l.13632 ...re tense and modality: The case of {\em
                                                    will} in {E}nglish},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2609,7 +2609,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.13641 ...re tense and modality: The case of {\em
+l.13640 ...re tense and modality: The case of {\em
                                                    will} in {E}nglish},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2622,13 +2622,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.13799 @InCollection{bowerman_
+l.13798 @InCollection{bowerman_
                                choi03,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.13808 }
+l.13807 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2641,13 +2641,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.13809 
+l.13808 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (410.1622pt too wide) in paragraph at lines 13799--13809
+Overfull \hbox (410.1622pt too wide) in paragraph at lines 13798--13808
 []\tenrm @InCollectionbowerman$[]\teni hoi\tenrm 03\teni ; author \tenrm = []\t
 eni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -2660,7 +2660,7 @@ eni ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 
-Overfull \hbox (17.68036pt too wide) in paragraph at lines 13799--13809
+Overfull \hbox (17.68036pt too wide) in paragraph at lines 13798--13808
 []\teni ; crossref \tenrm = []\teni ; pages \tenrm = []\teni ; publisher \tenrm
  = []\teni ; year \tenrm =|
 
@@ -2679,7 +2679,7 @@ Overfull \hbox (17.68036pt too wide) in paragraph at lines 13799--13809
 .etc.
 
 ! Undefined control sequence.
-l.13814   title = 	 {{\em
+l.13813   title = 	 {{\em
                           Want that} is understood well before {\em say that...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2688,7 +2688,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.13814 ...nt that} is understood well before {\em
+l.13813 ...nt that} is understood well before {\em
                                                    say that, think that}, an...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2702,13 +2702,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.13833 @Article{lohmann_
+l.13832 @Article{lohmann_
                          tomasello03,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.13841 }
+l.13840 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2721,13 +2721,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.13842 
+l.13841 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (408.31279pt too wide) in paragraph at lines 13833--13842
+Overfull \hbox (408.31279pt too wide) in paragraph at lines 13832--13841
 []\tenrm @Articlelohmann$[]\teni omasello\tenrm 03\teni ; author \tenrm = []\te
 ni ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -2744,13 +2744,13 @@ ni ; title \tenrm = []\teni ; journal \tenrm =|
                 $
 <to be read again> 
                    _
-l.13895 @InCollection{gentner_
+l.13894 @InCollection{gentner_
                               goldin-meadow03,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.13904 }
+l.13903 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2763,13 +2763,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.13905 
+l.13904 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (1.43431pt too wide) in paragraph at lines 13895--13905
+Overfull \hbox (1.43431pt too wide) in paragraph at lines 13894--13904
 []\tenrm @InCollectiongentner$[]\teni oldin \tensy ^^@ \teni meadow\tenrm 03\te
 ni ; author \tenrm = []\teni ; title \tenrm =|
 
@@ -2786,13 +2786,13 @@ ni ; author \tenrm = []\teni ; title \tenrm =|
                 $
 <to be read again> 
                    _
-l.13907 @Article{pinker_
+l.13906 @Article{pinker_
                         bloom90,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.13914 }
+l.13913 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2805,13 +2805,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.13915 
+l.13914 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (95.43185pt too wide) in paragraph at lines 13907--13915
+Overfull \hbox (95.43185pt too wide) in paragraph at lines 13906--13914
 []\tenrm @Articlepinker$[]\teni loom\tenrm 90\teni ; author \tenrm = []\teni ; 
 title \tenrm = []\teni ; journal \tenrm =|
 
@@ -2824,7 +2824,7 @@ title \tenrm = []\teni ; journal \tenrm =|
 .etc.
 
 
-Overfull \hbox (4.77365pt too wide) in paragraph at lines 13952--13960
+Overfull \hbox (4.77365pt too wide) in paragraph at lines 13951--13959
 []\tenrm @InCollectionmatthewson03, au-thor = Matthew-son, Lisa, ti-tle = An un
 der-specified tense in St'^^Sat'imcets,|
 
@@ -2837,7 +2837,7 @@ der-specified tense in St'^^Sat'imcets,|
 .etc.
 
 ! Undefined control sequence.
-l.13973 ...e = 	 {Talk to be presented at the {\em
+l.13972 ...e = 	 {Talk to be presented at the {\em
                                                    Conference on Indigenous ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2846,7 +2846,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.13980   note = 	 {Poster presented at the {\em
+l.13979   note = 	 {Poster presented at the {\em
                                                  Workshop on Prosody and Mea...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2855,7 +2855,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.13986   note = 	 {Talk presented at the {\em
+l.13985   note = 	 {Talk presented at the {\em
                                                Experimental Pragmatics} conf...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2864,7 +2864,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (3.57928pt too wide) in paragraph at lines 13983--13988
+Overfull \hbox (3.57928pt too wide) in paragraph at lines 13982--13987
 []\tenrm @Unpublishedtonhauser-degen-xprag2019, au-thor = Ton-hauser, Ju-dith a
 nd Ju-dith De-gen, ti-tle = Higher-|
 
@@ -2878,7 +2878,7 @@ nd Ju-dith De-gen, ti-tle = Higher-|
 
 [82]
 ! Undefined control sequence.
-l.13995   note = 	 {Talk given at the 2012 {\em
+l.13994   note = 	 {Talk given at the 2012 {\em
                                                 Workshop on the Structure an...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -2891,13 +2891,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.14048 @Article{mccarthy_
+l.14047 @Article{mccarthy_
                           prince90,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14055 }
+l.14054 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2910,13 +2910,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14056 
+l.14055 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (103.53447pt too wide) in paragraph at lines 14048--14056
+Overfull \hbox (103.53447pt too wide) in paragraph at lines 14047--14055
 []\tenrm @Articlemccarthy$[]\teni rince\tenrm 90\teni ; author \tenrm = []\teni
  ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -2933,13 +2933,13 @@ Overfull \hbox (103.53447pt too wide) in paragraph at lines 14048--14056
                 $
 <to be read again> 
                    _
-l.14057 @Unpublished{mccarthy_
+l.14056 @Unpublished{mccarthy_
                               prince86,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14062 }
+l.14061 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2952,13 +2952,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14063 
+l.14062 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (46.60127pt too wide) in paragraph at lines 14057--14063
+Overfull \hbox (46.60127pt too wide) in paragraph at lines 14056--14062
 []\tenrm @Unpublishedmccarthy$[]\teni rince\tenrm 86\teni ; author \tenrm = []\
 teni ; title \tenrm = []\teni ; note \tenrm =|
 
@@ -2975,13 +2975,13 @@ teni ; title \tenrm = []\teni ; note \tenrm =|
                 $
 <to be read again> 
                    _
-l.14104 @Article{orie_
+l.14103 @Article{orie_
                       bricker00,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14112 }
+l.14111 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -2994,13 +2994,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14113 
+l.14112 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (185.85477pt too wide) in paragraph at lines 14104--14113
+Overfull \hbox (185.85477pt too wide) in paragraph at lines 14103--14112
 []\tenrm @Articleorie$[]\teni ricker\tenrm 00\teni ; author \tenrm = []\teni ; 
 title \tenrm = []\teni ; journal \tenrm =|
 
@@ -3017,13 +3017,13 @@ title \tenrm = []\teni ; journal \tenrm =|
                 $
 <to be read again> 
                    _
-l.14114 @Article{broselow_
+l.14113 @Article{broselow_
                           mccarthy83,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14121 }
+l.14120 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3036,13 +3036,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14122 
+l.14121 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (112.93585pt too wide) in paragraph at lines 14114--14122
+Overfull \hbox (112.93585pt too wide) in paragraph at lines 14113--14121
 []\tenrm @Articlebroselow$[]\teni ccarthy\tenrm 83\teni ; author \tenrm = []\te
 ni ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -3059,13 +3059,13 @@ ni ; title \tenrm = []\teni ; journal \tenrm =|
                 $
 <to be read again> 
                    _
-l.14130 @Unpublished{mccarthy_
+l.14129 @Unpublished{mccarthy_
                               prince93b,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14135 }
+l.14134 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3078,13 +3078,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14136 
+l.14135 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (234.75307pt too wide) in paragraph at lines 14130--14136
+Overfull \hbox (234.75307pt too wide) in paragraph at lines 14129--14135
 []\tenrm @Unpublishedmccarthy$[]\teni rince\tenrm 93\teni b; author \tenrm = []
 \teni ; title \tenrm = []\teni ; note \tenrm =|
 
@@ -3101,13 +3101,13 @@ Overfull \hbox (234.75307pt too wide) in paragraph at lines 14130--14136
                 $
 <to be read again> 
                    _
-l.14137 @InCollection{mccarthy_
+l.14136 @InCollection{mccarthy_
                                prince93a,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14145 }
+l.14144 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3120,13 +3120,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14146 
+l.14145 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (79.7627pt too wide) in paragraph at lines 14137--14146
+Overfull \hbox (79.7627pt too wide) in paragraph at lines 14136--14145
 []\tenrm @InCollectionmccarthy$[]\teni rince\tenrm 93\teni a; author \tenrm = [
 ]\teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -3143,13 +3143,13 @@ Overfull \hbox (79.7627pt too wide) in paragraph at lines 14137--14146
                 $
 <to be read again> 
                    _
-l.14147 @Unpublished{prince_
+l.14146 @Unpublished{prince_
                             smolensky93,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14152 }
+l.14151 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3162,13 +3162,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14153 
+l.14152 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (247.27942pt too wide) in paragraph at lines 14147--14153
+Overfull \hbox (247.27942pt too wide) in paragraph at lines 14146--14152
 []\tenrm @Unpublishedprince$[]\teni molensky\tenrm 93\teni ; author \tenrm = []
 \teni ; title \tenrm = []\teni ; note \tenrm =|
 
@@ -3189,13 +3189,13 @@ Missing character: There is no ê in font cmr10!
                 $
 <to be read again> 
                    _
-l.14385 @Article{vallduvi_
+l.14384 @Article{vallduvi_
                           engdahl96,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14392 }
+l.14391 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3208,13 +3208,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14393 
+l.14392 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (186.34756pt too wide) in paragraph at lines 14385--14393
+Overfull \hbox (186.34756pt too wide) in paragraph at lines 14384--14392
 []\tenrm @Articlevallduvi$[]\teni ngdahl\tenrm 96\teni ; author \tenrm = []\ten
 i ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -3227,7 +3227,7 @@ i ; title \tenrm = []\teni ; journal \tenrm =|
 .etc.
 
 ! Undefined control sequence.
-l.14496 ... = 	 {Submitted for publication to {\em
+l.14495 ... = 	 {Submitted for publication to {\em
                                                    Acta Linguistica Hafniens...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3236,7 +3236,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.14504   title = 	 {{\noopsort
+l.14503   title = 	 {{\noopsort
                                {d}}{A} preliminary investigation of conditio...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3245,7 +3245,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.14520   title = 	 {{\noopsort
+l.14519   title = 	 {{\noopsort
                                {a}}{V}oice in discourse: {T}he case of {Y}uc...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3254,7 +3254,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.14529 ...ual and contrastive sentence-final {\em
+l.14528 ...ual and contrastive sentence-final {\em
                                                    ne}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3264,7 +3264,7 @@ and I'll forget about whatever was undefined.
 
 [85]
 ! Undefined control sequence.
-l.14557   title = 	 {{\noopsort
+l.14556   title = 	 {{\noopsort
                                {b}}The syntax and semantics of {Y}ucatec {M}...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3277,13 +3277,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.14617 @InCollection{keenan_
+l.14616 @InCollection{keenan_
                              hull73,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14625 }
+l.14624 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3296,13 +3296,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14626 
+l.14625 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (169.39095pt too wide) in paragraph at lines 14617--14626
+Overfull \hbox (169.39095pt too wide) in paragraph at lines 14616--14625
 []\tenrm @InCollectionkeenan$[]\teni ull\tenrm 73\teni ; author \tenrm = []\ten
 i ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -3315,7 +3315,7 @@ i ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 
-Overfull \hbox (66.95467pt too wide) in paragraph at lines 14617--14626
+Overfull \hbox (66.95467pt too wide) in paragraph at lines 14616--14625
 []\teni ; pages \tenrm = []\teni ; publisher \tenrm =|
 
 \hbox(7.51782+1.94444)x469.75499
@@ -3333,7 +3333,7 @@ Overfull \hbox (66.95467pt too wide) in paragraph at lines 14617--14626
 .etc.
 
 
-Overfull \hbox (57.65796pt too wide) in paragraph at lines 14617--14626
+Overfull \hbox (57.65796pt too wide) in paragraph at lines 14616--14625
 []\teni ; year \tenrm = 1973\teni ; editor \tenrm = []$ |
 
 \hbox(6.94444+1.94444)x469.75499
@@ -3355,13 +3355,13 @@ Overfull \hbox (57.65796pt too wide) in paragraph at lines 14617--14626
                 $
 <to be read again> 
                    _
-l.14637 @InProceedings{bresnan_
+l.14636 @InProceedings{bresnan_
                                lummi01,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.14645 }
+l.14644 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3374,13 +3374,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.14646 
+l.14645 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (52.13483pt too wide) in paragraph at lines 14637--14646
+Overfull \hbox (52.13483pt too wide) in paragraph at lines 14636--14645
 []\tenrm @InProceedingsbresnan$[]\teni ummi\tenrm 01\teni ; author \tenrm = []\
 teni ; title \tenrm =|
 
@@ -3393,7 +3393,7 @@ teni ; title \tenrm =|
 .etc.
 
 
-Overfull \hbox (141.66345pt too wide) in paragraph at lines 14637--14646
+Overfull \hbox (141.66345pt too wide) in paragraph at lines 14636--14645
 []\teni ; booktitle \tenrm = []\teni ; pages \tenrm =|
 
 \hbox(6.94444+1.94444)x469.75499
@@ -3411,7 +3411,7 @@ Overfull \hbox (141.66345pt too wide) in paragraph at lines 14637--14646
 .etc.
 
 
-Overfull \hbox (4.67497pt too wide) in paragraph at lines 14637--14646
+Overfull \hbox (4.67497pt too wide) in paragraph at lines 14636--14645
 []\teni ; year \tenrm = 2001\teni ; editor \tenrm = []\teni ; publisher \tenrm 
 = []$ |
 
@@ -3426,7 +3426,7 @@ Overfull \hbox (4.67497pt too wide) in paragraph at lines 14637--14646
 .etc.
 
 [86]
-Overfull \hbox (1.82932pt too wide) in paragraph at lines 14790--14796
+Overfull \hbox (1.82932pt too wide) in paragraph at lines 14789--14795
 []\tenrm @Bookcooreman87, au-thor = Coore-man, Ann, ti-tle = Tran-si-tiv-ity an
 d Dis-course Con-ti-nu-ity in Chamorro|
 
@@ -3440,7 +3440,7 @@ d Dis-course Con-ti-nu-ity in Chamorro|
 
 [87]
 ! Undefined control sequence.
-l.15001 ... {The inverse voice and possessive {\em
+l.15000 ... {The inverse voice and possessive {\em
                                                    yi-/bi-} in {N}avajo},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3449,7 +3449,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.15020 ...ember 2002 at the MPI in Nijmegen, {\em
+l.15019 ...ember 2002 at the MPI in Nijmegen, {\em
                                                    http://personalpages.manc...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3458,7 +3458,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (222.02316pt too wide) in paragraph at lines 15017--15022
+Overfull \hbox (222.02316pt too wide) in paragraph at lines 15016--15021
 \tenrm = Slides from a talk given in Novem-ber 2002 at the MPI in Ni-jmegen, ht
 tp://personalpages.manchester.ac.uk/staff/martina.t.faller/documents/Implicatur
 es.ppt,|
@@ -3472,7 +3472,7 @@ es.ppt,|
 .etc.
 
 ! Undefined control sequence.
-l.15028   publisher =	 {Walnut Creek, Calif.\:
+l.15027   publisher =	 {Walnut Creek, Calif.\:
                                                Altamira Press},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3482,7 +3482,7 @@ and I'll forget about whatever was undefined.
 
 [88] [89]
 ! Undefined control sequence.
-l.15326 ...} et la cat\'egorie {INFL} en f\textipa
+l.15325 ...} et la cat\'egorie {INFL} en f\textipa
                                                   {O}ngb\`e},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3491,7 +3491,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.15387   title = 	 {The meaning of {\em
+l.15386   title = 	 {The meaning of {\em
                                          too, enough} and {\em so...that}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3500,7 +3500,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.15387 ...e meaning of {\em too, enough} and {\em
+l.15386 ...e meaning of {\em too, enough} and {\em
                                                    so...that}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3509,7 +3509,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.15434   title = 	 {{\em
+l.15433   title = 	 {{\em
                           Be articulate}: {A} pragmatic theory of presupposi...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3525,13 +3525,13 @@ Missing character: There is no † in font cmr10!
                 $
 <to be read again> 
                    _
-l.15522 @Article{cole_
+l.15521 @Article{cole_
                       hermon98,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.15529 }
+l.15528 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3544,13 +3544,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.15530 
+l.15529 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (180.36229pt too wide) in paragraph at lines 15522--15530
+Overfull \hbox (180.36229pt too wide) in paragraph at lines 15521--15529
 []\tenrm @Articlecole$[]\teni ermon\tenrm 98\teni ; author \tenrm = []\teni ; t
 itle \tenrm = []\teni ; journal \tenrm =|
 
@@ -3563,7 +3563,7 @@ itle \tenrm = []\teni ; journal \tenrm =|
 .etc.
 
 ! Undefined control sequence.
-l.15567   title = 	 {{\noopsort
+l.15566   title = 	 {{\noopsort
                                {a}}{F}-constructions in {Y}ucatec {M}aya},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3572,7 +3572,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.15578   title = 	 {{\noopsort
+l.15577   title = 	 {{\noopsort
                                {c}}{O}n the syntax and semantics of content ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3585,13 +3585,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.15607 @Book{hinton_
+l.15606 @Book{hinton_
                      hale01,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.15612 }
+l.15611 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3604,13 +3604,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.15613 
+l.15612 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (127.5882pt too wide) in paragraph at lines 15607--15613
+Overfull \hbox (127.5882pt too wide) in paragraph at lines 15606--15612
 []\tenrm @Bookhinton$[]\teni ale\tenrm 01\teni ; author \tenrm = []\teni ; titl
 e \tenrm = []\teni ; publisher \tenrm =|
 
@@ -3623,7 +3623,7 @@ e \tenrm = []\teni ; publisher \tenrm =|
 .etc.
 
 [91]
-Overfull \hbox (4.88483pt too wide) in paragraph at lines 15652--15658
+Overfull \hbox (4.88483pt too wide) in paragraph at lines 15651--15657
 []\tenrm @Bookpaul1880, au-thor = Paul, Her-mann, ti-tle = Prinzip-ien der Spra
 chgeschichte, pub-lisher = T^^?ubingen:|
 
@@ -3636,7 +3636,7 @@ chgeschichte, pub-lisher = T^^?ubingen:|
 .etc.
 
 ! Undefined control sequence.
-l.15664   note =	 {Translation of {\em
+l.15663   note =	 {Translation of {\em
                                        Prinzipien der Sprachgeschichte}}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3649,13 +3649,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.15747 @InProceedings{allen_
+l.15746 @InProceedings{allen_
                              frantz78,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.15754 }
+l.15753 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3668,13 +3668,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.15755 
+l.15754 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (129.02682pt too wide) in paragraph at lines 15747--15755
+Overfull \hbox (129.02682pt too wide) in paragraph at lines 15746--15754
 []\tenrm @InProceedingsallen$[]\teni rantz\tenrm 78\teni ; author \tenrm = []\t
 eni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -3691,13 +3691,13 @@ eni ; title \tenrm = []\teni ; booktitle \tenrm =|
                 $
 <to be read again> 
                    _
-l.15830 @InCollection{dik_
+l.15829 @InCollection{dik_
                           et_al81,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.15839 }
+l.15838 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3710,13 +3710,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.15840 
+l.15839 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (207.37566pt too wide) in paragraph at lines 15830--15840
+Overfull \hbox (207.37566pt too wide) in paragraph at lines 15829--15839
 []\tenrm @InCollectiondik$[]\teni t[]l\tenrm 81\teni ; author \tenrm = []\teni 
 ; title \tenrm =|
 
@@ -3729,7 +3729,7 @@ Overfull \hbox (207.37566pt too wide) in paragraph at lines 15830--15840
 .etc.
 
 
-Overfull \hbox (138.59422pt too wide) in paragraph at lines 15830--15840
+Overfull \hbox (138.59422pt too wide) in paragraph at lines 15829--15839
 []\teni ; booktitle \tenrm = []\teni ; publisher \tenrm = []\teni ; year \tenrm
  =|
 
@@ -3748,7 +3748,7 @@ Overfull \hbox (138.59422pt too wide) in paragraph at lines 15830--15840
 .etc.
 
 [92]
-Overfull \hbox (4.96805pt too wide) in paragraph at lines 15941--15947
+Overfull \hbox (4.96805pt too wide) in paragraph at lines 15940--15946
 []\tenrm @Unpublishedstone99, au-thor = Matthew Stone, ti-tle = Ref-er-ence to 
 Pos-si-ble Worlds, note = Manuscript,|
 
@@ -3761,7 +3761,7 @@ Pos-si-ble Worlds, note = Manuscript,|
 .etc.
 
 ! Undefined control sequence.
-l.15982   title = 	 {Definites in {\em
+l.15981   title = 	 {Definites in {\em
                                        there}--sentences},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3771,7 +3771,7 @@ and I'll forget about whatever was undefined.
 
 [93] [94]
 ! Undefined control sequence.
-l.16218 ... Heusinger and Paul Portner (eds.) {\em
+l.16217 ... Heusinger and Paul Portner (eds.) {\em
                                                    Semantics: An Internation...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3780,7 +3780,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.16218 ...avalable in prepublication form at {\em
+l.16217 ...avalable in prepublication form at {\em
                                                    http://semanticsarchive.n...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3789,7 +3789,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (43.21373pt too wide) in paragraph at lines 16215--16221
+Overfull \hbox (43.21373pt too wide) in paragraph at lines 16214--16220
 \tenrm de Gruyter; aval-able in pre-pub-li-ca-tion form at http://semanticsarch
 ive.net/Archive/WM0ZTVhZ/handbookpaper.pdf,|
 
@@ -3802,7 +3802,7 @@ ive.net/Archive/WM0ZTVhZ/handbookpaper.pdf,|
 .etc.
 
 ! Undefined control sequence.
-l.16224   title = 	 {{\em
+l.16223   title = 	 {{\em
                           Yvonne Rainer}: The Mind is a Muscle},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3811,7 +3811,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 [95]
-Overfull \hbox (4.88483pt too wide) in paragraph at lines 16454--16475
+Overfull \hbox (4.88483pt too wide) in paragraph at lines 16453--16474
 []\tenrm @InCollectiondejong87, au-thor = Fran-ciska de Jong, ti-tle = The Com-
 po-si-tional Na-ture of (In)definiteness,|
 
@@ -3825,7 +3825,7 @@ po-si-tional Na-ture of (In)definiteness,|
 
 [96]
 ! Undefined control sequence.
-l.16589   note = 	 {Invited talk presented at {\em
+l.16588   note = 	 {Invited talk presented at {\em
                                                    Semantics and Linguistic ...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3835,7 +3835,7 @@ and I'll forget about whatever was undefined.
 
 [97]
 ! Undefined control sequence.
-l.16853 ...uous pseudoclefts with unambiguous {\em
+l.16852 ...uous pseudoclefts with unambiguous {\em
                                                    be}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3844,7 +3844,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.16873   booktitle = 	 {\citealt
+l.16872   booktitle = 	 {\citealt
                                  {montague74}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3853,7 +3853,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.16927 ...{C}hamorro: {A} study of preverbal {\em
+l.16926 ...{C}hamorro: {A} study of preverbal {\em
                                                    para}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3863,7 +3863,7 @@ and I'll forget about whatever was undefined.
 
 [98]
 ! Undefined control sequence.
-l.16986   title = 	 {{\em
+l.16985   title = 	 {{\em
                           Be Going to} as a case of high aspect},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3876,13 +3876,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.17095 @Article{imai_
+l.17094 @Article{imai_
                       gentner97,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.17102 }
+l.17101 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3895,13 +3895,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.17103 
+l.17102 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (280.46434pt too wide) in paragraph at lines 17095--17103
+Overfull \hbox (280.46434pt too wide) in paragraph at lines 17094--17102
 []\tenrm @Articleimai$[]\teni entner\tenrm 97\teni ; author \tenrm = []\teni ; 
 title \tenrm = []\teni ; journal \tenrm =|
 
@@ -3915,7 +3915,7 @@ title \tenrm = []\teni ; journal \tenrm =|
 
 [99] [100]
 ! Undefined control sequence.
-l.17319 ... {The semantics of the common noun {\em
+l.17318 ... {The semantics of the common noun {\em
                                                    kind}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3930,13 +3930,13 @@ and I'll forget about whatever was undefined.
                    \delimiter 
 \}->\delimiter 
                "5267309 
-l.17391 ...Carlson, {Gregory N.} and {Francis J.\}
+l.17390 ...Carlson, {Gregory N.} and {Francis J.\}
                                                    Pelletier}
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.17391 ...regory N.} and {Francis J.\} Pelletier}
+l.17390 ...regory N.} and {Francis J.\} Pelletier}
                                                   
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3945,7 +3945,7 @@ the way to recover is to insert both the forgotten and the
 deleted material, e.g., by typing `I$}'.
 
 ! Extra }, or forgotten $.
-l.17392 }
+l.17391 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -3958,13 +3958,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.17393 
+l.17392 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Undefined control sequence.
-l.17405 ...ivity of the {H}ebrew (unstressed) {\em
+l.17404 ...ivity of the {H}ebrew (unstressed) {\em
                                                    stam}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3973,7 +3973,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (0.5237pt too wide) in paragraph at lines 17409--17414
+Overfull \hbox (0.5237pt too wide) in paragraph at lines 17408--17413
 []\tenrm @InProceedingscoppock-beaver12, au-thor = Cop-pock, Eliz-a-beth and Da
 vid Beaver, ti-tle = Weak unique-|
 
@@ -3987,7 +3987,7 @@ vid Beaver, ti-tle = Weak unique-|
 
 [101] [102]
 ! Undefined control sequence.
-l.17654   title = 	 {{\em
+l.17653   title = 	 {{\em
                           Dynamic {S}emantics and the {T}emporal {I}nterpret...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -3996,7 +3996,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 [103]
-Overfull \hbox (43.69054pt too wide) in paragraph at lines 17812--17821
+Overfull \hbox (43.69054pt too wide) in paragraph at lines 17811--17820
 []\tenrm @incollectionsnider2017, au-thor=Snider, Todd, title=At-issueness $\te
 nsy 6\tenrm =$ anaphoric avail-abil-ity, book-ti-tle=Proceedings|
 
@@ -4013,13 +4013,13 @@ nsy 6\tenrm =$ anaphoric avail-abil-ity, book-ti-tle=Proceedings|
                 $
 <to be read again> 
                    _
-l.17876 @InProceedings{lambrecht_
+l.17875 @InProceedings{lambrecht_
                                  polinsky97,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.17883 }
+l.17882 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4032,13 +4032,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.17884 
+l.17883 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (266.36493pt too wide) in paragraph at lines 17876--17884
+Overfull \hbox (266.36493pt too wide) in paragraph at lines 17875--17883
 []\tenrm @InProceedingslambrecht$[]\teni olinsky\tenrm 97\teni ; author \tenrm 
 = []\teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -4055,13 +4055,13 @@ Overfull \hbox (266.36493pt too wide) in paragraph at lines 17876--17884
                 $
 <to be read again> 
                    _
-l.17897 @Article{kim_
+l.17896 @Article{kim_
                      sag02,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.17905 }
+l.17904 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4074,13 +4074,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.17906 
+l.17905 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (56.41193pt too wide) in paragraph at lines 17897--17906
+Overfull \hbox (56.41193pt too wide) in paragraph at lines 17896--17905
 []\tenrm @Articlekim$[]\teni ag\tenrm 02\teni ; author \tenrm = []\teni ; title
  \tenrm = []\teni ; journal \tenrm =|
 
@@ -4094,7 +4094,7 @@ Overfull \hbox (56.41193pt too wide) in paragraph at lines 17897--17906
 
 [104] [105]
 ! Undefined control sequence.
-l.18271 ...iety of America, published 1981 in {\em
+l.18270 ...iety of America, published 1981 in {\em
                                                    Text} vol.1.3, pp.233-240},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4108,13 +4108,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.18592 @InCollection{larsen_
+l.18591 @InCollection{larsen_
                              norman79,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.18600 }
+l.18599 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4127,13 +4127,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.18601 
+l.18600 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (151.88393pt too wide) in paragraph at lines 18592--18601
+Overfull \hbox (151.88393pt too wide) in paragraph at lines 18591--18600
 []\tenrm @InCollectionlarsen$[]\teni orman\tenrm 79\teni ; author \tenrm = []\t
 eni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -4146,7 +4146,7 @@ eni ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 ! Undefined control sequence.
-l.18774   note =	 {Reprinted in \citealt
+l.18773   note =	 {Reprinted in \citealt
                                         {pullum91}}
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4159,13 +4159,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.18786 @Book{yah_
+l.18785 @Book{yah_
                   bricker81,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.18792 }
+l.18791 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4178,13 +4178,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.18793 
+l.18792 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (260.23752pt too wide) in paragraph at lines 18786--18793
+Overfull \hbox (260.23752pt too wide) in paragraph at lines 18785--18792
 []\tenrm @Bookyah$[]\teni ricker\tenrm 81\teni ; author \tenrm = []\teni ; titl
 e \tenrm = []\teni ; publisher \tenrm =|
 
@@ -4202,13 +4202,13 @@ e \tenrm = []\teni ; publisher \tenrm =|
                 $
 <to be read again> 
                    _
-l.18875 @InCollection{hale_
+l.18874 @InCollection{hale_
                            selkirk87,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.18883 }
+l.18882 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4221,13 +4221,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.18884 
+l.18883 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (89.75218pt too wide) in paragraph at lines 18875--18884
+Overfull \hbox (89.75218pt too wide) in paragraph at lines 18874--18883
 []\tenrm @InCollectionhale$[]\teni elkirk\tenrm 87\teni ; author \tenrm = []\te
 ni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -4240,7 +4240,7 @@ ni ; title \tenrm = []\teni ; booktitle \tenrm =|
 .etc.
 
 ! Undefined control sequence.
-l.18991 title = {{\em
+l.18990 title = {{\em
                       Totally} tall sounds {\em totally} younger: {I}ntensif...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4249,7 +4249,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.18991 title = {{\em Totally} tall sounds {\em
+l.18990 title = {{\em Totally} tall sounds {\em
                                                 totally} younger: {I}ntensif...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4266,7 +4266,7 @@ Missing character: There is no ê in font cmr10!
                 $
 <to be read again> 
                    _
-l.19313 @Article{kraemer_
+l.19312 @Article{kraemer_
                          wunderlich99,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -4274,13 +4274,13 @@ you left one out. Proceed, with fingers crossed.
 ! Please use \mathaccent for accents in math mode.
 \"#1->{\accent 
                "7F #1}
-l.19314   author = 	 {Kr\"a
+l.19313   author = 	 {Kr\"a
                            mer, Martin and Dieter Wunderlich},
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
 
 ! Extra }, or forgotten $.
-l.19322 }
+l.19321 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4293,13 +4293,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.19323 
+l.19322 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (381.06172pt too wide) in paragraph at lines 19313--19323
+Overfull \hbox (381.06172pt too wide) in paragraph at lines 19312--19322
 []\tenrm @Articlekraemer$[]\teni underlich\tenrm 99\teni ; author \tenrm = []\t
 eni ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -4316,7 +4316,7 @@ eni ; title \tenrm = []\teni ; journal \tenrm =|
                 $
 <to be read again> 
                    _
-l.19324 @Book{ayres_
+l.19323 @Book{ayres_
                     pfeiler97,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -4324,7 +4324,7 @@ you left one out. Proceed, with fingers crossed.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.19326 ... = 	 {Los verbos mayas: la conjugaci\'o
+l.19325 ... = 	 {Los verbos mayas: la conjugaci\'o
                                                   n  en el Maya Yucateco Mod...
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -4332,7 +4332,7 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.19327   publisher = 	 {M\'e
+l.19326   publisher = 	 {M\'e
                              rida, Mexico. Universidad Aut\'onoma de Yucat\'...
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -4340,7 +4340,7 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.19327 ...	 {M\'erida, Mexico. Universidad Aut\'o
+l.19326 ...	 {M\'erida, Mexico. Universidad Aut\'o
                                                   noma de Yucat\'an},
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
@@ -4348,13 +4348,13 @@ I'm changing \accent to \mathaccent here; wish me luck.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.19327 ...ico. Universidad Aut\'onoma de Yucat\'a
+l.19326 ...ico. Universidad Aut\'onoma de Yucat\'a
                                                   n},
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
 
 ! Extra }, or forgotten $.
-l.19329 }
+l.19328 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4367,13 +4367,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.19330 
+l.19329 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (199.40962pt too wide) in paragraph at lines 19324--19330
+Overfull \hbox (199.40962pt too wide) in paragraph at lines 19323--19329
 []\tenrm @Bookayres$[]\teni feiler\tenrm 97\teni ; author \tenrm = []\teni ; ti
 tle \tenrm = []\teni ; publisher \tenrm =|
 
@@ -4387,7 +4387,7 @@ tle \tenrm = []\teni ; publisher \tenrm =|
 
 [111]
 ! Undefined control sequence.
-l.19492   title = 	 {Moods and modalities for {\em
+l.19491   title = 	 {Moods and modalities for {\em
                                                    will} and {\em would}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4396,7 +4396,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.19492 ... and modalities for {\em will} and {\em
+l.19491 ... and modalities for {\em will} and {\em
                                                    would}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4409,7 +4409,7 @@ and I'll forget about whatever was undefined.
                    {16}
 \'#1->{\accent 19 #1
                     }
-l.19504 ...d and Luis Casillas Mart\'{\symbol{16}}
+l.19503 ...d and Luis Casillas Mart\'{\symbol{16}}
                                                   nez and Brady Clark and St...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4419,7 +4419,7 @@ and I'll forget about whatever was undefined.
 
 [112]
 ! Undefined control sequence.
-l.19539   title = 	 {{\em
+l.19538   title = 	 {{\em
                           Wo pao de kuai} and {C}hinese phrase structure},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4432,13 +4432,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.19650 @Article{mccloskey_
+l.19649 @Article{mccloskey_
                            hale84,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.19657 }
+l.19656 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4451,13 +4451,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.19658 
+l.19657 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (228.03009pt too wide) in paragraph at lines 19650--19658
+Overfull \hbox (228.03009pt too wide) in paragraph at lines 19649--19657
 []\tenrm @Articlemccloskey$[]\teni ale\tenrm 84\teni ; author \tenrm = []\teni 
 ; title \tenrm = []\teni ; journal \tenrm =|
 
@@ -4471,7 +4471,7 @@ Overfull \hbox (228.03009pt too wide) in paragraph at lines 19650--19658
 
 [113] [114] [115]
 ! Undefined control sequence.
-l.20058   note = {Downloaded from LingBuzz \url
+l.20057   note = {Downloaded from LingBuzz \url
                                                {https://ling.auf.net/lingbuz...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4480,7 +4480,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20085 ...at-issueness in the acquisition of {\em
+l.20084 ...at-issueness in the acquisition of {\em
                                                    forget} and {\em remember}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4489,7 +4489,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20085 ...he acquisition of {\em forget} and {\em
+l.20084 ...he acquisition of {\em forget} and {\em
                                                    remember}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4498,7 +4498,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 
-Overfull \hbox (0.3698pt too wide) in paragraph at lines 20107--20114
+Overfull \hbox (0.3698pt too wide) in paragraph at lines 20106--20113
 []\tenrm @Articleguerzoni-sharvit2007, au-thor = Guer-zoni, Elena and Yael Shar
 vit, ti-tle = A ques-tion of strength:|
 
@@ -4511,7 +4511,7 @@ vit, ti-tle = A ques-tion of strength:|
 .etc.
 
 
-Overfull \hbox (12.19043pt too wide) in paragraph at lines 20124--20130
+Overfull \hbox (12.19043pt too wide) in paragraph at lines 20123--20129
 []\tenrm @InCollectiontonhauser-sula7, au-thor = Ton-hauser, Ju-dith, ti-tle = 
 Re-por-ta-tive ev-i-den-tial-ity in Paraguayan|
 
@@ -4524,7 +4524,7 @@ Re-por-ta-tive ev-i-den-tial-ity in Paraguayan|
 .etc.
 
 ! Undefined control sequence.
-l.20160                   content' (\citealt
+l.20159                   content' (\citealt
                                             {tonhauser-sula6})},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4533,7 +4533,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20161   note = {{\em
+l.20160   note = {{\em
                        http://www.ling.ohio-state.edu/~judith/nai-guarani.pd...
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4547,13 +4547,13 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.20362 @Article{nida_
+l.20361 @Article{nida_
                       romero50,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.20369 }
+l.20368 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4566,13 +4566,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.20370 
+l.20369 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (112.03764pt too wide) in paragraph at lines 20362--20370
+Overfull \hbox (112.03764pt too wide) in paragraph at lines 20361--20369
 []\tenrm @Articlenida$[]\teni omero\tenrm 50\teni ; author \tenrm = []\teni ; t
 itle \tenrm = []\teni ; journal \tenrm =|
 
@@ -4590,7 +4590,7 @@ itle \tenrm = []\teni ; journal \tenrm =|
                 $
 <to be read again> 
                    _
-l.20578 @InCollection{svolacchia_
+l.20577 @InCollection{svolacchia_
                                  etal95,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -4598,13 +4598,13 @@ you left one out. Proceed, with fingers crossed.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.20584   editor =	 {Kiss, Katalin \'E
+l.20583   editor =	 {Kiss, Katalin \'E
                                       .},
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
 
 ! Extra }, or forgotten $.
-l.20586 }
+l.20585 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4617,13 +4617,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.20587 
+l.20586 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (25.39287pt too wide) in paragraph at lines 20578--20587
+Overfull \hbox (25.39287pt too wide) in paragraph at lines 20577--20586
 []\tenrm @InCollectionsvolacchia$[]\teni tal\tenrm 95\teni ; author \tenrm = []
 \teni ; title \tenrm =|
 
@@ -4636,7 +4636,7 @@ Overfull \hbox (25.39287pt too wide) in paragraph at lines 20578--20587
 .etc.
 
 
-Overfull \hbox (32.9441pt too wide) in paragraph at lines 20578--20587
+Overfull \hbox (32.9441pt too wide) in paragraph at lines 20577--20586
 []\teni ; booktitle \tenrm = []\teni ; publisher \tenrm =|
 
 \hbox(6.94444+1.94444)x469.75499
@@ -4655,7 +4655,7 @@ Overfull \hbox (32.9441pt too wide) in paragraph at lines 20578--20587
 
 [119]
 ! Undefined control sequence.
-l.20761   author = 	 {{\SortNoop
+l.20760   author = 	 {{\SortNoop
                                 {Fintel}}von Fintel, Kai},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4664,7 +4664,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20779   author = 	 {{\SortNoop
+l.20778   author = 	 {{\SortNoop
                                 {Fintel}}von Fintel, Kai},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4673,7 +4673,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20852   title = 	 {{\sc
+l.20851   title = 	 {{\sc
                           retrievablity} and Ellipsis},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4683,7 +4683,7 @@ and I'll forget about whatever was undefined.
 
 [120]
 ! Undefined control sequence.
-l.20932 ...and textual coherence: the case of {\em
+l.20931 ...and textual coherence: the case of {\em
                                                    almost} and {\em barely}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4692,7 +4692,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.20932 ...ence: the case of {\em almost} and {\em
+l.20931 ...ence: the case of {\em almost} and {\em
                                                    barely}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4701,7 +4701,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.21048 ...een said in {T}agalog: Reportative {\em
+l.21047 ...een said in {T}agalog: Reportative {\em
                                                    daw}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4711,7 +4711,7 @@ and I'll forget about whatever was undefined.
 
 [121]
 ! Undefined control sequence.
-l.21125 ...ypothesis for cardinal readings of {\em
+l.21124 ...ypothesis for cardinal readings of {\em
                                                    few} \& {\em many}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4720,7 +4720,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Undefined control sequence.
-l.21125 ... cardinal readings of {\em few} \& {\em
+l.21124 ... cardinal readings of {\em few} \& {\em
                                                    many}},
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4733,7 +4733,7 @@ and I'll forget about whatever was undefined.
                 $
 <to be read again> 
                    _
-l.21195 @InCollection{campbell_
+l.21194 @InCollection{campbell_
                                kaufman90,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
@@ -4741,13 +4741,13 @@ you left one out. Proceed, with fingers crossed.
 ! Please use \mathaccent for accents in math mode.
 \'#1->{\accent 
                19 #1}
-l.21199 ...Investigaciones Regionales de Mesoam\'e
+l.21198 ...Investigaciones Regionales de Mesoam\'e
                                                   rica,
 I'm changing \accent to \mathaccent here; wish me luck.
 (Accents are not the same in formulas as they are in text.)
 
 ! Undefined control sequence.
-l.21203 ...d from Campbell and Kaufman (1985) {\em
+l.21202 ...d from Campbell and Kaufman (1985) {\em
                                                    Mayan
 The control sequence at the end of the top line
 of your error message was never \def'ed. If you have
@@ -4756,7 +4756,7 @@ spelling (e.g., `I\hbox'). Otherwise just continue,
 and I'll forget about whatever was undefined.
 
 ! Extra }, or forgotten $.
-l.21207 }
+l.21206 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4769,13 +4769,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.21208 
+l.21207 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (244.97345pt too wide) in paragraph at lines 21195--21208
+Overfull \hbox (244.97345pt too wide) in paragraph at lines 21194--21207
 []\tenrm @InCollectioncampbell$[]\teni aufman\tenrm 90\teni ; author \tenrm = [
 ]\teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -4788,7 +4788,7 @@ Overfull \hbox (244.97345pt too wide) in paragraph at lines 21195--21208
 .etc.
 
 
-Overfull \hbox (159.90338pt too wide) in paragraph at lines 21195--21208
+Overfull \hbox (159.90338pt too wide) in paragraph at lines 21194--21207
 []\teni ; publisher \tenrm = []\teni ; year \tenrm =|
 
 \hbox(6.94444+1.94444)x469.75499
@@ -4806,7 +4806,7 @@ Overfull \hbox (159.90338pt too wide) in paragraph at lines 21195--21208
 .etc.
 
 
-Overfull \hbox (393.17653pt too wide) in paragraph at lines 21195--21208
+Overfull \hbox (393.17653pt too wide) in paragraph at lines 21194--21207
 \tenrm 1990\teni ; editor \tenrm = []\teni ; note \tenrm = []\teni ; pages \ten
 rm =|
 
@@ -4823,13 +4823,13 @@ rm =|
                 $
 <to be read again> 
                    _
-l.21209 @InCollection{norman_
+l.21208 @InCollection{norman_
                              campbell78,
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 ! Extra }, or forgotten $.
-l.21219 }
+l.21218 }
          
 I've deleted a group-closing symbol because it seems to be
 spurious, as in `$x}$'. But perhaps the } is legitimate and
@@ -4842,13 +4842,13 @@ deleted material, e.g., by typing `I$}'.
                 $
 <to be read again> 
                    \par 
-l.21220 
+l.21219 
         
 I've inserted a begin-math/end-math symbol since I think
 you left one out. Proceed, with fingers crossed.
 
 
-Overfull \hbox (319.19896pt too wide) in paragraph at lines 21209--21220
+Overfull \hbox (319.19896pt too wide) in paragraph at lines 21208--21219
 []\tenrm @InCollectionnorman$[]\teni ampbell\tenrm 78\teni ; author \tenrm = []
 \teni ; title \tenrm = []\teni ; booktitle \tenrm =|
 
@@ -4861,7 +4861,7 @@ Overfull \hbox (319.19896pt too wide) in paragraph at lines 21209--21220
 .etc.
 
 
-Overfull \hbox (55.2888pt too wide) in paragraph at lines 21209--21220
+Overfull \hbox (55.2888pt too wide) in paragraph at lines 21208--21219
 []\teni ; publisher \tenrm = []\teni ; year \tenrm =|
 
 \hbox(6.94444+1.94444)x469.75499
@@ -4879,7 +4879,7 @@ Overfull \hbox (55.2888pt too wide) in paragraph at lines 21209--21220
 .etc.
 
 [122]
-Overfull \hbox (14.49612pt too wide) in paragraph at lines 21369--21379
+Overfull \hbox (14.49612pt too wide) in paragraph at lines 21368--21378
 []\tenrm @articlewinograd1972, ti-tle=Understanding nat-u-ral lan-guage, au-tho
 r=Winograd, Terry, jour-nal=Cognitive|
 
