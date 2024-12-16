@@ -66,6 +66,8 @@ e1 <- e1 %>%
                                  emo_comm_attitude == "yes" ~ "attitude"),
          changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
                                    TRUE ~ "no"),
+         activity = case_when(activity_predicate == "yes" ~ "yes",
+                              TRUE ~ "no"),
          sayVerb = case_when(say_verb == "yes" ~ "yes",
                              TRUE ~ "no"),
          sayVerbType = case_when(discourse_role_verb == "yes" ~ "discourse role verb",
@@ -94,6 +96,13 @@ e1 %>%
 # 2 emoComm           27
 # 3 nonEmoComm       163
 
+# communicatives only
+e1.comm <- e1 %>% filter(predicateType == "communicative")
+
+e1.comm %>%
+  distinct(predicate) %>%
+  count() # 190
+
 # calculate by-predicate projection means for new data
 mean.proj.e1 <- e1 %>%
   group_by(predicate) %>%
@@ -109,18 +118,23 @@ nrow(mean.proj.e1) # 192
 # cat(paste0('"', as.character(mean.proj.e1$predicate), '",'))
 
 tmp <- e1 %>%
-  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType, ratingsCount)) %>%
-  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType, ratingsCount)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType, 
+           ratingsCount)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType, 
+           ratingsCount)
 nrow(tmp) # 192
 
 mean.proj.e1 <- left_join(mean.proj.e1, tmp, by = c("predicate")) %>%
   distinct() %>%
   mutate(predicate = fct_reorder(as.factor(predicate), Mean.Proj))
 nrow(mean.proj.e1) # 192
+
+# communicatives only
+mean.proj.e1.comm <- mean.proj.e1 %>% filter(predicateType == "communicative")
+mean.proj.e1.comm %>% nrow() # 190
+
 
 ## MV dataset (White & Rawlins 2018)----
 d <- read.csv("../../MegaVeridicality/data/d.csv")
@@ -159,6 +173,8 @@ d.proj <- d.proj %>%
                                  emo_comm_attitude == "yes" ~ "attitude"),
          changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
                                    TRUE ~ "no"),
+         activity = case_when(activity_predicate == "yes" ~ "yes",
+                              TRUE ~ "no"),
          environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
                                  polarity == "positive" & conditional == "True" ~ "qcond",
                                  polarity == "negative" & conditional == "True" ~ "qcondneg"),
@@ -187,12 +203,10 @@ mean.proj.MV <- d.proj %>%
 nrow(mean.proj.MV) # 192
 
 tmp <- d.proj %>%
-  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)) %>%
-  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType)
 nrow(tmp) # 192
 
 mean.proj.MV <- left_join(mean.proj.MV, tmp, by = c("predicate")) %>%
@@ -215,12 +229,12 @@ mean.proj.MV.env <- d.proj %>%
 nrow(mean.proj.MV.env) # 576
 
 tmp <- d.proj %>%
-  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType, environment)) %>%
-  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType, environment)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType, 
+           environment)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType, 
+           environment)
 nrow(tmp) # 576
 
 mean.proj.MV.env <- left_join(mean.proj.MV.env, tmp, by = c("predicate", "environment")) %>%
@@ -271,6 +285,8 @@ d.proj.neg <- d.proj.neg %>%
                                  emo_comm_attitude == "yes" ~ "attitude"),
          changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
                                    TRUE ~ "no"),
+         activity = case_when(activity_predicate == "yes" ~ "yes",
+                              TRUE ~ "no"),
          sayVerb = case_when(say_verb == "yes" ~ "yes",
                              TRUE ~ "no"),
          sayVerbType = case_when(discourse_role_verb == "yes" ~ "discourse role verb",
@@ -297,12 +313,10 @@ mean.proj.MV.neg <- d.proj.neg %>%
 nrow(mean.proj.MV.neg) # 192
 
 tmp <- d.proj %>%
-  select(c(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)) %>%
-  distinct(predicate, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)
+  select(c(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType)) %>%
+  distinct(predicate, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           changeOfState, activity, volition, sayVerb, sayVerbType, modeVerbType, sayByMeansVerbType)
 nrow(tmp) # 192
 
 mean.proj.MV.neg <- left_join(mean.proj.MV.neg, tmp, by = c("predicate")) %>%
@@ -381,6 +395,8 @@ mean.proj.e1.plus <- mean.proj.e1.plus %>%
          rankingMVneg = rank(Mean.Proj.MV.neg),
          ranking_difference = abs(rankingNew - rankingMVneg))
 
+mean.proj.e1.plus.comm <- mean.proj.e1.plus %>% filter(predicateType == "communicative")
+mean.proj.e1.plus.comm %>% nrow() # 190
 
 
 ## valence and arousal data (Warriner et al. 2013) ----
@@ -443,6 +459,18 @@ e1.VAD %>%
 # 2 emoComm           25
 # 3 nonEmoComm       137
 
+# communicatives only
+e1.VAD.comm <- e1.VAD %>% filter(predicateType == "communicative")
+
+e1.VAD.comm %>% 
+  group_by(predicateType2) %>% 
+  distinct(predicate) %>% 
+  count() 
+#   predicateType2     n
+#   <chr>          <int>
+# 1 emoComm           25
+# 2 nonEmoComm       137
+
 mean.proj.e1.plus.VAD <- mean.proj.e1.plus.VAD %>% 
   filter(!predicate %in% c("address", "figure", "intercept", "log", "notice", "post", "share", 
                               "spot", "state", "stress", "type"))
@@ -458,9 +486,14 @@ mean.proj.e1.plus.VAD %>%
 # 2 emoComm           25
 # 3 nonEmoComm       137
 
+# communicatives only
+mean.proj.e1.plus.VAD.comm <- mean.proj.e1.plus.VAD %>% filter(predicateType == "communicative")
+nrow(mean.proj.e1.plus.VAD.comm) # 162
+
 # For 164 of the 192 predicates included in experiment 1, Warriner et al.'s (2013) dataset contains 
 # valence, arousal and dominance ratings that could not have been based on an interpretation of the 
-# lemma as a noun whose meaning is clearly different from that of the corresponding verb.
+# lemma as a noun whose meaning is clearly different from that of the corresponding verb. 162 of 
+# these are communicatives.
 
 
 # rescale V + A + D ratings
@@ -1884,6 +1917,119 @@ lm(Mean.Proj ~ fct_relevel(emoCommType, "attitude"),
 
 
 # C Communicatives ----
+## C.1 overall ----
+### C.1.1 by-predicateType ----
+#### plot ----
+# calculate by-predicateType means
+mean.proj.comm.bt <-  e1.comm %>%
+  group_by(commType) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         commType = fct_reorder(as.factor(commType), Mean.Proj))
+nrow(mean.proj.comm.bt) # 3
+
+ggplot(mean.proj.comm.bt, aes(x = factor(commType, c("state changing", "discourse participation", "pure")), 
+                              y = Mean.Proj, colour = commType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.text = element_text(size = 12),
+        axis.title.x = element_text(vjust = -.2),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_x_discrete(labels = c("state changing" = "state\nchanging",
+                              "discourse participation" = "discourse\nparticipation",
+                              "pure" = "pure")) +
+  scale_colour_manual(values = c("pure" = "orange", 
+                                 "discourse participation" = "darkorange", 
+                                 "state changing" = "orangered"))
+ggsave("../graphs/projection-by-predicateType-commType-new.pdf", height = 4, width = 5)
+
+# faceted by predicate type
+mean.proj.comm.bt2 <-  e1.comm %>%
+  group_by(commType, predicateType2) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         commType = fct_reorder(as.factor(commType), Mean.Proj))
+nrow(mean.proj.comm.bt2) # 5
+
+ggplot(mean.proj.comm.bt2, aes(x = factor(commType, c("state changing", "discourse participation", "pure")),
+                               y = Mean.Proj, colour = commType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 16),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.2),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_x_discrete(labels = c("state changing" = "state\nchanging", 
+                              "discourse participation" = "discourse\nparticipation", 
+                              "pure" = "pure")) + 
+  scale_colour_manual(
+    values = c("pure" = "orange",
+               "discourse participation" = "darkorange",
+               "state changing" = "orangered")) +
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names))
+ggsave("../graphs/projection-by-predicateType-commType-faceted-new.pdf", height = 4, width = 8)
+
+#### linear models ----
+lm(Mean.Proj ~ fct_relevel(commType, "discourse participation"), 
+   mean.proj.e1.comm) %>% 
+  summary()
+# Coefficients:
+#                                                                 Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                     0.407833   0.030285  13.466   <2e-16 ***
+# fct_relevel(commType, "discourse participation")pure           -0.002883   0.045428  -0.063    0.949    
+# fct_relevel(commType, "discourse participation")state changing -0.166449   0.074183  -2.244    0.026 *  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2952 on 187 degrees of freedom
+# Multiple R-squared:  0.02785,	Adjusted R-squared:  0.01746 
+# F-statistic: 2.679 on 2 and 187 DF,  p-value: 0.07127
+
+lm(Mean.Proj ~ fct_relevel(commType, "pure") * fct_relevel(predicateType2, "nonEmoComm"), 
+   mean.proj.e1.comm) %>% 
+  summary()
+# emoComm     significance of difference between commTypes
+# dp - pure   n.s. (this looks significant in the plot)
+# nonEmoComm
+# sc - dp     *
+# dp - pure   n.s.
+# sc - pure   n.s. ?! (this looks significant in the plot)
+
+### C.1.2 distribution ----
+# How many of which type of communicative predicate?
+mean.proj.e1.comm %>%
+  select(commType, predicate) %>% 
+  unique() %>% 
+  group_by(commType) %>% 
+  count()
+#   commType                    n
+#   <chr>                   <int>
+# 1 discourse participation    95
+# 2 pure                       76
+# 3 state changing             19
+
 ## C.3 say verbs (Grimshaw 2015) ----
 ### C.3.1 types of communicatives ----
 #### distributions ----
@@ -3587,6 +3733,112 @@ d %>%
                     values = c("blue", "white", "red")) +
   guides(fill = guide_legend(override.aes = list(colour = c("black", "black", "black"))))
 ggsave("../graphs/ratings-distribution-MV-NO-my.pdf", height = 4, width = 13)
+
+
+
+# H Dynamicity/Activity/CoS predicates and projection----
+## H.3 activity ----
+### H.3.1 overall ----
+#### plot ----
+mean.proj.act <- e1.comm %>%
+  group_by(activity) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh)
+nrow(mean.proj.act) # 2
+
+ggplot(mean.proj.act, aes(x = activity, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Activity",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-activity-new.pdf", height = 4, width = 4)
+
+#### linear model ----
+lm(Mean.Proj ~ activity, mean.proj.e1.comm) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.33642    0.03509   9.588   <2e-16 ***
+# activityyes  0.08560    0.04434   1.931    0.055 .  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2957 on 188 degrees of freedom
+# Multiple R-squared:  0.01944,	Adjusted R-squared:  0.01423 
+# F-statistic: 3.728 on 1 and 188 DF,  p-value: 0.05502
+
+### H.3.2 by predicate type ----
+# how many predicates in which predicateType and activity / no activity?
+e1.comm %>%
+  select(predicateType2, predicate, activity) %>%
+  unique() %>%
+  group_by(predicateType2, activity) %>%
+  summarise(count = n())
+#   predicateType2 activity count
+#   <chr>          <chr>    <int>
+# 1 emoComm        no           2
+# 2 emoComm        yes         25
+# 3 nonEmoComm     no          69
+# 4 nonEmoComm     yes         94
+
+#### plot ----
+mean.proj.act2 <- e1.comm %>%
+  group_by(predicateType2, activity) %>%
+  summarise(Mean.Proj = mean(rating), 
+            CILow = ci.low(rating), 
+            CIHigh = ci.high(rating)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
+nrow(mean.proj.act2) # 4
+
+ggplot(mean.proj.act2, aes(x = predicateType2, y = Mean.Proj, colour = activity)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Predicate type",
+       colour = "Activity") +
+  scale_x_discrete(labels = predicateType2_names) + 
+  scale_y_continuous(limits = c(-.25, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("no" = "slateblue", "yes" = "red3"))
+ggsave("../graphs/projection-by-predicateType-and-activity-new.pdf", height = 4, width = 8)
+
+#### linear model ----
+lm(Mean.Proj ~ activity * fct_relevel(predicateType2, "emoComm"), mean.proj.e1.comm) %>% 
+  summary()
+# predicateType2  significance of no vs yes
+# emoComm         n.s.
+# nonEmoComm      n.s.
+
+# Residual standard error: 0.2883 on 186 degrees of freedom
+# Multiple R-squared:  0.07762,	Adjusted R-squared:  0.06275 
+# F-statistic: 5.218 on 3 and 186 DF,  p-value: 0.001758
+
+
 
 
 # X VAD ratings ----

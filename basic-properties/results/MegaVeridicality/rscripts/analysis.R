@@ -3626,7 +3626,7 @@ mean.proj.verid = mean.proj.verid %>%
 nrow(mean.proj.verid) # 523
 
 # Mean projection by mean veridicality
-♠### plots ----
+### plots ----
 ggplot(mean.proj.verid, aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.1) +
   geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.1) +

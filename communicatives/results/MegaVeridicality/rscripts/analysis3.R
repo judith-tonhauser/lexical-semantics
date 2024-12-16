@@ -82,8 +82,17 @@ d.proj <- d.proj %>%
                               state_changing_comm == "yes" ~ "state changing"),
          emoCommType = case_when(emo_comm_manner == "yes" ~ "manner",
                               emo_comm_attitude == "yes" ~ "attitude"),
+         dynamicity = case_when(stative_predicate == "yes" ~ "stative",
+                                dynamic_predicate == "yes" ~ "dynamic",
+                                TRUE ~ "unclear"),
          changeOfState = case_when(change_of_state_predicate == "yes" ~ "yes",
                                    TRUE ~ "no"),
+         activity = case_when(activity_predicate == "yes" ~ "yes",
+                              TRUE ~ "no"),
+         evidenceType = case_when(perceptual_evidence == "yes" ~ "perceptual",
+                                  reportative_evidence == "yes" ~	"reportative",
+                                  inferential_evidence == "yes" ~ "inferential",
+                                  TRUE ~ NA),
          environment = case_when(polarity == "negative" & conditional == "False" ~ "neg",  
                                  polarity == "positive" & conditional == "True" ~ "qcond",
                                  polarity == "negative" & conditional == "True" ~ "qcondneg"),
@@ -121,12 +130,12 @@ nrow(mean.proj.all) # 544
 
 # add predicateType etc. to the means
 tmp <- d.proj %>%
-  select(c(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)) %>%
-  distinct(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
-           modeVerbType, sayByMeansVerbType)
+  select(c(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, commType, 
+           emoCommType, dynamicity, changeOfState, activity, evidenceType, volition, sayVerb, 
+           sayVerbType, modeVerbType, sayByMeansVerbType)) %>%
+  distinct(verb, verb_renamed, predicateType, predicateType2, emotiveComponent, commType, 
+           emoCommType, dynamicity, changeOfState, activity, evidenceType, volition, sayVerb, 
+           sayVerbType, modeVerbType, sayByMeansVerbType)
 nrow(tmp) # 544
 
 mean.proj.all <- left_join(mean.proj.all, tmp, by = c("verb_renamed")) %>%
@@ -161,9 +170,9 @@ mean.proj %>%
 # <chr>          <int>
 # 1 cognitive         53
 # 2 emoComm           33
-# 3 emotive          149
-# 4 evidential        87
-# 5 nonEmoComm       185
+# 3 emotive          148
+# 4 evidential        85
+# 5 nonEmoComm       184
 
 # Subsets for all predicates / communicative predicates with mean acceptability
 # ratings greater than 4. See "Acceptability" below for the reasons for and the
@@ -205,6 +214,37 @@ d.proj.comm <- d.proj.acc %>%
   filter(predicateType == "communicative")
 nrow(d.proj.comm) # 6022
 
+# create dataset for veridicality inferences
+d.verid <- d %>% 
+  filter(polarity == "positive" & conditional == "False")
+nrow(d.verid) # 5401
+
+# only include acceptable predicates
+d.verid <- d.verid %>% 
+  filter(verb_renamed %in% acc.preds)
+d.verid %>% distinct(verb_renamed) %>% nrow() # 474
+
+# calculate by-predicate veridicality means 
+mean.verid <- d.verid %>%
+  group_by(verb_renamed) %>%
+  summarise(Mean.Verid = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Verid = Mean.Verid - CILow, 
+         YMax.Verid = Mean.Verid + CIHigh, 
+         verb_renamed = fct_reorder(as.factor(verb_renamed), Mean.Verid))
+nrow(mean.verid) # 474
+
+# combine projection and veridicality means in one data frame
+mean.proj.verid <- mean.proj.acc %>%
+  inner_join(mean.verid, by = ("verb_renamed"))
+nrow(mean.proj.verid) # 474
+
+# only communicative predicates
+mean.proj.verid.comm <- mean.proj.verid %>%
+  filter(predicateType == "communicative")
+nrow(mean.proj.verid.comm) # 201
+
 # by embedding environment
 # calculate by-predicate projection means for MV data
 mean.proj.all.env <- d.proj %>%
@@ -220,18 +260,18 @@ mean.proj.all.env <- d.proj %>%
 nrow(mean.proj.all.env) # 1632
 
 tmp <- d.proj %>%
-  select(c(verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+  select(c(verb_renamed, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           dynamicity, changeOfState, activity, evidenceType, volition, sayVerb, sayVerbType, 
            modeVerbType, sayByMeansVerbType, environment)) %>%
-  distinct(verb_renamed, predicateType, predicateType2, emotiveComponent, 
-           commType, emoCommType, changeOfState, volition, sayVerb, sayVerbType, 
+  distinct(verb_renamed, predicateType, predicateType2, emotiveComponent, commType, emoCommType, 
+           dynamicity, changeOfState, activity, evidenceType, volition, sayVerb, sayVerbType, 
            modeVerbType, sayByMeansVerbType, environment)
 nrow(tmp) # 1632
 
 mean.proj.all.env <- left_join(mean.proj.all.env, tmp, by = c("verb_renamed", "environment")) %>%
   distinct() %>%
   mutate(predicate = fct_reorder(as.factor(verb_renamed), Mean.Proj))
-nrow(mean.proj.all.env) # 576
+nrow(mean.proj.all.env) # 1632
 
 # how many predicates in which environment?
 mean.proj.all.env %>%
@@ -1230,9 +1270,8 @@ ggplot(mean.proj.emoCogs %>% filter(emoCogType != "other"),
 
 # C Communicatives ----
 ## C.1 overall ----
-### C.1.1 by-predicateType ----
+### C.1.1 by predicateType ----
 #### plot ----
-# calculate by-predicateType means
 mean.proj.comm.bt <-  d.proj.comm %>%
   group_by(commType) %>%
   summarize(Mean.Proj = mean(veridicality_num), CILow = ci.low(veridicality_num), 
@@ -1241,7 +1280,8 @@ mean.proj.comm.bt <-  d.proj.comm %>%
          commType = fct_reorder(as.factor(commType), Mean.Proj))
 nrow(mean.proj.comm.bt) # 3
 
-ggplot(mean.proj.comm.bt, aes(x = commType, y = Mean.Proj, colour = commType)) +
+ggplot(mean.proj.comm.bt, aes(x = factor(commType, c("state changing", "discourse participation", "pure")), 
+                              y = Mean.Proj, colour = commType)) +
   geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
   geom_point() +
   geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
@@ -1249,21 +1289,97 @@ ggplot(mean.proj.comm.bt, aes(x = commType, y = Mean.Proj, colour = commType)) +
         axis.ticks.x = element_blank(),
         axis.title = element_text(size = 14),
         axis.text = element_text(size = 12),
-        axis.title.x = element_text(vjust = -1),
+        axis.title.x = element_text(vjust = -.2),
         legend.title = element_text(size = 14),
         legend.text = element_text(size = 12),
-        panel.grid.major.x = element_blank(),
-        plot.margin = margin(5.5, 132, 5.5, 132)) +
+        panel.grid.major.x = element_blank()) +
   labs(x = "Type of communicative",
        y = "Mean projection rating") +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
-  scale_x_discrete(labels = c("state\nchanging", "discourse\nparticipation", "pure")) + 
+  scale_x_discrete(labels = c("state changing" = "state\nchanging",
+                              "discourse participation" = "discourse\nparticipation",
+                              "pure" = "pure")) +
   scale_colour_manual(values = c("pure" = "orange", 
                                  "discourse participation" = "darkorange", 
                                  "state changing" = "orangered"))
-ggsave("../graphs/projection-by-predicateType-commType.pdf", height = 4, width = 10)
+ggsave("../graphs/projection-by-predicateType-commType.pdf", height = 4, width = 5)
 
-### C.1.2 by-predicate ----
+#### linear model ----
+lm(Mean.Proj ~ fct_relevel(commType, "discourse participation"), 
+   mean.proj.comm) %>% 
+  summary()
+# Coefficients:
+#                                                      Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                           0.33285    0.01975  16.854  < 2e-16 ***
+# fct_relevel(commType, "pure")discourse participation -0.03381    0.02631  -1.285  0.20022    
+# fct_relevel(commType, "pure")state changing          -0.14469    0.04394  -3.293  0.00117 ** 
+
+# Coefficients:
+#                                                                Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)                                                     0.29904    0.01738  17.206   <2e-16 ***
+# fct_relevel(commType, "discourse participation")pure            0.03381    0.02631   1.285   0.2002    
+# fct_relevel(commType, "discourse participation")state changing -0.11088    0.04293  -2.583   0.0105 *  
+
+ 
+# Residual standard error: 0.1755 on 198 degrees of freedom
+# Multiple R-squared:  0.05208,	Adjusted R-squared:  0.0425 
+# F-statistic: 5.439 on 2 and 198 DF,  p-value: 0.005017
+
+# faceted by predicate type
+mean.proj.comm.bt2 <-  d.proj.comm %>%
+  group_by(commType, predicateType2) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         commType = fct_reorder(as.factor(commType), Mean.Proj))
+nrow(mean.proj.comm.bt2) # 5
+
+ggplot(mean.proj.comm.bt2, aes(x = factor(commType, c("state changing", "discourse participation", "pure")),
+                               y = Mean.Proj, colour = commType)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "none",
+        strip.text = element_text(size = 16),
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.2),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Type of communicative",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  scale_x_discrete(labels = c("state changing" = "state\nchanging", 
+                              "discourse participation" = "discourse\nparticipation", 
+                              "pure" = "pure")) + 
+  scale_colour_manual(
+    values = c("pure" = "orange",
+               "discourse participation" = "darkorange",
+               "state changing" = "orangered")) +
+  facet_wrap(~ predicateType2, labeller = as_labeller(predicateType2_names))
+ggsave("../graphs/projection-by-predicateType-commType-faceted.pdf", height = 4, width = 8)
+
+lm(Mean.Proj ~ fct_relevel(commType, "discourse participation") * fct_relevel(predicateType2, "nonEmoComm"), 
+   mean.proj.comm) %>% 
+  summary()                                                                                
+#                                                                                                                 t value Pr(>|t|)    
+# (Intercept)                                                                                                      16.717   <2e-16 ***
+# fct_relevel(commType, "discourse participation")pure                                                              0.185   0.8532    
+# fct_relevel(commType, "discourse participation")state changing                                                   -2.448   0.0153 *  
+# fct_relevel(predicateType2, "nonEmoComm")emoComm                                                                  1.990   0.0479 *  
+# fct_relevel(commType, "discourse participation")pure:fct_relevel(predicateType2, "nonEmoComm")emoComm            -0.044   0.9652    
+# fct_relevel(commType, "discourse participation")state changing:fct_relevel(predicateType2, "nonEmoComm")emoComm      NA       NA    
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.1704 on 196 degrees of freedom
+# Multiple R-squared:  0.1162,	Adjusted R-squared:  0.09821 
+# F-statistic: 6.445 on 4 and 196 DF,  p-value: 6.821e-05
+
+
+### C.1.2 by predicate ----
 mean.proj.comm %>%
   select(commType, verb_renamed) %>% 
   unique() %>% 
@@ -2013,7 +2129,7 @@ ggplot(mean.proj.overall, aes(x = sayVerbType, y = Mean.Proj, colour = modeVerbT
 ggsave("../graphs/projection-by-saybymeansverb-type2.pdf", height = 4, width = 10)
 
 
-## D.2 Spearman rank correlations ----
+# D Spearman rank correlations ----
 # between the different embedding environments in the MV dataset
 
 # all 544 predicates
@@ -2063,6 +2179,396 @@ mean.proj.acc.env %>%
 mean.proj.acc.env %>% 
   pivot_wider(id_cols = verb_renamed, names_from = environment, values_from = Mean.Proj) %>% 
   summarise(correlation = cor(qcond, qcondneg, method = "spearman")) # 0.342
+
+# H Dynamicity/Activity/CoS predicates and projection----
+## H.1 dynamicity ----
+### H.1.1 overall ----
+#### plot ----
+mean.proj.dyn <- d.proj.acc %>%
+  group_by(dynamicity) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh)
+nrow(mean.proj.dyn) # 2
+
+ggplot(mean.proj.dyn, aes(x = dynamicity, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Dynamicity",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-dynamicity.pdf", height = 4, width = 4)
+
+#### linear model ----
+lm(Mean.Proj ~ dynamicity, mean.proj.acc) %>% 
+  summary()
+# Coefficients:
+#                   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)        0.29214    0.01363   21.43   <2e-16 ***
+# dynamicitystative  0.32862    0.02188   15.02   <2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2322 on 472 degrees of freedom
+# Multiple R-squared:  0.3233,	Adjusted R-squared:  0.3219 
+# F-statistic: 225.5 on 1 and 472 DF,  p-value: < 2.2e-16
+
+### H.1.2 by predicate type ----
+# how many predicates in which predicateType and with which dynamicity?
+d.proj.acc %>%
+  select(predicateType2, verb_renamed, dynamicity) %>%
+  unique() %>%
+  group_by(predicateType2, dynamicity) %>%
+  summarise(count=n())
+#   predicateType2 dynamicity count
+#   <chr>          <chr>      <int>
+# 1 cognitive      dynamic       14
+# 2 cognitive      stative       38
+# 3 emoComm        dynamic       27
+# 4 emotive        dynamic        1
+# 5 emotive        stative      143
+# 6 evidential     dynamic       74
+# 7 evidential     stative        3
+# 8 nonEmoComm     dynamic      174
+
+d.proj.acc %>% filter(predicateType2 == "emotive" & dynamicity == "dynamic") %>% distinct(verb_renamed)
+#   verb_renamed
+# 1      agonize
+
+#### plot ----
+mean.proj.dyn2 <- d.proj.acc %>%
+  group_by(predicateType2, dynamicity) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType2 = fct_reorder(as.factor(predicateType2), Mean.Proj))
+nrow(mean.proj.dyn2) # 8
+
+ggplot(mean.proj.dyn2, aes(x = predicateType2, y = Mean.Proj, colour = dynamicity)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Predicate type",
+       y = "Mean projection rating", 
+       colour = "Dynamicity") +
+  scale_x_discrete(labels = predicateType2_names) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("dynamic" = "violetred3", "stative" = "aquamarine4"))
+ggsave("../graphs/projection-by-predicateType-and-dynamicity.pdf", height = 4, width = 8)
+
+#### linear model ----
+lm(Mean.Proj ~ dynamicity * fct_relevel(predicateType2, "nonEmoComm"), 
+   data = mean.proj.acc) %>%  
+  summary()
+# predicateType2  significance of dynamic-stative difference
+# cognitive       *
+# emoComm         n/a
+# emotive         n.s.
+# evidential      n.s.
+# nonEmoComm      n/a
+
+# Residual standard error: 0.1933 on 466 degrees of freedom
+# Multiple R-squared:  0.5367,	Adjusted R-squared:  0.5298 
+# F-statistic: 77.13 on 7 and 466 DF,  p-value: < 2.2e-16
+
+## H.2 change of state ----
+### H.2.1 overall ----
+mean.proj.CoS <- d.proj.acc %>%
+  group_by(changeOfState) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh)
+nrow(mean.proj.CoS) # 2
+
+ggplot(mean.proj.CoS, aes(x = changeOfState, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Change of state",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-CoS.pdf", height = 4, width = 4)
+
+#### linear model ----
+lm(Mean.Proj ~ changeOfState, mean.proj.acc) %>% 
+  summary()
+# Coefficients:
+#                  Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)       0.42632    0.01342  31.758   <2e-16 ***
+# changeOfStateyes -0.08960    0.04940  -1.814   0.0703 .  
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2813 on 472 degrees of freedom
+# Multiple R-squared:  0.006922,	Adjusted R-squared:  0.004818 
+# F-statistic:  3.29 on 1 and 472 DF,  p-value: 0.07035
+
+### H.2.2 by predicate type ----
+# how many predicates in which predicateType and CoS / no CoS?
+d.proj.acc %>%
+  select(predicateType2, verb_renamed, changeOfState) %>%
+  unique() %>%
+  group_by(predicateType2, changeOfState) %>%
+  summarise(count=n())
+#   predicateType2 changeOfState count
+#   <chr>          <chr>         <int>
+# 1 cognitive      no               50
+# 2 cognitive      yes               2
+# 3 emoComm        no               27
+# 4 emotive        no              144
+# 5 evidential     no               44
+# 6 evidential     yes              33
+# 7 nonEmoComm     no              174
+
+##### plot ----
+mean.proj.CoS2 <- d.proj.acc %>%
+  group_by(predicateType2, changeOfState) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
+nrow(mean.proj.CoS2) # 7
+
+ggplot(mean.proj.CoS2, aes(x = predicateType2, y = Mean.Proj, colour = changeOfState)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -1),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Predicate type",
+       colour = "Change-of-state predicate") +
+  scale_x_discrete(labels = predicateType2_names) + 
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("no" = "darkblue", "yes" = "gold3"))
+ggsave("../graphs/projection-by-predicateType-and-CoS.pdf", height = 4, width = 8)
+
+#### linear model ----
+lm(Mean.Proj ~ changeOfState * fct_relevel(predicateType2, "evidential"), mean.proj.acc) %>% 
+  summary()
+# predicateType2  significance of no vs yes
+# cognitive       *** (note: only 2 of 52 cognitives are CoS predicates)
+# emoComm         n/a
+# emotive         n/a
+# evidential      n.s.
+# nonEmoComm      n/a
+
+# Residual standard error: 0.1898 on 467 degrees of freedom
+# Multiple R-squared:  0.5527,	Adjusted R-squared:  0.547 
+# F-statistic: 96.18 on 6 and 467 DF,  p-value: < 2.2e-16
+
+## H.3 activity ----
+### H.3.1 overall ----
+#### plot ----
+mean.proj.act <- d.proj.acc %>%
+  group_by(activity) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh)
+nrow(mean.proj.act) # 2
+
+ggplot(mean.proj.act, aes(x = activity, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(x = "Activity",
+       y = "Mean projection rating") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1))
+ggsave("../graphs/projection-by-activity.pdf", height = 4, width = 4)
+
+#### linear model ----
+lm(Mean.Proj ~ activity, mean.proj.acc) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.47188    0.01491  31.642  < 2e-16 ***
+# activityyes -0.17176    0.02706  -6.348 5.12e-10 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2709 on 472 degrees of freedom
+# Multiple R-squared:  0.07866,	Adjusted R-squared:  0.07671 
+# F-statistic:  40.3 on 1 and 472 DF,  p-value: 5.12e-10
+
+### H.3.2 by predicate type ----
+# how many predicates in which predicateType and activity / no activity?
+d.proj.acc %>%
+  select(predicateType2, verb_renamed, activity) %>%
+  unique() %>%
+  group_by(predicateType2, activity) %>%
+  summarise(count=n())
+#   predicateType2 activity count
+#   <chr>          <chr>    <int>
+# 1 cognitive      no          40
+# 2 cognitive      yes         12
+# 3 emoComm        no           2
+# 4 emoComm        yes         25
+# 5 emotive        no         143
+# 6 emotive        yes          1
+# 7 evidential     no          67
+# 8 evidential     yes         10
+# 9 nonEmoComm     no          78
+# 10 nonEmoComm     yes         96
+
+#### plot ----
+mean.proj.act2 <- d.proj.acc %>%
+  group_by(predicateType2, activity) %>%
+  summarize(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         predicateType = fct_reorder(as.factor(predicateType2),Mean.Proj))
+nrow(mean.proj.act2) # 10
+
+ggplot(mean.proj.act2, aes(x = predicateType2, y = Mean.Proj, colour = activity)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point(position = position_dodge(0.2)) +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0, 
+                position = position_dodge(0.2)) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Predicate type",
+       colour = "Activity") +
+  scale_x_discrete(labels = predicateType2_names) + 
+  scale_y_continuous(limits = c(-.25, 1), breaks = c(0, 0.5, 1)) +
+  scale_colour_manual(values = c("no" = "slateblue", "yes" = "red3"))
+ggsave("../graphs/projection-by-predicateType-and-activity.pdf", height = 4, width = 8)
+
+#### linear model ----
+lm(Mean.Proj ~ activity * fct_relevel(predicateType2, "cognitive"), mean.proj.acc) %>% 
+  summary()
+# predicateType2  significance of no vs yes
+# cognitive       ***
+# emoComm         n.s.
+# emotive         n.s.
+# evidential      n.s.
+# nonEmoComm      n.s.
+
+# Residual standard error: 0.1897 on 464 degrees of freedom
+# Multiple R-squared:  0.556,	Adjusted R-squared:  0.5474 
+# F-statistic: 64.56 on 9 and 464 DF,  p-value: < 2.2e-16
+
+## H.4 evidence type ----
+# how many predicates in which evidence type?
+d.proj.acc %>%
+  filter(predicateType2 == "evidential") %>% 
+  select(evidenceType, verb_renamed) %>% 
+  unique() %>% 
+  group_by(evidenceType) %>% 
+  summarise(count=n())
+#   evidenceType count
+#   <chr>        <int>
+# 1 inferential     37
+# 2 perceptual      10
+# 3 reportative     30
+
+#### plot ----
+mean.proj.evT <- d.proj.acc %>%
+  filter(predicateType2 == "evidential") %>% 
+  group_by(evidenceType) %>%
+  summarise(Mean.Proj = mean(veridicality_num), 
+            CILow = ci.low(veridicality_num), 
+            CIHigh = ci.high(veridicality_num)) %>%
+  mutate(YMin.Proj = Mean.Proj - CILow, 
+         YMax.Proj = Mean.Proj + CIHigh, 
+         evidenceType = fct_reorder(as.factor(evidenceType), Mean.Proj))
+nrow(mean.proj.evT) # 3
+
+ggplot(mean.proj.evT, aes(x = evidenceType, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50") +
+  geom_point() +
+  geom_errorbar(aes(ymin = YMin.Proj, ymax = YMax.Proj), width = 0) +
+  theme(legend.position = "top",
+        axis.ticks.x = element_blank(),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.3),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        panel.grid.major.x = element_blank()) +
+  labs(y = "Mean projection rating",
+       x = "Evidence type") +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 0.5, 1)) 
+ggsave("../graphs/projection-by-evidenceType.pdf", height = 4, width = 4)
+
+#### linear model ----
+lm(Mean.Proj ~ evidenceType, 
+   mean.proj.acc %>% filter(predicateType2 == "evidential")) %>% 
+  summary()
+# Coefficients:
+#                          Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)              0.291488   0.040896   7.128 5.68e-10 ***
+# evidenceTypeperceptual   0.078512   0.088660   0.886    0.379    
+# evidenceTypereportative -0.006929   0.061116  -0.113    0.910   
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.2488 on 74 degrees of freedom
+# Multiple R-squared:  0.01267,	Adjusted R-squared:  -0.01402 
+# F-statistic: 0.4747 on 2 and 74 DF,  p-value: 0.6239
+
 
 
 ## X VAD ratings ----
@@ -6643,23 +7149,88 @@ mean.proj.comm %>%
 # 3 nonEmoComm     non-volitional    13
 # 4 nonEmoComm     volitional       161
 
-# W ----
-mean.proj.comm %>% 
-  filter(sayByMeansVerbType == "form") %>% 
-  select(verb_renamed) %>% 
-  print(n = Inf)
 
-# two possible interpretation: CC was not said vs was not said in a certain way /
-# with a certain attitude etc.
+# Y Veridicality ----
+## plots ----
+mean.proj.verid %>% 
+  ggplot(aes(x = Mean.Verid, y = Mean.Proj, colour = predicateType2)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE, show.legend = FALSE, linewidth = 0.5) +
+  theme(legend.position = "right",
+        legend.spacing.y = unit(6, "pt"),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12),
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 12),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  guides(colour = guide_legend(byrow = TRUE), 
+         linetype = guide_legend(byrow = TRUE)) +
+  labs(x = "Mean veridicality rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_manual(values = cols2,
+                      labels = predicateType2_names) 
+ggsave("../graphs/projection-by-veridicality2.pdf", height = 4, width = 6)
 
-# emoComms: all
-# commType discourse participation: mixed, more single interpretation
-# commType pure: mixed, more focus-sensitive interpretation
-# commType state changing: mixed
-# say verbs discourse role: mainly single interpretation (exceptions: apologize, insist...)  
-# mode verbs say-with-attitude: all
-# say-by-means verbs sound: all, manner: all, form: none
+# faceted
+mean.proj.verid %>% 
+  ggplot(aes(x = Mean.Verid, y = Mean.Proj)) +
+  geom_hline(yintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_vline(xintercept = 0, linetype = 2, colour = "grey50", linewidth = 0.3) +
+  geom_point(aes(colour = predicateType2), alpha = 0.7) +
+  geom_smooth(method = "lm", se = TRUE, show.legend = FALSE, linewidth = 0.5, colour = "grey20") +
+  theme(legend.position = "none",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        axis.title.x = element_text(vjust = -.5),
+        axis.text = element_text(size = 12),
+        strip.text = element_text(size = 11.5),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.spacing = unit(18, "pt")) +
+  labs(x = "Mean veridicality rating", 
+       y = "Mean projection rating",
+       colour = "Predicate type") +
+  scale_y_continuous(limits = c(-1, 1)) +
+  scale_x_continuous(limits = c(-1, 1)) +
+  scale_colour_manual(values = cols2) +
+  coord_fixed(ratio = 1) + 
+  facet_wrap( ~ predicateType2, labeller = as_labeller(predicateType2_names), ncol = 5)
+ggsave("../graphs/projection-by-veridicality2-faceted.pdf", height = 3, width = 11.5)
 
+## linear models ----
+lm(Mean.Proj ~ Mean.Verid, data = mean.proj.verid) %>% 
+  summary()
+# Coefficients:
+#             Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)  0.10160    0.01717   5.916 6.34e-09 ***
+# Mean.Verid   0.52522    0.02401  21.874  < 2e-16 ***
+# ---
+# Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.1989 on 472 degrees of freedom
+# Multiple R-squared:  0.5034,	Adjusted R-squared:  0.5023 
+# F-statistic: 478.5 on 1 and 472 DF,  p-value: < 2.2e-16
+
+lm(Mean.Proj ~ Mean.Verid * fct_relevel(predicateType2, "nonEmoComm"), 
+   mean.proj.verid) %>% 
+  summary()
+# predicate type  significance of Mean.Verid
+# communicative   ***
+# predicate type2 significance of Mean.Verid
+# cognitive       ***
+# emoComm         ***
+# emotive         ***
+# evidential      ***
+# nonEmoComm      ***
 
 # Z projection by communicatives ----
 ## with think and know ----
@@ -7457,6 +8028,7 @@ ggplot(mean.proj.acc %>%
   scale_colour_manual(limits = c("communicative predicate", "say", "think", "emoComms", "know"),
                       values = c("deepskyblue2", "blue", "deeppink", "green4", "orangered3"))
 ggsave("../graphs/projection-by-communicative-emoComms-acc5.pdf", height = 4, width = 13)
+
 
 # ZZ combined models ----
 ## predicate type ----
